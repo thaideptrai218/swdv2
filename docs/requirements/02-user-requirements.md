@@ -218,16 +218,24 @@ Use cases derived from Product Functions (Section 1.2) mapped to validated actor
 
 ### Use Case Relationships
 
-| Relationship | Base Use Case             | Related Use Case          | Type          | Condition                                   |
-| ------------ | ------------------------- | ------------------------- | ------------- | ------------------------------------------- |
-| R1           | UC-05: Book Accommodation | UC-02: Log In             | `<<include>>` | Traveler must be authenticated to book      |
-| R2           | UC-07: Submit Review      | UC-02: Log In             | `<<include>>` | Traveler must be authenticated to review    |
-| R3           | UC-12: Process Booking    | UC-05: Book Accommodation | linked        | Owner processes what traveler books         |
-| R4           | UC-05: Book Accommodation | UC-24: Cancel Booking     | `<<extend>>`  | Traveler cancels within cancellation window |
+| Relationship | Base Use Case             | Related Use Case          | Type          | Condition                                                        |
+| ------------ | ------------------------- | ------------------------- | ------------- | ---------------------------------------------------------------- |
+| R1           | UC-05: Book Accommodation | UC-02: Log In             | `<<include>>` | Traveler must be authenticated to book                           |
+| R2           | UC-07: Submit Review      | UC-02: Log In             | `<<include>>` | Traveler must be authenticated to review                         |
+| R3           | UC-12: Process Booking    | UC-05: Book Accommodation | linked        | Owner processes what traveler books (cross-actor data dependency) |
+| R4           | UC-05: Book Accommodation | UC-24: Cancel Booking     | `<<extend>>`  | Traveler cancels within cancellation window                      |
+| R5           | UC-06: Manage Bookings    | UC-24: Cancel Booking     | `<<extend>>`  | Traveler cancels from booking details within cancellation window |
+| R6           | UC-06: Manage Bookings    | UC-07: Submit Review      | `<<extend>>`  | Traveler submits review from past booking after check-out        |
 
 **R1 rationale**: UC-05 is incomplete without authentication — traveler cannot book without being logged in. Mandatory reuse across UC-05 and UC-07.
 
+**R3 rationale**: UC-12 and UC-05 involve different actors (Owner vs Traveler) at different times. Not `<<include>>` or `<<extend>>` — those require execution within the same flow. The booking's existence is a precondition in UC-12, making this a cross-actor data dependency.
+
 **R4 rationale**: UC-05 (booking flow) is complete without cancellation. Cancellation only applies if traveler chooses to cancel within 24-hour window. Extension point: after booking confirmed. Condition: traveler requests cancellation within policy window.
+
+**R5 rationale**: UC-06 (manage bookings) is complete without cancellation. Step 7.4 explicitly offers "Cancel booking → UC-24" as optional action. Extension point: after viewing booking details. Condition: booking is upcoming and within cancellation window.
+
+**R6 rationale**: UC-06 (manage bookings) is complete without review submission. Step 7.5 explicitly offers "Leave review → UC-07" as optional action. Extension point: after viewing past booking details. Condition: check-out date passed and booking not yet reviewed.
 
 ### Rejected Use Case Candidates
 
@@ -384,6 +392,8 @@ graph TB
     UC05 -.->|include| UC02
     UC07 -.->|include| UC02
     UC24 -.->|extend| UC05
+    UC24 -.->|extend| UC06
+    UC07 -.->|extend| UC06
 
     UC01 --> A5
     UC05 --> A4
@@ -441,6 +451,8 @@ graph TB
     UC05 -.->|include| UC02
     UC07 -.->|include| UC02
     UC24 -.->|extend| UC05
+    UC24 -.->|extend| UC06
+    UC07 -.->|extend| UC06
 
     UC01 --> A5
     UC03 --> A8

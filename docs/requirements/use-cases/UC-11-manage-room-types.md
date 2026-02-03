@@ -1,0 +1,53 @@
+# UC-11: Manage Room Types
+
+| Field | Description |
+|-------|-------------|
+| **Use Case Name** | Manage Room Types |
+| **Use Case ID** | UC-11 |
+| **Created By** | System Analyst |
+| **Created Date** | 2026-02-04 |
+| **Last Updated By** | System Analyst |
+| **Last Updated Date** | 2026-02-04 |
+| **Summary** | Hostel Owner creates and manages room type inventory including private rooms and dorm beds. Owner configures capacity, pricing, bed configurations, availability calendar, and room-specific amenities. System calculates occupancy and manages booking availability. |
+| **Dependency** | Include: None. Extend: None |
+| **Actors** | Primary: A1: Hostel Owner. Secondary: None |
+| **Preconditions** | Owner authenticated. Owner has registered property (UC-09). Property status is "Active" or "Pending Verification". System operational. |
+| **Trigger** | Owner clicks "Manage Rooms" or "Room Inventory" button in property dashboard |
+| **Main Sequence** | 1. Owner navigates to room management page<br>2. System retrieves existing room types for property<br>3. System displays room types list<br>&nbsp;&nbsp;&nbsp;&nbsp;3.1. For each room: name, type, capacity, pricing, availability status<br>&nbsp;&nbsp;&nbsp;&nbsp;3.2. Quick action buttons: Edit, Duplicate, Disable, Delete<br>4. Owner clicks "Add Room Type" button<br>5. System displays room type creation form<br>6. **Basic Room Information**<br>&nbsp;&nbsp;&nbsp;&nbsp;6.1. Owner enters room type name (e.g., "4-Bed Mixed Dorm", "Private Double Room")<br>&nbsp;&nbsp;&nbsp;&nbsp;6.2. Owner selects room category (Private Room, Shared Dorm, Entire Place)<br>&nbsp;&nbsp;&nbsp;&nbsp;6.3. Owner enters room size in square meters (optional)<br>&nbsp;&nbsp;&nbsp;&nbsp;6.4. Owner enters number of rooms of this type (quantity)<br>7. **Bed Configuration**<br>&nbsp;&nbsp;&nbsp;&nbsp;7.1. If Private Room: Owner specifies bed type (single, double, queen, king, twin)<br>&nbsp;&nbsp;&nbsp;&nbsp;7.2. If Shared Dorm: Owner specifies total beds per room<br>&nbsp;&nbsp;&nbsp;&nbsp;7.3. Owner specifies bed types (bunk bed, single bed, capsule)<br>&nbsp;&nbsp;&nbsp;&nbsp;7.4. System calculates total guest capacity<br>8. **Pricing Configuration**<br>&nbsp;&nbsp;&nbsp;&nbsp;8.1. Owner enters base price per night<br>&nbsp;&nbsp;&nbsp;&nbsp;8.2. If Private Room: price is per room<br>&nbsp;&nbsp;&nbsp;&nbsp;8.3. If Shared Dorm: price is per bed per night<br>&nbsp;&nbsp;&nbsp;&nbsp;8.4. Owner configures seasonal pricing (optional)<br>&nbsp;&nbsp;&nbsp;&nbsp;8.5. Owner enters weekend surcharge percentage (optional)<br>&nbsp;&nbsp;&nbsp;&nbsp;8.6. Owner sets minimum/maximum stay requirements<br>9. **Room-Specific Amenities**<br>&nbsp;&nbsp;&nbsp;&nbsp;9.1. Owner selects amenities (private bathroom, air conditioning, balcony, window, locker, reading light)<br>&nbsp;&nbsp;&nbsp;&nbsp;9.2. Owner adds room description (highlights, views, special features)<br>10. **Availability Settings**<br>&nbsp;&nbsp;&nbsp;&nbsp;10.1. Owner sets default availability (available/blocked)<br>&nbsp;&nbsp;&nbsp;&nbsp;10.2. Owner blocks specific dates on calendar (maintenance, reserved for groups)<br>&nbsp;&nbsp;&nbsp;&nbsp;10.3. System displays availability calendar with color coding<br>11. **Guest Restrictions (Optional)**<br>&nbsp;&nbsp;&nbsp;&nbsp;11.1. Owner specifies age restrictions (18+, families only)<br>&nbsp;&nbsp;&nbsp;&nbsp;11.2. Owner specifies gender restrictions (female only, male only, mixed)<br>&nbsp;&nbsp;&nbsp;&nbsp;11.3. Owner sets maximum occupancy per booking<br>12. Owner saves room type<br>13. System validates room configuration<br>14. System creates room type record<br>15. System generates individual bed/room inventory<br>&nbsp;&nbsp;&nbsp;&nbsp;15.1. For Private Rooms: Creates X room units (where X = quantity)<br>&nbsp;&nbsp;&nbsp;&nbsp;15.2. For Dorms: Creates X rooms, each with Y beds (where Y = beds per room)<br>16. System displays success message "Room type created successfully"<br>17. System returns to room types list showing new addition |
+| **Alternative Sequences** | **Step 13**: If validation fails (missing required fields, pricing below minimum threshold), System displays specific error messages and prevents saving<br><br>**Edit Existing Room Type**:<br>- Owner clicks "Edit" on existing room<br>- System displays edit form with current data<br>- Owner modifies information<br>- System validates changes<br>- If active bookings exist: System prevents changes that conflict with bookings (reducing capacity, changing pricing retroactively)<br>- System saves changes<br>- Changes apply to future bookings only<br><br>**Duplicate Room Type**:<br>- Owner clicks "Duplicate" on existing room<br>- System creates copy with "(Copy)" appended to name<br>- Owner modifies as needed<br>- Owner saves new room type<br>- Useful for creating similar rooms with minor differences<br><br>**Disable Room Type**:<br>- Owner clicks "Disable" to temporarily remove from availability<br>- System updates status to "Disabled"<br>- System hides room from traveler search results<br>- Existing bookings remain valid<br>- Owner can re-enable anytime<br><br>**Delete Room Type**:<br>- Owner clicks "Delete"<br>- System checks for active or upcoming bookings<br>- If bookings exist: System prevents deletion, displays "Cannot delete room type with active bookings"<br>- If no bookings: System displays confirmation "Are you sure? This cannot be undone."<br>- Owner confirms deletion<br>- System marks room type as deleted (soft delete)<br><br>**Bulk Availability Update**:<br>- Owner selects date range on calendar<br>- Owner marks as "Available" or "Blocked"<br>- System updates all selected dates<br>- Useful for seasonal closures or maintenance periods<br><br>**Pricing Rules**:<br>- Owner creates seasonal pricing rule (high season, holidays)<br>- Owner specifies date range<br>- Owner enters adjusted price or percentage increase<br>- System applies pricing rule automatically for bookings in that period<br>- System displays effective price in calendar view<br><br>**Room Photos**:<br>- Owner uploads room-specific photos (separate from property photos)<br>- Photos displayed when traveler views room type details<br>- Owner reorders photos for best presentation |
+| **Postconditions** | **Success**: Room type created/updated and available for booking. Inventory generated for individual rooms/beds. Pricing configured. Availability calendar set. Changes visible to travelers in search results.<br><br>**Failure**: Room type not saved. Validation errors displayed. Inventory unchanged. Owner can correct and retry. |
+| **Nonfunctional Requirements** | **Performance**: Room management page loads within 2 seconds. Room creation saves within 3 seconds. Calendar operations (block dates, pricing rules) complete within 1 second. Availability checks real-time during booking flow.<br><br>**Usability**: Visual calendar interface for availability management. Drag-select for bulk date operations. Color-coded calendar (green=available, red=blocked, yellow=limited, blue=booked). Pricing preview shows traveler-facing price. Room type list sortable/filterable. Duplicate feature saves time for similar rooms.<br><br>**Data Integrity**: Inventory calculations accurate (rooms × beds = total capacity). Overbooking prevention enforced. Pricing rules applied correctly by date. Availability synchronized across all access points.<br><br>**Flexibility**: Support for various room types (private, dorm, capsule, entire property). Multiple pricing strategies (fixed, seasonal, dynamic). Flexible bed configurations. Guest restriction options for diverse property types.<br><br>**Validation**: Minimum price thresholds enforced. Capacity limits validated. Date range conflicts detected. Guest restriction logic validated. |
+| **Business Requirements** | BR-060: Each property must have at least one active room type to receive bookings<br>BR-061: Dorm pricing is per bed per night; private room pricing is per room per night<br>BR-062: Room capacity changes require admin notification if active bookings exist<br>BR-063: Pricing changes apply to future bookings only (not retroactive)<br>BR-064: Seasonal pricing rules override base pricing for specified date ranges<br>BR-065: Disabled room types hidden from search but remain in owner dashboard |
+| **Frequency of Use** | Medium (initial setup intensive, then periodic updates for pricing/availability) |
+| **Priority** | High |
+| **Outstanding Questions** | 1. Should system support dynamic pricing based on demand/occupancy?<br>2. Should owner be able to set different prices for weekdays vs weekends automatically?<br>3. Should system recommend pricing based on competitor analysis?<br>4. Should system support package deals (e.g., 7 nights for price of 6)?<br>5. Should owner be able to allocate specific room numbers/identifiers?<br>6. Should system support last-minute discounts automatically?<br>7. Should owner be able to link rooms (e.g., connecting rooms for families)? |
+
+## Related Use Cases
+
+- **UC-09: Register Hostel** — Property must be registered before rooms can be configured
+- **UC-10: Manage Property** — Property-level management separate from room inventory
+- **UC-03: Search Hostels** — Travelers search and see room types with pricing
+- **UC-05: Book Accommodation** — Booking references specific room types
+- **UC-12: Process Booking** — Owner assigns specific beds from dorm room types
+
+## Notes
+
+- Room type configuration is hostel-specific (emphasis on dorms with bed-level inventory)
+- Flexible pricing essential for revenue management and seasonal demand
+- Bed-level inventory for dorms unique compared to traditional hotel systems
+- Visual calendar interface reduces errors in availability management
+- Gender-specific dorms common requirement in hostel industry
+- Duplicate feature useful as properties often have multiple similar rooms
+- Soft delete preserves booking history while removing from active inventory
+- Seasonal pricing automation reduces manual price adjustments
+- Real-time availability critical to prevent overbooking
+
+## Acceptance Criteria Validation
+
+✓ **C1: Delivers useful result to primary actor** — Owner configures room inventory enabling property to receive bookings with accurate capacity and pricing
+
+✓ **C2: Avoids functional decomposition** — Complete room management sequence from creation through configuration to availability control
+
+✓ **C3: Maintains black box view** — No mention of inventory tables, availability algorithms, pricing engines; only describes room configuration behavior
+
+✓ **C4: Primary and secondary actors identified** — Primary: Owner (manages room types); Secondary: None (all operations internal to system)

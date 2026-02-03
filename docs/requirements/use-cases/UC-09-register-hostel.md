@@ -1,0 +1,49 @@
+# UC-09: Register Hostel
+
+| Field | Description |
+|-------|-------------|
+| **Use Case Name** | Register Hostel |
+| **Use Case ID** | UC-09 |
+| **Created By** | System Analyst |
+| **Created Date** | 2026-02-04 |
+| **Last Updated By** | System Analyst |
+| **Last Updated Date** | 2026-02-04 |
+| **Summary** | Hostel Owner registers new property by providing business information, property details, and supporting documentation. System validates information, creates property listing, and sends verification confirmation via Email Service. |
+| **Dependency** | Include: None. Extend: None |
+| **Actors** | Primary: A1: Hostel Owner. Secondary: A5: Email Service |
+| **Preconditions** | Owner has registered user account and is authenticated. Owner does not have existing pending or active property registration. System operational. Email Service available. |
+| **Trigger** | Owner clicks "Add Property" or "Register Hostel" button in owner dashboard |
+| **Main Sequence** | 1. Owner clicks "Add Property" button<br>2. System displays property registration wizard with progress indicator<br>3. **Step 1: Business Information**<br>&nbsp;&nbsp;&nbsp;&nbsp;3.1. Owner enters business name<br>&nbsp;&nbsp;&nbsp;&nbsp;3.2. Owner enters business registration number<br>&nbsp;&nbsp;&nbsp;&nbsp;3.3. Owner enters tax identification number<br>&nbsp;&nbsp;&nbsp;&nbsp;3.4. Owner uploads business license document (PDF, JPG, max 10MB)<br>&nbsp;&nbsp;&nbsp;&nbsp;3.5. Owner enters business contact information (phone, email)<br>4. Owner clicks "Next" to continue<br>5. System validates business information format<br>6. **Step 2: Property Details**<br>&nbsp;&nbsp;&nbsp;&nbsp;6.1. Owner enters property name<br>&nbsp;&nbsp;&nbsp;&nbsp;6.2. Owner enters complete address<br>&nbsp;&nbsp;&nbsp;&nbsp;6.3. Owner enters property description (minimum 100 characters)<br>&nbsp;&nbsp;&nbsp;&nbsp;6.4. Owner selects property type (hostel, guesthouse, budget hotel)<br>&nbsp;&nbsp;&nbsp;&nbsp;6.5. Owner enters total number of rooms/dorms<br>&nbsp;&nbsp;&nbsp;&nbsp;6.6. Owner enters total guest capacity<br>7. Owner clicks "Next" to continue<br>8. System validates property details<br>9. **Step 3: Amenities & Facilities**<br>&nbsp;&nbsp;&nbsp;&nbsp;9.1. Owner selects available amenities (WiFi, parking, breakfast, kitchen, lockers, laundry, etc.)<br>&nbsp;&nbsp;&nbsp;&nbsp;9.2. Owner selects common areas (lounge, terrace, garden, game room)<br>&nbsp;&nbsp;&nbsp;&nbsp;9.3. Owner selects accessibility features (wheelchair access, elevator)<br>&nbsp;&nbsp;&nbsp;&nbsp;9.4. Owner enters check-in/check-out times<br>10. Owner clicks "Next" to continue<br>11. **Step 4: Policies & Rules**<br>&nbsp;&nbsp;&nbsp;&nbsp;11.1. Owner enters cancellation policy details<br>&nbsp;&nbsp;&nbsp;&nbsp;11.2. Owner enters house rules (quiet hours, smoking policy, age restrictions)<br>&nbsp;&nbsp;&nbsp;&nbsp;11.3. Owner enters payment terms (deposit required, accepted methods)<br>&nbsp;&nbsp;&nbsp;&nbsp;11.4. Owner enters minimum/maximum stay requirements (if any)<br>12. Owner clicks "Next" to continue<br>13. **Step 5: Bank Account Information**<br>&nbsp;&nbsp;&nbsp;&nbsp;13.1. Owner enters bank name<br>&nbsp;&nbsp;&nbsp;&nbsp;13.2. Owner enters account number<br>&nbsp;&nbsp;&nbsp;&nbsp;13.3. Owner enters account holder name<br>&nbsp;&nbsp;&nbsp;&nbsp;13.4. Owner uploads bank account verification document<br>14. Owner reviews complete registration summary<br>15. Owner accepts terms and conditions for property listing<br>16. Owner submits registration<br>17. System validates all information completeness<br>18. System creates property listing with "Pending Verification" status<br>19. System sends registration confirmation email to owner via Email Service<br>20. System sends registration details to platform admin for verification review<br>21. System displays confirmation message with next steps<br>&nbsp;&nbsp;&nbsp;&nbsp;21.1. "Registration submitted successfully"<br>&nbsp;&nbsp;&nbsp;&nbsp;21.2. "Verification usually takes 2-3 business days"<br>&nbsp;&nbsp;&nbsp;&nbsp;21.3. Link to complete property setup (add photos, room types) |
+| **Alternative Sequences** | **Step 5**: If business information invalid (wrong format, missing required fields), System displays specific error messages and prevents progression to next step<br><br>**Step 8**: If property address cannot be validated, System displays "Unable to verify address" warning but allows continuation with manual review flag<br><br>**Step 17**: If required information missing, System highlights incomplete sections and returns to specific step<br><br>**After Step 19**: Admin verifies registration within 2-3 business days<br>- **If approved**: System updates property status to "Active", sends approval email via Email Service, enables full property management features<br>- **If additional info needed**: System sends request email via Email Service with specific requirements, owner updates information, resubmits for review<br>- **If rejected**: System updates status to "Rejected", sends rejection email via Email Service with reason, owner can appeal or submit new registration<br><br>**Step 3.4/13.4**: If document upload fails (wrong format, too large), System displays error message specifying requirements and allows retry<br><br>**Step 15**: If owner declines terms and conditions, System prevents submission and displays message "You must accept terms to register property"<br><br>**Wizard Navigation**: Owner clicks "Back" button, System saves current step data and returns to previous step, data preserved for all steps<br><br>**Save as Draft**: Owner clicks "Save and Continue Later", System saves progress, owner can resume registration from last completed step |
+| **Postconditions** | **Success**: Property registration submitted and queued for verification. Owner receives confirmation email. Property listed with "Pending Verification" status. Owner can add photos and room types while awaiting approval.<br><br>**Failure**: Registration not submitted. Validation errors displayed. Draft saved for later completion. Owner can correct and resubmit. |
+| **Nonfunctional Requirements** | **Performance**: Each wizard step loads within 1 second. Document uploads complete within 15 seconds. Final submission processes within 5 seconds.<br><br>**Security**: Business license and bank documents stored securely. Tax ID and bank account encrypted. Only platform admin can access sensitive verification documents. Owner data protected per data privacy regulations.<br><br>**Usability**: Wizard shows progress (Step X of 5). Clear field labels and tooltips. Inline validation provides immediate feedback. Required fields clearly marked. Document upload drag-and-drop supported. Mobile-responsive design. Auto-save prevents data loss.<br><br>**Compliance**: Business registration verification required per local regulations. Tax ID validation for financial reporting. Bank account verification for payout processing. Terms and conditions include liability, commission, and cancellation policies.<br><br>**Verification**: Admin review within 2-3 business days (72 hours). Automated checks for duplicate property addresses. Document authenticity spot-checked. |
+| **Business Requirements** | BR-048: All properties require admin verification before going live<br>BR-049: Business license and tax documentation mandatory<br>BR-050: Bank account verification required for payouts<br>BR-051: Property listing commission structure disclosed in terms<br>BR-052: Owner can manage property setup while awaiting verification approval<br>BR-053: Single owner can register multiple properties (separate registrations) |
+| **Frequency of Use** | Low to Medium (one-time per property, repeated for owners with multiple locations) |
+| **Priority** | High |
+| **Outstanding Questions** | 1. Should system support co-ownership (multiple owners for one property)?<br>2. Should system verify business registration number automatically via government API?<br>3. What is the approval rate threshold for expedited verification for established owners?<br>4. Should system support property import from existing booking platforms (Booking.com export)?<br>5. Should owner be able to register property without bank details initially (add later)?<br>6. What documentation is required for properties in different countries/regions?<br>7. Should system offer guided onboarding call for first-time property registration? |
+
+## Related Use Cases
+
+- **UC-10: Manage Property** — After registration, owner manages property details
+- **UC-11: Manage Room Types** — After registration, owner configures room inventory
+- **UC-15: Manage Subscription** — Property activation may require subscription plan selection
+
+## Notes
+
+- Verification process ensures legitimate properties and reduces fraud
+- Business documentation protects platform from liability
+- Bank account verification enables automated payouts to owners
+- Multi-step wizard reduces abandonment compared to single long form
+- Auto-save functionality prevents data loss during registration
+- Property setup (photos, rooms) allowed during verification keeps owners engaged
+- Clear communication about verification timeline sets expectations
+
+## Acceptance Criteria Validation
+
+✓ **C1: Delivers useful result to primary actor** — Owner registers property for listing on platform with clear verification process
+
+✓ **C2: Avoids functional decomposition** — Complete registration sequence from initial form through submission to verification confirmation
+
+✓ **C3: Maintains black box view** — No mention of database tables, file storage systems, admin dashboards; only describes registration behavior
+
+✓ **C4: Primary and secondary actors identified** — Primary: Owner (registers property); Secondary: Email Service (sends confirmations and verification updates)

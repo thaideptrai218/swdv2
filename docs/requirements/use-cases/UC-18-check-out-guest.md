@@ -1,0 +1,53 @@
+# UC-18: Check Out Guest
+
+| Field | Description |
+|-------|-------------|
+| **Use Case Name** | Check Out Guest |
+| **Use Case ID** | UC-18 |
+| **Created By** | System Analyst |
+| **Created Date** | 2026-02-04 |
+| **Last Updated By** | System Analyst |
+| **Last Updated Date** | 2026-02-04 |
+| **Summary** | Hostel Staff processes guest departure, collects room keys, checks for damages or issues, settles any outstanding charges, and completes check-out. System updates booking status, releases bed/room availability, and records check-out timestamp. |
+| **Dependency** | Include: None. Extend: None |
+| **Actors** | Primary: A2a: Hostel Staff (generalized actor covering Receptionist and Owner). Secondary: None |
+| **Preconditions** | Staff authenticated with check-out permissions. Guest currently checked in (booking status "Checked-In"). Check-out date is today or past. System operational. |
+| **Trigger** | Guest approaches reception desk to check out, or Staff proactively processes scheduled departures |
+| **Main Sequence** | 1. Staff navigates to check-out interface<br>2. System displays today's expected departures list<br>&nbsp;&nbsp;&nbsp;&nbsp;2.1. For each departure: guest name, booking reference, room/bed number, scheduled check-out time, status<br>&nbsp;&nbsp;&nbsp;&nbsp;2.2. List sorted by check-out time<br>3. Staff searches for guest booking<br>&nbsp;&nbsp;&nbsp;&nbsp;3.1. Staff enters guest name, booking reference, or room/bed number<br>&nbsp;&nbsp;&nbsp;&nbsp;3.2. System displays matching bookings<br>4. Staff selects correct booking<br>5. System displays check-out form with stay details<br>&nbsp;&nbsp;&nbsp;&nbsp;5.1. Guest information<br>&nbsp;&nbsp;&nbsp;&nbsp;5.2. Check-in and check-out dates (actual vs scheduled)<br>&nbsp;&nbsp;&nbsp;&nbsp;5.3. Room/bed assignment<br>&nbsp;&nbsp;&nbsp;&nbsp;5.4. Total amount paid<br>&nbsp;&nbsp;&nbsp;&nbsp;5.5. Outstanding charges (if any)<br>6. Staff asks guest about stay experience<br>&nbsp;&nbsp;&nbsp;&nbsp;6.1. Guest provides feedback (verbal, informal)<br>&nbsp;&nbsp;&nbsp;&nbsp;6.2. Staff notes any issues or compliments in system<br>7. Staff collects room key or access card<br>&nbsp;&nbsp;&nbsp;&nbsp;7.1. Verifies all keys returned<br>&nbsp;&nbsp;&nbsp;&nbsp;7.2. If locker key included: checks locker emptied<br>8. Staff inspects room/bed area (if possible)<br>&nbsp;&nbsp;&nbsp;&nbsp;8.1. Checks for damages<br>&nbsp;&nbsp;&nbsp;&nbsp;8.2. Checks for lost property<br>&nbsp;&nbsp;&nbsp;&nbsp;8.3. Notes any issues in system<br>9. Staff processes outstanding charges (if any)<br>&nbsp;&nbsp;&nbsp;&nbsp;9.1. Extra services used (laundry, meals, tours)<br>&nbsp;&nbsp;&nbsp;&nbsp;9.2. Damages or losses (broken items, lost keys)<br>&nbsp;&nbsp;&nbsp;&nbsp;9.3. Late check-out fees (if applicable)<br>&nbsp;&nbsp;&nbsp;&nbsp;9.4. Staff collects payment<br>&nbsp;&nbsp;&nbsp;&nbsp;9.5. System records additional charges and payment<br>10. Staff confirms guest collected all belongings<br>11. Staff provides receipt for additional charges (if any)<br>12. Staff thanks guest and invites review<br>&nbsp;&nbsp;&nbsp;&nbsp;12.1. Staff mentions review request email coming soon<br>&nbsp;&nbsp;&nbsp;&nbsp;12.2. Staff may provide business card with property details<br>13. Staff completes check-out<br>14. System validates check-out completion<br>15. System updates booking status to "Completed"<br>16. System records check-out timestamp<br>17. System releases bed/room from occupancy<br>18. System marks bed/room as "Needs Cleaning"<br>19. System displays success message "Guest checked out successfully"<br>20. System updates availability for future bookings |
+| **Alternative Sequences** | **Step 3**: If booking not found, Staff tries alternative search methods, checks physical registration book, or asks guest for booking confirmation<br><br>**Step 5**: If check-out date is future (early check-out), System displays warning "Early check-out - Scheduled for [date]", Staff proceeds with early check-out, no refund for unused nights per policy<br><br>**Step 7**: If guest lost room key or access card, Staff charges key replacement fee (added to Step 9 outstanding charges), issues temporary exit pass if needed<br><br>**Step 8**: If damage found, Staff documents with photos, assesses damage cost, adds to outstanding charges, may require manager approval for significant damage<br><br>**Step 9**: If guest unable to pay outstanding charges, Staff contacts manager, may accept later payment with signed agreement, or withholds final receipt until paid<br><br>**Late Check-Out Handling**:<br>- Guest requests late check-out<br>- Staff checks room availability (next booking?)<br>- If available: Staff approves (free or for fee per property policy)<br>- If not available: Staff offers luggage storage<br>- System updates scheduled check-out time<br><br>**Express Check-Out**:<br>- Guest doesn't visit reception (early morning departure)<br>- Guest leaves key in drop box<br>- Staff processes check-out when discovered<br>- System marks check-out time as actual departure<br>- No outstanding charges collection possible (charged to card if authorized)<br><br>**Extended Stay Request**:<br>- Guest wants to extend stay beyond original check-out<br>- Staff checks room/bed availability<br>- If available: Staff creates new booking or modifies existing<br>- If not available: Staff offers alternative room or refers to nearby hostels<br><br>**Lost Property Found**:<br>- Guest left belongings in room<br>- Staff logs lost property item<br>- Staff contacts guest via email/phone<br>- Arranges shipping or pickup<br>- Lost property tracked in system<br><br>**Automatic Check-Out**:<br>- Guest doesn't check out by scheduled time<br>- Staff attempts to contact guest<br>- If no response by end of day: Staff processes check-out<br>- Bed/room released for next booking<br>- Outstanding charges handled per policy<br><br>**Group Check-Out**:<br>- Multiple guests on single booking<br>- Lead guest checks out for group<br>- Staff collects all keys from group<br>- Single check-out transaction<br><br>**Dispute Resolution**:<br>- Guest disputes additional charges<br>- Staff escalates to manager<br>- Manager reviews evidence (photos, logs)<br>- Resolution reached (waive, reduce, or uphold charge)<br>- Guest checks out after resolution |
+| **Postconditions** | **Success**: Guest checked out. Booking status updated to "Completed". Check-out timestamp recorded. Bed/room released and marked for cleaning. Outstanding charges settled. Availability updated for future bookings.<br><br>**Failure**: Check-out not completed. Booking status remains "Checked-In". Issue noted for resolution. Staff escalates to manager. |
+| **Nonfunctional Requirements** | **Performance**: Expected departures list loads within 2 seconds. Check-out form displays within 1 second. Check-out completion saves within 2 seconds. Availability updates immediately.<br><br>**Usability**: Check-out interface quick and efficient (minimal steps). Search by room/bed number common use case. Touch-friendly for tablet interface. Clear indicators for outstanding charges. Easy to add additional charges with preset categories (laundry, damage, etc.).<br><br>**Accuracy**: Check-out timestamp accurate. Financial calculations correct. Room/bed status updates reliable. No double-booking after release. Late check-out fees calculated per policy.<br><br>**Reliability**: Check-out works offline (sync later). Duplicate check-out prevention. Room cleaning status tracked separately from availability. Guest feedback preserved for analysis.<br><br>**Housekeeping Integration**: Room status visible to cleaning staff. Cleaning completion updates room from "Needs Cleaning" to "Clean" and "Available". Priority cleaning for immediate next bookings. |
+| **Business Requirements** | BR-097: Check-out possible on or after scheduled date (early check-out allowed)<br>BR-098: Outstanding charges must be settled before check-out completion<br>BR-099: Room/bed released immediately after check-out for availability<br>BR-100: Check-out timestamp recorded for operational and legal records<br>BR-101: Guest feedback collected during check-out for quality improvement<br>BR-102: Lost property logged and tracked for minimum 30 days<br>BR-103: Late check-out fees applied per property policy (if next booking exists) |
+| **Frequency of Use** | Very High (daily for active properties, multiple check-outs per day) |
+| **Priority** | High |
+| **Outstanding Questions** | 1. Should system send automated check-out confirmation email to guest?<br>2. Should guest be able to check out via mobile app (express check-out)?<br>3. Should system generate summary of stay (nights stayed, services used)?<br>4. Should staff be able to rate guest behavior (for future bookings)?<br>5. Should system automatically trigger review request email immediately after check-out?<br>6. Should system support contactless key return (smart locks)?<br>7. Should lost property images be stored in system for easy identification? |
+
+## Related Use Cases
+
+- **UC-17: Check In Guest** — Check-out completes stay cycle started by check-in
+- **UC-12: Process Booking** — Check-out marks booking completion
+- **UC-19: View Booking Details** — Staff views stay details during check-out
+- **UC-07: Submit Review** — Guest invited to review after check-out
+
+## Notes
+
+- Check-out critical for releasing inventory and financial reconciliation
+- Outstanding charges common in hostel operations (damages, extra services)
+- Key collection prevents security issues and replacement costs
+- Guest feedback during check-out provides valuable insights
+- Room status tracking (occupied → needs cleaning → clean → available) essential
+- Express check-out reduces staff workload for early departures
+- Late check-out flexibility improves guest satisfaction when possible
+- Lost property management reduces liability and improves service
+- Automated check-out for no-shows prevents inventory blocking
+- Check-out efficiency impacts next guest check-in experience
+
+## Acceptance Criteria Validation
+
+✓ **C1: Delivers useful result to primary actor** — Staff completes guest departure with charges settled and inventory released
+
+✓ **C2: Avoids functional decomposition** — Complete check-out sequence from guest search through charge settlement to status update
+
+✓ **C3: Maintains black box view** — No mention of status updates, availability algorithms, cleaning workflows; only describes check-out behavior
+
+✓ **C4: Primary and secondary actors identified** — Primary: Hostel Staff (processes check-out); Secondary: None (all operations internal)
