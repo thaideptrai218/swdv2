@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HostelViet - Discover Vietnam's Best Hostels</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#E6F0F7',
+                            100: '#CCE1EF',
+                            500: '#0F4C75',
+                            600: '#0D3F61',
+                            700: '#0A324D',
+                            900: '#051926',
+                        },
+                        secondary: {
+                            400: '#F5A623',
+                            500: '#D4920F',
+                            600: '#B37D0D',
+                        },
+                        neutral: {
+                            0: '#FFFFFF',
+                            50: '#F8FAFC',
+                            100: '#F1F5F9',
+                            200: '#E2E8F0',
+                            400: '#94A3B8',
+                            600: '#475569',
+                            900: '#0F172A',
+                        }
+                    },
+                    fontFamily: {
+                        heading: ['Outfit', 'system-ui', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base styles */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', system-ui, sans-serif;
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Hero gradient background */
+        .hero-gradient {
+            background: linear-gradient(135deg, #0F4C75 0%, #0A324D 50%, #051926 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-gradient::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image:
+                radial-gradient(circle at 20% 80%, rgba(212, 146, 15, 0.15) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(212, 146, 15, 0.1) 0%, transparent 40%);
+            pointer-events: none;
+        }
+
+        /* Wave pattern overlay */
+        .hero-gradient::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 80px;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 80'%3E%3Cpath fill='%23FFFFFF' d='M0,40 C360,80 720,0 1080,40 C1260,60 1380,60 1440,40 L1440,80 L0,80 Z'/%3E%3C/svg%3E");
+            background-size: cover;
+        }
+
+        /* Destination card hover */
+        .destination-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .destination-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px -8px rgba(15, 76, 117, 0.2);
+        }
+
+        /* Hostel card hover */
+        .hostel-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .hostel-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 32px -8px rgba(15, 76, 117, 0.15);
+        }
+
+        /* Button hover states */
+        .btn-primary:hover {
+            background-color: #0D3F61;
+        }
+
+        .btn-accent:hover {
+            background-color: #B37D0D;
+        }
+
+        /* Focus states */
+        .focus-ring:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #0F4C75;
+        }
+
+        /* Mobile menu animation */
+        .mobile-menu {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .mobile-menu.hidden {
+            transform: translateY(-10px);
+            opacity: 0;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body class="bg-white text-neutral-900 font-body">
+
+    <!-- Skip to content link (accessibility) -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary-500 text-white px-4 py-2 rounded-md z-50">
+        Skip to main content
+    </a>
+
+    <!-- ========================================
+         HEADER
+         - Logo left, Nav center, Auth right
+         - Sticky positioning
+         - Mobile hamburger menu
+    ======================================== -->
+    <header class="sticky top-0 z-40 bg-white border-b border-neutral-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-2 focus-ring rounded-md">
+                    <div class="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
+                        <i data-lucide="bed-double" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <span class="font-heading font-bold text-xl">
+                        <span class="text-primary-500">Hostel</span><span class="text-secondary-500">Viet</span>
+                    </span>
+                </a>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center gap-8" aria-label="Main navigation">
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 font-medium transition-colors focus-ring rounded-md px-2 py-1">
+                        Explore
+                    </a>
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 font-medium transition-colors focus-ring rounded-md px-2 py-1">
+                        About
+                    </a>
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 font-medium transition-colors focus-ring rounded-md px-2 py-1">
+                        Contact
+                    </a>
+                </nav>
+
+                <!-- Auth Buttons (Desktop) -->
+                <div class="hidden md:flex items-center gap-3">
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 font-medium px-4 py-2 rounded-md transition-colors focus-ring">
+                        Login
+                    </a>
+                    <a href="#" class="btn-primary bg-primary-500 text-white font-medium px-4 py-2 rounded-md transition-colors focus-ring">
+                        Sign Up
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button
+                    type="button"
+                    class="md:hidden p-2 rounded-md text-neutral-600 hover:text-primary-500 hover:bg-neutral-100 focus-ring"
+                    aria-label="Toggle menu"
+                    aria-expanded="false"
+                    onclick="toggleMobileMenu()"
+                >
+                    <i data-lucide="menu" class="w-6 h-6" id="menu-icon"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="mobile-menu hidden md:hidden pb-4">
+                <nav class="flex flex-col gap-2" aria-label="Mobile navigation">
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 hover:bg-neutral-50 font-medium px-4 py-3 rounded-md transition-colors">
+                        Explore
+                    </a>
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 hover:bg-neutral-50 font-medium px-4 py-3 rounded-md transition-colors">
+                        About
+                    </a>
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 hover:bg-neutral-50 font-medium px-4 py-3 rounded-md transition-colors">
+                        Contact
+                    </a>
+                    <hr class="border-neutral-200 my-2">
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 hover:bg-neutral-50 font-medium px-4 py-3 rounded-md transition-colors">
+                        Login
+                    </a>
+                    <a href="#" class="bg-primary-500 text-white font-medium px-4 py-3 rounded-md text-center hover:bg-primary-600 transition-colors">
+                        Sign Up
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content">
+
+        <!-- ========================================
+             HERO SECTION
+             - Gradient background with pattern
+             - Headline and subheadline
+             - Search box with form inputs
+        ======================================== -->
+        <section class="hero-gradient text-white py-16 sm:py-24 lg:py-32 pb-24 sm:pb-32 lg:pb-40">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+
+                <!-- Headlines -->
+                <div class="text-center max-w-3xl mx-auto mb-10 sm:mb-12">
+                    <h1 class="font-heading font-bold text-4xl sm:text-5xl lg:text-6xl mb-4 leading-tight">
+                        Discover Vietnam's <span class="text-secondary-400">Best Hostels</span>
+                    </h1>
+                    <p class="text-lg sm:text-xl text-primary-100 max-w-2xl mx-auto">
+                        Book unique stays across Vietnam. From bustling cities to tranquil beaches.
+                    </p>
+                </div>
+
+                <!-- Search Box -->
+                <div class="bg-white rounded-xl shadow-2xl p-4 sm:p-6 max-w-4xl mx-auto">
+                    <form class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4">
+
+                        <!-- Location Input -->
+                        <div class="lg:col-span-4">
+                            <label for="location" class="block text-sm font-medium text-neutral-600 mb-1.5">
+                                Location
+                            </label>
+                            <div class="relative">
+                                <i data-lucide="map-pin" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400"></i>
+                                <input
+                                    type="text"
+                                    id="location"
+                                    placeholder="Where in Vietnam?"
+                                    class="w-full h-11 pl-10 pr-4 border border-neutral-200 rounded-lg text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Check-in Date -->
+                        <div class="lg:col-span-2">
+                            <label for="checkin" class="block text-sm font-medium text-neutral-600 mb-1.5">
+                                Check-in
+                            </label>
+                            <div class="relative">
+                                <i data-lucide="calendar" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400"></i>
+                                <input
+                                    type="date"
+                                    id="checkin"
+                                    class="w-full h-11 pl-10 pr-4 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Check-out Date -->
+                        <div class="lg:col-span-2">
+                            <label for="checkout" class="block text-sm font-medium text-neutral-600 mb-1.5">
+                                Check-out
+                            </label>
+                            <div class="relative">
+                                <i data-lucide="calendar" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400"></i>
+                                <input
+                                    type="date"
+                                    id="checkout"
+                                    class="w-full h-11 pl-10 pr-4 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                >
+                            </div>
+                        </div>
+
+                        <!-- Guests Count -->
+                        <div class="lg:col-span-2">
+                            <label for="guests" class="block text-sm font-medium text-neutral-600 mb-1.5">
+                                Guests
+                            </label>
+                            <div class="relative">
+                                <i data-lucide="users" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400"></i>
+                                <select
+                                    id="guests"
+                                    class="w-full h-11 pl-10 pr-8 border border-neutral-200 rounded-lg text-neutral-900 appearance-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+                                >
+                                    <option value="1">1 Guest</option>
+                                    <option value="2">2 Guests</option>
+                                    <option value="3">3 Guests</option>
+                                    <option value="4">4 Guests</option>
+                                    <option value="5">5+ Guests</option>
+                                </select>
+                                <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none"></i>
+                            </div>
+                        </div>
+
+                        <!-- Search Button -->
+                        <div class="lg:col-span-2 flex items-end">
+                            <button
+                                type="submit"
+                                class="btn-accent w-full h-11 bg-secondary-500 text-neutral-900 font-semibold rounded-lg flex items-center justify-center gap-2 transition-colors focus-ring"
+                            >
+                                <i data-lucide="search" class="w-5 h-5"></i>
+                                <span>Search</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             POPULAR DESTINATIONS
+             - Grid of 4 destination cards
+             - City name and hostel count
+        ======================================== -->
+        <section class="py-16 sm:py-20 lg:py-24 bg-neutral-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+                <!-- Section Header -->
+                <div class="text-center mb-10 sm:mb-12">
+                    <h2 class="font-heading font-bold text-3xl sm:text-4xl text-neutral-900 mb-3">
+                        Popular Destinations
+                    </h2>
+                    <p class="text-neutral-600 text-lg max-w-2xl mx-auto">
+                        Explore Vietnam's most loved cities and find your perfect stay
+                    </p>
+                </div>
+
+                <!-- Destinations Grid -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+
+                    <!-- Ho Chi Minh City -->
+                    <a href="#" class="destination-card group block rounded-xl overflow-hidden bg-white shadow-sm border border-neutral-200 focus-ring">
+                        <div class="aspect-[4/3] bg-gradient-to-br from-primary-500 to-primary-700 relative">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i data-lucide="building-2" class="w-16 h-16 text-white/30"></i>
+                            </div>
+                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                                <h3 class="font-heading font-semibold text-xl text-white">Ho Chi Minh City</h3>
+                            </div>
+                        </div>
+                        <div class="p-4 flex items-center justify-between">
+                            <span class="text-neutral-600">
+                                <span class="font-semibold text-primary-500">45</span> hostels
+                            </span>
+                            <i data-lucide="arrow-right" class="w-5 h-5 text-neutral-400 group-hover:text-primary-500 transition-colors"></i>
+                        </div>
+                    </a>
+
+                    <!-- Hanoi -->
+                    <a href="#" class="destination-card group block rounded-xl overflow-hidden bg-white shadow-sm border border-neutral-200 focus-ring">
+                        <div class="aspect-[4/3] bg-gradient-to-br from-secondary-500 to-secondary-600 relative">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i data-lucide="landmark" class="w-16 h-16 text-white/30"></i>
+                            </div>
+                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                                <h3 class="font-heading font-semibold text-xl text-white">Hanoi</h3>
+                            </div>
+                        </div>
+                        <div class="p-4 flex items-center justify-between">
+                            <span class="text-neutral-600">
+                                <span class="font-semibold text-primary-500">38</span> hostels
+                            </span>
+                            <i data-lucide="arrow-right" class="w-5 h-5 text-neutral-400 group-hover:text-primary-500 transition-colors"></i>
+                        </div>
+                    </a>
+
+                    <!-- Da Nang -->
+                    <a href="#" class="destination-card group block rounded-xl overflow-hidden bg-white shadow-sm border border-neutral-200 focus-ring">
+                        <div class="aspect-[4/3] bg-gradient-to-br from-primary-600 to-primary-900 relative">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i data-lucide="waves" class="w-16 h-16 text-white/30"></i>
+                            </div>
+                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                                <h3 class="font-heading font-semibold text-xl text-white">Da Nang</h3>
+                            </div>
+                        </div>
+                        <div class="p-4 flex items-center justify-between">
+                            <span class="text-neutral-600">
+                                <span class="font-semibold text-primary-500">28</span> hostels
+                            </span>
+                            <i data-lucide="arrow-right" class="w-5 h-5 text-neutral-400 group-hover:text-primary-500 transition-colors"></i>
+                        </div>
+                    </a>
+
+                    <!-- Hoi An -->
+                    <a href="#" class="destination-card group block rounded-xl overflow-hidden bg-white shadow-sm border border-neutral-200 focus-ring">
+                        <div class="aspect-[4/3] bg-gradient-to-br from-secondary-400 to-primary-500 relative">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i data-lucide="lamp" class="w-16 h-16 text-white/30"></i>
+                            </div>
+                            <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                                <h3 class="font-heading font-semibold text-xl text-white">Hoi An</h3>
+                            </div>
+                        </div>
+                        <div class="p-4 flex items-center justify-between">
+                            <span class="text-neutral-600">
+                                <span class="font-semibold text-primary-500">22</span> hostels
+                            </span>
+                            <i data-lucide="arrow-right" class="w-5 h-5 text-neutral-400 group-hover:text-primary-500 transition-colors"></i>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             FEATURED HOSTELS
+             - Grid of 3 hostel cards
+             - Image, name, location, rating, price, CTA
+        ======================================== -->
+        <section class="py-16 sm:py-20 lg:py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+                <!-- Section Header -->
+                <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4 mb-10 sm:mb-12">
+                    <div>
+                        <h2 class="font-heading font-bold text-3xl sm:text-4xl text-neutral-900 mb-3">
+                            Featured Hostels
+                        </h2>
+                        <p class="text-neutral-600 text-lg">
+                            Top-rated stays handpicked for travelers
+                        </p>
+                    </div>
+                    <a href="#" class="text-primary-500 hover:text-primary-600 font-medium flex items-center gap-1 transition-colors">
+                        View all hostels
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </a>
+                </div>
+
+                <!-- Hostels Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+
+                    <!-- Hostel Card 1 -->
+                    <article class="hostel-card rounded-xl overflow-hidden bg-white shadow-sm border border-neutral-200">
+                        <!-- Image Placeholder -->
+                        <div class="aspect-[16/10] bg-gradient-to-br from-primary-100 to-primary-200 relative">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i data-lucide="image" class="w-12 h-12 text-primary-300"></i>
+                            </div>
+                            <!-- Wishlist Button -->
+                            <button class="absolute top-3 right-3 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors focus-ring" aria-label="Add to wishlist">
+                                <i data-lucide="heart" class="w-5 h-5 text-neutral-600"></i>
+                            </button>
+                        </div>
+                        <!-- Card Content -->
+                        <div class="p-5">
+                            <div class="flex items-start justify-between gap-2 mb-2">
+                                <h3 class="font-heading font-semibold text-lg text-neutral-900 line-clamp-1">
+                                    Saigon Backpackers Hub
+                                </h3>
+                                <div class="flex items-center gap-1 shrink-0">
+                                    <i data-lucide="star" class="w-4 h-4 text-secondary-500 fill-secondary-500"></i>
+                                    <span class="font-semibold text-sm text-neutral-900">4.8</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1.5 text-neutral-600 text-sm mb-4">
+                                <i data-lucide="map-pin" class="w-4 h-4 text-neutral-400"></i>
+                                <span>District 1, Ho Chi Minh City</span>
+                            </div>
+                            <div class="flex items-end justify-between">
+                                <div>
+                                    <span class="text-sm text-neutral-500">From</span>
+                                    <p class="text-xl font-bold text-primary-500">$12<span class="text-sm font-normal text-neutral-500">/night</span></p>
+                                </div>
+                                <a href="#" class="btn-accent bg-secondary-500 text-neutral-900 font-semibold px-4 py-2 rounded-lg text-sm transition-colors focus-ring">
+                                    Book Now
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Hostel Card 2 -->
+                    <article class="hostel-card rounded-xl overflow-hidden bg-white shadow-sm border border-neutral-200">
+                        <div class="aspect-[16/10] bg-gradient-to-br from-secondary-100 to-secondary-200 relative">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i data-lucide="image" class="w-12 h-12 text-secondary-300"></i>
+                            </div>
+                            <button class="absolute top-3 right-3 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors focus-ring" aria-label="Add to wishlist">
+                                <i data-lucide="heart" class="w-5 h-5 text-neutral-600"></i>
+                            </button>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex items-start justify-between gap-2 mb-2">
+                                <h3 class="font-heading font-semibold text-lg text-neutral-900 line-clamp-1">
+                                    Old Quarter Hostel
+                                </h3>
+                                <div class="flex items-center gap-1 shrink-0">
+                                    <i data-lucide="star" class="w-4 h-4 text-secondary-500 fill-secondary-500"></i>
+                                    <span class="font-semibold text-sm text-neutral-900">4.6</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1.5 text-neutral-600 text-sm mb-4">
+                                <i data-lucide="map-pin" class="w-4 h-4 text-neutral-400"></i>
+                                <span>Hoan Kiem, Hanoi</span>
+                            </div>
+                            <div class="flex items-end justify-between">
+                                <div>
+                                    <span class="text-sm text-neutral-500">From</span>
+                                    <p class="text-xl font-bold text-primary-500">$10<span class="text-sm font-normal text-neutral-500">/night</span></p>
+                                </div>
+                                <a href="#" class="btn-accent bg-secondary-500 text-neutral-900 font-semibold px-4 py-2 rounded-lg text-sm transition-colors focus-ring">
+                                    Book Now
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+
+                    <!-- Hostel Card 3 -->
+                    <article class="hostel-card rounded-xl overflow-hidden bg-white shadow-sm border border-neutral-200">
+                        <div class="aspect-[16/10] bg-gradient-to-br from-primary-50 to-secondary-100 relative">
+                            <div class="absolute inset-0 flex items-center justify-center">
+                                <i data-lucide="image" class="w-12 h-12 text-primary-200"></i>
+                            </div>
+                            <button class="absolute top-3 right-3 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors focus-ring" aria-label="Add to wishlist">
+                                <i data-lucide="heart" class="w-5 h-5 text-neutral-600"></i>
+                            </button>
+                        </div>
+                        <div class="p-5">
+                            <div class="flex items-start justify-between gap-2 mb-2">
+                                <h3 class="font-heading font-semibold text-lg text-neutral-900 line-clamp-1">
+                                    Beach View Hostel
+                                </h3>
+                                <div class="flex items-center gap-1 shrink-0">
+                                    <i data-lucide="star" class="w-4 h-4 text-secondary-500 fill-secondary-500"></i>
+                                    <span class="font-semibold text-sm text-neutral-900">4.9</span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-1.5 text-neutral-600 text-sm mb-4">
+                                <i data-lucide="map-pin" class="w-4 h-4 text-neutral-400"></i>
+                                <span>My Khe Beach, Da Nang</span>
+                            </div>
+                            <div class="flex items-end justify-between">
+                                <div>
+                                    <span class="text-sm text-neutral-500">From</span>
+                                    <p class="text-xl font-bold text-primary-500">$15<span class="text-sm font-normal text-neutral-500">/night</span></p>
+                                </div>
+                                <a href="#" class="btn-accent bg-secondary-500 text-neutral-900 font-semibold px-4 py-2 rounded-lg text-sm transition-colors focus-ring">
+                                    Book Now
+                                </a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </div>
+        </section>
+
+        <!-- ========================================
+             WHY HOSTELVIET
+             - 3 feature cards with icons
+             - Best Prices, Verified Reviews, Instant Booking
+        ======================================== -->
+        <section class="py-16 sm:py-20 lg:py-24 bg-primary-500">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+                <!-- Section Header -->
+                <div class="text-center mb-10 sm:mb-12">
+                    <h2 class="font-heading font-bold text-3xl sm:text-4xl text-white mb-3">
+                        Why HostelViet?
+                    </h2>
+                    <p class="text-primary-100 text-lg max-w-2xl mx-auto">
+                        We make finding your perfect hostel simple, safe, and affordable
+                    </p>
+                </div>
+
+                <!-- Features Grid -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+
+                    <!-- Best Prices -->
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 sm:p-8 text-center border border-white/20">
+                        <div class="w-16 h-16 bg-secondary-500 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                            <i data-lucide="badge-percent" class="w-8 h-8 text-neutral-900"></i>
+                        </div>
+                        <h3 class="font-heading font-semibold text-xl text-white mb-3">
+                            Best Prices
+                        </h3>
+                        <p class="text-primary-100 leading-relaxed">
+                            We guarantee the lowest prices. Found it cheaper elsewhere? We'll match it.
+                        </p>
+                    </div>
+
+                    <!-- Verified Reviews -->
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 sm:p-8 text-center border border-white/20">
+                        <div class="w-16 h-16 bg-secondary-500 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                            <i data-lucide="shield-check" class="w-8 h-8 text-neutral-900"></i>
+                        </div>
+                        <h3 class="font-heading font-semibold text-xl text-white mb-3">
+                            Verified Reviews
+                        </h3>
+                        <p class="text-primary-100 leading-relaxed">
+                            Real reviews from real travelers. Every review is from a verified stay.
+                        </p>
+                    </div>
+
+                    <!-- Instant Booking -->
+                    <div class="bg-white/10 backdrop-blur-sm rounded-xl p-6 sm:p-8 text-center border border-white/20">
+                        <div class="w-16 h-16 bg-secondary-500 rounded-2xl flex items-center justify-center mx-auto mb-5">
+                            <i data-lucide="zap" class="w-8 h-8 text-neutral-900"></i>
+                        </div>
+                        <h3 class="font-heading font-semibold text-xl text-white mb-3">
+                            Instant Booking
+                        </h3>
+                        <p class="text-primary-100 leading-relaxed">
+                            Book instantly with immediate confirmation. No waiting, no hassle.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ========================================
+         FOOTER
+         - Logo and tagline
+         - Navigation links
+         - Social icons
+         - Copyright
+    ======================================== -->
+    <footer class="bg-neutral-900 text-white py-12 sm:py-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-10">
+
+                <!-- Brand Column -->
+                <div class="lg:col-span-2">
+                    <a href="#" class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
+                            <i data-lucide="bed-double" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <span class="font-heading font-bold text-xl">
+                            <span class="text-white">Hostel</span><span class="text-secondary-500">Viet</span>
+                        </span>
+                    </a>
+                    <p class="text-neutral-400 max-w-sm mb-6">
+                        Your Gateway to Vietnamese Adventures. Discover unique stays and unforgettable experiences across Vietnam.
+                    </p>
+
+                    <!-- Social Icons -->
+                    <div class="flex items-center gap-3">
+                        <a href="#" class="w-10 h-10 bg-neutral-800 hover:bg-primary-500 rounded-lg flex items-center justify-center transition-colors focus-ring" aria-label="Facebook">
+                            <i data-lucide="facebook" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-neutral-800 hover:bg-primary-500 rounded-lg flex items-center justify-center transition-colors focus-ring" aria-label="Instagram">
+                            <i data-lucide="instagram" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-neutral-800 hover:bg-primary-500 rounded-lg flex items-center justify-center transition-colors focus-ring" aria-label="Twitter">
+                            <i data-lucide="twitter" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-neutral-800 hover:bg-primary-500 rounded-lg flex items-center justify-center transition-colors focus-ring" aria-label="YouTube">
+                            <i data-lucide="youtube" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="font-heading font-semibold text-lg mb-4">Quick Links</h4>
+                    <nav class="flex flex-col gap-3">
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">About Us</a>
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">Contact</a>
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">Careers</a>
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">Blog</a>
+                    </nav>
+                </div>
+
+                <!-- Legal -->
+                <div>
+                    <h4 class="font-heading font-semibold text-lg mb-4">Legal</h4>
+                    <nav class="flex flex-col gap-3">
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">Terms of Service</a>
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">Privacy Policy</a>
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">Cookie Policy</a>
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">Refund Policy</a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="pt-8 border-t border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p class="text-neutral-500 text-sm">
+                    &copy; 2026 HostelViet. All rights reserved.
+                </p>
+                <p class="text-neutral-500 text-sm">
+                    Made with <i data-lucide="heart" class="w-4 h-4 inline text-secondary-500 fill-secondary-500"></i> in Vietnam
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========================================
+         SCRIPTS
+         - Initialize Lucide icons
+         - Mobile menu toggle
+    ======================================== -->
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('menu-icon');
+            const button = icon.closest('button');
+
+            menu.classList.toggle('hidden');
+
+            if (menu.classList.contains('hidden')) {
+                icon.setAttribute('data-lucide', 'menu');
+                button.setAttribute('aria-expanded', 'false');
+            } else {
+                icon.setAttribute('data-lucide', 'x');
+                button.setAttribute('aria-expanded', 'true');
+            }
+
+            // Re-initialize icons after changing
+            lucide.createIcons();
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('mobile-menu');
+            const menuButton = document.querySelector('[aria-label="Toggle menu"]');
+
+            if (!menu.contains(event.target) && !menuButton.contains(event.target) && !menu.classList.contains('hidden')) {
+                toggleMobileMenu();
+            }
+        });
+
+        // Set minimum date for date inputs to today
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('checkin').setAttribute('min', today);
+        document.getElementById('checkout').setAttribute('min', today);
+
+        // Update checkout min date when checkin changes
+        document.getElementById('checkin').addEventListener('change', function() {
+            document.getElementById('checkout').setAttribute('min', this.value);
+        });
+    </script>
+</body>
+</html>

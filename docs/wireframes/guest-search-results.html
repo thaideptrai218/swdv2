@@ -1,0 +1,1056 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Results - Ho Chi Minh City | HostelViet</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#E6F0F7',
+                            100: '#CCE1EF',
+                            500: '#0F4C75',
+                            600: '#0D3F61',
+                            700: '#0A324D',
+                            900: '#051926',
+                        },
+                        secondary: {
+                            400: '#F5A623',
+                            500: '#D4920F',
+                            600: '#B37D0D',
+                        },
+                        neutral: {
+                            0: '#FFFFFF',
+                            50: '#F8FAFC',
+                            100: '#F1F5F9',
+                            200: '#E2E8F0',
+                            400: '#94A3B8',
+                            600: '#475569',
+                            900: '#0F172A',
+                        }
+                    },
+                    fontFamily: {
+                        heading: ['Outfit', 'system-ui', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base styles */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', system-ui, sans-serif;
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Hostel card hover */
+        .hostel-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .hostel-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 32px -8px rgba(15, 76, 117, 0.15);
+        }
+
+        /* Button hover states */
+        .btn-primary:hover {
+            background-color: #0D3F61;
+        }
+
+        .btn-accent:hover {
+            background-color: #B37D0D;
+        }
+
+        /* Focus states */
+        .focus-ring:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #0F4C75;
+        }
+
+        /* Mobile menu animation */
+        .mobile-menu {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .mobile-menu.hidden {
+            transform: translateY(-10px);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Filter sidebar mobile */
+        .filter-sidebar {
+            transition: transform 0.3s ease;
+        }
+
+        @media (max-width: 1023px) {
+            .filter-sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                bottom: 0;
+                width: 320px;
+                max-width: 90vw;
+                z-index: 50;
+                transform: translateX(-100%);
+                background: white;
+                overflow-y: auto;
+            }
+
+            .filter-sidebar.open {
+                transform: translateX(0);
+            }
+
+            .filter-overlay {
+                position: fixed;
+                inset: 0;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 49;
+                opacity: 0;
+                pointer-events: none;
+                transition: opacity 0.3s ease;
+            }
+
+            .filter-overlay.open {
+                opacity: 1;
+                pointer-events: auto;
+            }
+        }
+
+        /* Custom range slider */
+        input[type="range"] {
+            -webkit-appearance: none;
+            height: 6px;
+            background: #E2E8F0;
+            border-radius: 3px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            background: #0F4C75;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            background: #0F4C75;
+            border-radius: 50%;
+            cursor: pointer;
+            border: 2px solid white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Custom checkbox */
+        .custom-checkbox {
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid #E2E8F0;
+            border-radius: 4px;
+            cursor: pointer;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .custom-checkbox:checked {
+            background-color: #0F4C75;
+            border-color: #0F4C75;
+        }
+
+        .custom-checkbox:checked::after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 2px;
+            width: 5px;
+            height: 9px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .custom-checkbox:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #0F4C75;
+        }
+    </style>
+</head>
+<body class="bg-neutral-50 text-neutral-900 font-body">
+
+    <!-- Skip to content link (accessibility) -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary-500 text-white px-4 py-2 rounded-md z-50">
+        Skip to main content
+    </a>
+
+    <!-- ========================================
+         HEADER
+         - Same as guest-home.html
+         - Logo left, Nav center, Auth right
+         - Sticky positioning
+    ======================================== -->
+    <header class="sticky top-0 z-40 bg-white border-b border-neutral-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+
+                <!-- Logo -->
+                <a href="guest-home.html" class="flex items-center gap-2 focus-ring rounded-md">
+                    <div class="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
+                        <i data-lucide="bed-double" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <span class="font-heading font-bold text-xl">
+                        <span class="text-primary-500">Hostel</span><span class="text-secondary-500">Viet</span>
+                    </span>
+                </a>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center gap-8" aria-label="Main navigation">
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 font-medium transition-colors focus-ring rounded-md px-2 py-1">
+                        Explore
+                    </a>
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 font-medium transition-colors focus-ring rounded-md px-2 py-1">
+                        About
+                    </a>
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 font-medium transition-colors focus-ring rounded-md px-2 py-1">
+                        Contact
+                    </a>
+                </nav>
+
+                <!-- Auth Buttons (Desktop) -->
+                <div class="hidden md:flex items-center gap-3">
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 font-medium px-4 py-2 rounded-md transition-colors focus-ring">
+                        Login
+                    </a>
+                    <a href="#" class="btn-primary bg-primary-500 text-white font-medium px-4 py-2 rounded-md transition-colors focus-ring">
+                        Sign Up
+                    </a>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button
+                    type="button"
+                    class="md:hidden p-2 rounded-md text-neutral-600 hover:text-primary-500 hover:bg-neutral-100 focus-ring"
+                    aria-label="Toggle menu"
+                    aria-expanded="false"
+                    onclick="toggleMobileMenu()"
+                >
+                    <i data-lucide="menu" class="w-6 h-6" id="menu-icon"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="mobile-menu hidden md:hidden pb-4">
+                <nav class="flex flex-col gap-2" aria-label="Mobile navigation">
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 hover:bg-neutral-50 font-medium px-4 py-3 rounded-md transition-colors">
+                        Explore
+                    </a>
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 hover:bg-neutral-50 font-medium px-4 py-3 rounded-md transition-colors">
+                        About
+                    </a>
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 hover:bg-neutral-50 font-medium px-4 py-3 rounded-md transition-colors">
+                        Contact
+                    </a>
+                    <hr class="border-neutral-200 my-2">
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 hover:bg-neutral-50 font-medium px-4 py-3 rounded-md transition-colors">
+                        Login
+                    </a>
+                    <a href="#" class="bg-primary-500 text-white font-medium px-4 py-3 rounded-md text-center hover:bg-primary-600 transition-colors">
+                        Sign Up
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <!-- ========================================
+         STICKY SEARCH BAR
+         - Refined search with pre-filled values
+         - Modify search functionality
+    ======================================== -->
+    <div class="sticky top-16 z-30 bg-white border-b border-neutral-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+            <form class="flex flex-wrap items-end gap-3">
+
+                <!-- Location -->
+                <div class="flex-1 min-w-[200px]">
+                    <label for="search-location" class="block text-xs font-medium text-neutral-500 mb-1">
+                        Location
+                    </label>
+                    <div class="relative">
+                        <i data-lucide="map-pin" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400"></i>
+                        <input
+                            type="text"
+                            id="search-location"
+                            value="Ho Chi Minh City"
+                            class="w-full h-10 pl-9 pr-3 border border-neutral-200 rounded-lg text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        >
+                    </div>
+                </div>
+
+                <!-- Check-in -->
+                <div class="w-32 sm:w-36">
+                    <label for="search-checkin" class="block text-xs font-medium text-neutral-500 mb-1">
+                        Check-in
+                    </label>
+                    <div class="relative">
+                        <i data-lucide="calendar" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400"></i>
+                        <input
+                            type="date"
+                            id="search-checkin"
+                            value="2026-02-10"
+                            class="w-full h-10 pl-9 pr-2 border border-neutral-200 rounded-lg text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        >
+                    </div>
+                </div>
+
+                <!-- Check-out -->
+                <div class="w-32 sm:w-36">
+                    <label for="search-checkout" class="block text-xs font-medium text-neutral-500 mb-1">
+                        Check-out
+                    </label>
+                    <div class="relative">
+                        <i data-lucide="calendar" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400"></i>
+                        <input
+                            type="date"
+                            id="search-checkout"
+                            value="2026-02-15"
+                            class="w-full h-10 pl-9 pr-2 border border-neutral-200 rounded-lg text-sm text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                        >
+                    </div>
+                </div>
+
+                <!-- Guests -->
+                <div class="w-28">
+                    <label for="search-guests" class="block text-xs font-medium text-neutral-500 mb-1">
+                        Guests
+                    </label>
+                    <div class="relative">
+                        <i data-lucide="users" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400"></i>
+                        <select
+                            id="search-guests"
+                            class="w-full h-10 pl-9 pr-6 border border-neutral-200 rounded-lg text-sm text-neutral-900 appearance-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+                        >
+                            <option value="1">1</option>
+                            <option value="2" selected>2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5+</option>
+                        </select>
+                        <i data-lucide="chevron-down" class="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <!-- Modify Search Button -->
+                <button
+                    type="submit"
+                    class="btn-accent h-10 bg-secondary-500 text-neutral-900 font-semibold px-4 rounded-lg flex items-center gap-2 text-sm transition-colors focus-ring"
+                >
+                    <i data-lucide="search" class="w-4 h-4"></i>
+                    <span class="hidden sm:inline">Modify Search</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <main id="main-content">
+
+        <!-- ========================================
+             RESULTS SECTION
+             - Results header with count, sort, map toggle
+             - Filter sidebar (left)
+             - Results grid (right)
+        ======================================== -->
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+
+            <!-- Results Header -->
+            <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+                <div class="flex items-center gap-4">
+                    <!-- Mobile Filter Toggle -->
+                    <button
+                        type="button"
+                        class="lg:hidden flex items-center gap-2 px-4 py-2 border border-neutral-200 rounded-lg text-sm font-medium text-neutral-700 hover:bg-neutral-100 transition-colors focus-ring"
+                        onclick="toggleFilters()"
+                    >
+                        <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+                        Filters
+                    </button>
+
+                    <h1 class="font-heading font-semibold text-xl sm:text-2xl text-neutral-900">
+                        <span class="text-primary-500">24</span> hostels in Ho Chi Minh City
+                    </h1>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <!-- Sort Dropdown -->
+                    <div class="relative">
+                        <label for="sort-by" class="sr-only">Sort by</label>
+                        <select
+                            id="sort-by"
+                            class="h-10 pl-4 pr-10 border border-neutral-200 rounded-lg text-sm text-neutral-700 appearance-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white cursor-pointer"
+                        >
+                            <option value="recommended">Recommended</option>
+                            <option value="price-low">Price: Low to High</option>
+                            <option value="price-high">Price: High to Low</option>
+                            <option value="rating">Highest Rated</option>
+                        </select>
+                        <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none"></i>
+                    </div>
+
+                    <!-- Map View Toggle -->
+                    <button
+                        type="button"
+                        class="flex items-center gap-2 h-10 px-4 border border-neutral-200 rounded-lg text-sm font-medium text-neutral-700 hover:bg-neutral-100 transition-colors focus-ring"
+                    >
+                        <i data-lucide="map" class="w-4 h-4"></i>
+                        <span class="hidden sm:inline">Map View</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Content Grid -->
+            <div class="flex gap-6">
+
+                <!-- Filter Overlay (Mobile) -->
+                <div id="filter-overlay" class="filter-overlay lg:hidden" onclick="toggleFilters()"></div>
+
+                <!-- ========================================
+                     FILTERS SIDEBAR
+                     - Price range slider
+                     - Property type checkboxes
+                     - Amenities checkboxes
+                     - Rating filter
+                     - Clear filters
+                ======================================== -->
+                <aside id="filter-sidebar" class="filter-sidebar lg:block w-full lg:w-72 shrink-0 bg-white lg:bg-transparent p-6 lg:p-0">
+
+                    <!-- Mobile Close Button -->
+                    <div class="flex items-center justify-between mb-6 lg:hidden">
+                        <h2 class="font-heading font-semibold text-lg">Filters</h2>
+                        <button
+                            type="button"
+                            class="p-2 rounded-md hover:bg-neutral-100 transition-colors"
+                            onclick="toggleFilters()"
+                            aria-label="Close filters"
+                        >
+                            <i data-lucide="x" class="w-5 h-5 text-neutral-600"></i>
+                        </button>
+                    </div>
+
+                    <div class="space-y-6">
+
+                        <!-- Price Range -->
+                        <div class="bg-white rounded-xl border border-neutral-200 p-5">
+                            <h3 class="font-heading font-semibold text-sm text-neutral-900 mb-4">
+                                Price per night
+                            </h3>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between text-sm text-neutral-600">
+                                    <span id="price-min-display">100,000₫</span>
+                                    <span id="price-max-display">500,000₫</span>
+                                </div>
+                                <div class="relative">
+                                    <input
+                                        type="range"
+                                        id="price-min"
+                                        min="100000"
+                                        max="500000"
+                                        value="100000"
+                                        step="10000"
+                                        class="w-full"
+                                        oninput="updatePriceDisplay()"
+                                    >
+                                    <input
+                                        type="range"
+                                        id="price-max"
+                                        min="100000"
+                                        max="500000"
+                                        value="500000"
+                                        step="10000"
+                                        class="w-full mt-2"
+                                        oninput="updatePriceDisplay()"
+                                    >
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Property Type -->
+                        <div class="bg-white rounded-xl border border-neutral-200 p-5">
+                            <h3 class="font-heading font-semibold text-sm text-neutral-900 mb-4">
+                                Property Type
+                            </h3>
+                            <div class="space-y-3">
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" class="custom-checkbox" checked>
+                                    <span class="text-sm text-neutral-700 group-hover:text-neutral-900">Hostel</span>
+                                    <span class="text-xs text-neutral-400 ml-auto">(18)</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" class="custom-checkbox">
+                                    <span class="text-sm text-neutral-700 group-hover:text-neutral-900">Guesthouse</span>
+                                    <span class="text-xs text-neutral-400 ml-auto">(4)</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" class="custom-checkbox">
+                                    <span class="text-sm text-neutral-700 group-hover:text-neutral-900">Hotel</span>
+                                    <span class="text-xs text-neutral-400 ml-auto">(2)</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Amenities -->
+                        <div class="bg-white rounded-xl border border-neutral-200 p-5">
+                            <h3 class="font-heading font-semibold text-sm text-neutral-900 mb-4">
+                                Amenities
+                            </h3>
+                            <div class="space-y-3">
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" class="custom-checkbox" checked>
+                                    <i data-lucide="wifi" class="w-4 h-4 text-neutral-400"></i>
+                                    <span class="text-sm text-neutral-700 group-hover:text-neutral-900">Free WiFi</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" class="custom-checkbox">
+                                    <i data-lucide="chef-hat" class="w-4 h-4 text-neutral-400"></i>
+                                    <span class="text-sm text-neutral-700 group-hover:text-neutral-900">Kitchen</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" class="custom-checkbox">
+                                    <i data-lucide="shirt" class="w-4 h-4 text-neutral-400"></i>
+                                    <span class="text-sm text-neutral-700 group-hover:text-neutral-900">Laundry</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" class="custom-checkbox">
+                                    <i data-lucide="lock" class="w-4 h-4 text-neutral-400"></i>
+                                    <span class="text-sm text-neutral-700 group-hover:text-neutral-900">Locker</span>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" class="custom-checkbox">
+                                    <i data-lucide="snowflake" class="w-4 h-4 text-neutral-400"></i>
+                                    <span class="text-sm text-neutral-700 group-hover:text-neutral-900">Air Conditioning</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Rating -->
+                        <div class="bg-white rounded-xl border border-neutral-200 p-5">
+                            <h3 class="font-heading font-semibold text-sm text-neutral-900 mb-4">
+                                Guest Rating
+                            </h3>
+                            <div class="space-y-3">
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" class="custom-checkbox">
+                                    <div class="flex items-center gap-1">
+                                        <i data-lucide="star" class="w-4 h-4 text-secondary-500 fill-secondary-500"></i>
+                                        <span class="text-sm text-neutral-700 group-hover:text-neutral-900">4+ Excellent</span>
+                                    </div>
+                                </label>
+                                <label class="flex items-center gap-3 cursor-pointer group">
+                                    <input type="checkbox" class="custom-checkbox">
+                                    <div class="flex items-center gap-1">
+                                        <i data-lucide="star" class="w-4 h-4 text-secondary-500 fill-secondary-500"></i>
+                                        <span class="text-sm text-neutral-700 group-hover:text-neutral-900">3+ Good</span>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Clear Filters -->
+                        <button
+                            type="button"
+                            class="w-full text-sm text-primary-500 hover:text-primary-600 font-medium py-2 transition-colors"
+                        >
+                            Clear all filters
+                        </button>
+
+                        <!-- Apply Filters (Mobile) -->
+                        <button
+                            type="button"
+                            class="lg:hidden w-full btn-primary bg-primary-500 text-white font-semibold py-3 rounded-lg transition-colors"
+                            onclick="toggleFilters()"
+                        >
+                            Apply Filters
+                        </button>
+                    </div>
+                </aside>
+
+                <!-- ========================================
+                     RESULTS GRID
+                     - 6 hostel cards (2 columns)
+                     - Card: Image, Name, Rating, Location, Price, View button
+                     - Pagination
+                ======================================== -->
+                <div class="flex-1 min-w-0">
+
+                    <!-- Hostel Cards Grid -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
+
+                        <!-- Hostel Card 1 -->
+                        <article class="hostel-card rounded-xl overflow-hidden bg-white shadow-sm border border-neutral-200">
+                            <div class="aspect-[16/10] bg-gradient-to-br from-primary-100 to-primary-200 relative">
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <i data-lucide="image" class="w-12 h-12 text-primary-300"></i>
+                                </div>
+                                <button class="absolute top-3 right-3 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors focus-ring" aria-label="Add to wishlist">
+                                    <i data-lucide="heart" class="w-5 h-5 text-neutral-600"></i>
+                                </button>
+                                <span class="absolute top-3 left-3 bg-secondary-500 text-neutral-900 text-xs font-semibold px-2 py-1 rounded-md">
+                                    Featured
+                                </span>
+                            </div>
+                            <div class="p-5">
+                                <div class="flex items-start justify-between gap-2 mb-2">
+                                    <h3 class="font-heading font-semibold text-lg text-neutral-900 line-clamp-1">
+                                        Saigon Backpackers Hub
+                                    </h3>
+                                    <div class="flex items-center gap-1 shrink-0">
+                                        <i data-lucide="star" class="w-4 h-4 text-secondary-500 fill-secondary-500"></i>
+                                        <span class="font-semibold text-sm text-neutral-900">4.8</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5 text-neutral-600 text-sm mb-4">
+                                    <i data-lucide="map-pin" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>District 1, Ho Chi Minh City</span>
+                                </div>
+                                <div class="flex items-end justify-between">
+                                    <div>
+                                        <span class="text-sm text-neutral-500">From</span>
+                                        <p class="text-xl font-bold text-primary-500">180,000₫<span class="text-sm font-normal text-neutral-500">/night</span></p>
+                                    </div>
+                                    <a href="guest-hostel-detail.html" class="btn-primary bg-primary-500 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors focus-ring">
+                                        View
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Hostel Card 2 -->
+                        <article class="hostel-card rounded-xl overflow-hidden bg-white shadow-sm border border-neutral-200">
+                            <div class="aspect-[16/10] bg-gradient-to-br from-secondary-100 to-secondary-200 relative">
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <i data-lucide="image" class="w-12 h-12 text-secondary-300"></i>
+                                </div>
+                                <button class="absolute top-3 right-3 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors focus-ring" aria-label="Add to wishlist">
+                                    <i data-lucide="heart" class="w-5 h-5 text-neutral-600"></i>
+                                </button>
+                            </div>
+                            <div class="p-5">
+                                <div class="flex items-start justify-between gap-2 mb-2">
+                                    <h3 class="font-heading font-semibold text-lg text-neutral-900 line-clamp-1">
+                                        Vietnam House Hostel
+                                    </h3>
+                                    <div class="flex items-center gap-1 shrink-0">
+                                        <i data-lucide="star" class="w-4 h-4 text-secondary-500 fill-secondary-500"></i>
+                                        <span class="font-semibold text-sm text-neutral-900">4.6</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5 text-neutral-600 text-sm mb-4">
+                                    <i data-lucide="map-pin" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>District 3, Ho Chi Minh City</span>
+                                </div>
+                                <div class="flex items-end justify-between">
+                                    <div>
+                                        <span class="text-sm text-neutral-500">From</span>
+                                        <p class="text-xl font-bold text-primary-500">150,000₫<span class="text-sm font-normal text-neutral-500">/night</span></p>
+                                    </div>
+                                    <a href="guest-hostel-detail.html" class="btn-primary bg-primary-500 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors focus-ring">
+                                        View
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Hostel Card 3 -->
+                        <article class="hostel-card rounded-xl overflow-hidden bg-white shadow-sm border border-neutral-200">
+                            <div class="aspect-[16/10] bg-gradient-to-br from-primary-50 to-secondary-100 relative">
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <i data-lucide="image" class="w-12 h-12 text-primary-200"></i>
+                                </div>
+                                <button class="absolute top-3 right-3 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors focus-ring" aria-label="Add to wishlist">
+                                    <i data-lucide="heart" class="w-5 h-5 text-secondary-500 fill-secondary-500"></i>
+                                </button>
+                            </div>
+                            <div class="p-5">
+                                <div class="flex items-start justify-between gap-2 mb-2">
+                                    <h3 class="font-heading font-semibold text-lg text-neutral-900 line-clamp-1">
+                                        The Common Room Project
+                                    </h3>
+                                    <div class="flex items-center gap-1 shrink-0">
+                                        <i data-lucide="star" class="w-4 h-4 text-secondary-500 fill-secondary-500"></i>
+                                        <span class="font-semibold text-sm text-neutral-900">4.9</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5 text-neutral-600 text-sm mb-4">
+                                    <i data-lucide="map-pin" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>District 1, Ho Chi Minh City</span>
+                                </div>
+                                <div class="flex items-end justify-between">
+                                    <div>
+                                        <span class="text-sm text-neutral-500">From</span>
+                                        <p class="text-xl font-bold text-primary-500">220,000₫<span class="text-sm font-normal text-neutral-500">/night</span></p>
+                                    </div>
+                                    <a href="guest-hostel-detail.html" class="btn-primary bg-primary-500 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors focus-ring">
+                                        View
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Hostel Card 4 -->
+                        <article class="hostel-card rounded-xl overflow-hidden bg-white shadow-sm border border-neutral-200">
+                            <div class="aspect-[16/10] bg-gradient-to-br from-primary-100 to-primary-200 relative">
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <i data-lucide="image" class="w-12 h-12 text-primary-300"></i>
+                                </div>
+                                <button class="absolute top-3 right-3 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors focus-ring" aria-label="Add to wishlist">
+                                    <i data-lucide="heart" class="w-5 h-5 text-neutral-600"></i>
+                                </button>
+                            </div>
+                            <div class="p-5">
+                                <div class="flex items-start justify-between gap-2 mb-2">
+                                    <h3 class="font-heading font-semibold text-lg text-neutral-900 line-clamp-1">
+                                        Long Hostel Saigon
+                                    </h3>
+                                    <div class="flex items-center gap-1 shrink-0">
+                                        <i data-lucide="star" class="w-4 h-4 text-secondary-500 fill-secondary-500"></i>
+                                        <span class="font-semibold text-sm text-neutral-900">4.5</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5 text-neutral-600 text-sm mb-4">
+                                    <i data-lucide="map-pin" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>Phu Nhuan, Ho Chi Minh City</span>
+                                </div>
+                                <div class="flex items-end justify-between">
+                                    <div>
+                                        <span class="text-sm text-neutral-500">From</span>
+                                        <p class="text-xl font-bold text-primary-500">120,000₫<span class="text-sm font-normal text-neutral-500">/night</span></p>
+                                    </div>
+                                    <a href="guest-hostel-detail.html" class="btn-primary bg-primary-500 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors focus-ring">
+                                        View
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Hostel Card 5 -->
+                        <article class="hostel-card rounded-xl overflow-hidden bg-white shadow-sm border border-neutral-200">
+                            <div class="aspect-[16/10] bg-gradient-to-br from-secondary-100 to-primary-100 relative">
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <i data-lucide="image" class="w-12 h-12 text-secondary-200"></i>
+                                </div>
+                                <button class="absolute top-3 right-3 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors focus-ring" aria-label="Add to wishlist">
+                                    <i data-lucide="heart" class="w-5 h-5 text-neutral-600"></i>
+                                </button>
+                            </div>
+                            <div class="p-5">
+                                <div class="flex items-start justify-between gap-2 mb-2">
+                                    <h3 class="font-heading font-semibold text-lg text-neutral-900 line-clamp-1">
+                                        Bui Vien Backpackers
+                                    </h3>
+                                    <div class="flex items-center gap-1 shrink-0">
+                                        <i data-lucide="star" class="w-4 h-4 text-secondary-500 fill-secondary-500"></i>
+                                        <span class="font-semibold text-sm text-neutral-900">4.3</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5 text-neutral-600 text-sm mb-4">
+                                    <i data-lucide="map-pin" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>District 1, Ho Chi Minh City</span>
+                                </div>
+                                <div class="flex items-end justify-between">
+                                    <div>
+                                        <span class="text-sm text-neutral-500">From</span>
+                                        <p class="text-xl font-bold text-primary-500">100,000₫<span class="text-sm font-normal text-neutral-500">/night</span></p>
+                                    </div>
+                                    <a href="guest-hostel-detail.html" class="btn-primary bg-primary-500 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors focus-ring">
+                                        View
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Hostel Card 6 -->
+                        <article class="hostel-card rounded-xl overflow-hidden bg-white shadow-sm border border-neutral-200">
+                            <div class="aspect-[16/10] bg-gradient-to-br from-primary-100 to-secondary-100 relative">
+                                <div class="absolute inset-0 flex items-center justify-center">
+                                    <i data-lucide="image" class="w-12 h-12 text-primary-200"></i>
+                                </div>
+                                <button class="absolute top-3 right-3 w-9 h-9 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center hover:bg-white transition-colors focus-ring" aria-label="Add to wishlist">
+                                    <i data-lucide="heart" class="w-5 h-5 text-neutral-600"></i>
+                                </button>
+                            </div>
+                            <div class="p-5">
+                                <div class="flex items-start justify-between gap-2 mb-2">
+                                    <h3 class="font-heading font-semibold text-lg text-neutral-900 line-clamp-1">
+                                        Hideout Hostel Saigon
+                                    </h3>
+                                    <div class="flex items-center gap-1 shrink-0">
+                                        <i data-lucide="star" class="w-4 h-4 text-secondary-500 fill-secondary-500"></i>
+                                        <span class="font-semibold text-sm text-neutral-900">4.7</span>
+                                    </div>
+                                </div>
+                                <div class="flex items-center gap-1.5 text-neutral-600 text-sm mb-4">
+                                    <i data-lucide="map-pin" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>District 1, Ho Chi Minh City</span>
+                                </div>
+                                <div class="flex items-end justify-between">
+                                    <div>
+                                        <span class="text-sm text-neutral-500">From</span>
+                                        <p class="text-xl font-bold text-primary-500">200,000₫<span class="text-sm font-normal text-neutral-500">/night</span></p>
+                                    </div>
+                                    <a href="guest-hostel-detail.html" class="btn-primary bg-primary-500 text-white font-semibold px-4 py-2 rounded-lg text-sm transition-colors focus-ring">
+                                        View
+                                    </a>
+                                </div>
+                            </div>
+                        </article>
+                    </div>
+
+                    <!-- ========================================
+                         PAGINATION
+                         - Previous/Next buttons
+                         - Page numbers
+                    ======================================== -->
+                    <nav class="flex items-center justify-center gap-2" aria-label="Pagination">
+                        <!-- Previous -->
+                        <button
+                            type="button"
+                            class="flex items-center gap-1 h-10 px-4 border border-neutral-200 rounded-lg text-sm font-medium text-neutral-400 cursor-not-allowed"
+                            disabled
+                        >
+                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                            <span class="hidden sm:inline">Previous</span>
+                        </button>
+
+                        <!-- Page Numbers -->
+                        <div class="flex items-center gap-1">
+                            <button class="w-10 h-10 flex items-center justify-center rounded-lg text-sm font-semibold bg-primary-500 text-white">
+                                1
+                            </button>
+                            <button class="w-10 h-10 flex items-center justify-center rounded-lg text-sm font-medium text-neutral-700 hover:bg-neutral-100 transition-colors">
+                                2
+                            </button>
+                            <button class="w-10 h-10 flex items-center justify-center rounded-lg text-sm font-medium text-neutral-700 hover:bg-neutral-100 transition-colors">
+                                3
+                            </button>
+                            <span class="w-10 h-10 flex items-center justify-center text-neutral-400">...</span>
+                            <button class="w-10 h-10 flex items-center justify-center rounded-lg text-sm font-medium text-neutral-700 hover:bg-neutral-100 transition-colors">
+                                4
+                            </button>
+                        </div>
+
+                        <!-- Next -->
+                        <button
+                            type="button"
+                            class="flex items-center gap-1 h-10 px-4 border border-neutral-200 rounded-lg text-sm font-medium text-neutral-700 hover:bg-neutral-100 transition-colors focus-ring"
+                        >
+                            <span class="hidden sm:inline">Next</span>
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </button>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ========================================
+         FOOTER
+         - Same as guest-home.html
+         - Logo and tagline
+         - Navigation links
+         - Social icons
+         - Copyright
+    ======================================== -->
+    <footer class="bg-neutral-900 text-white py-12 sm:py-16 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-10">
+
+                <!-- Brand Column -->
+                <div class="lg:col-span-2">
+                    <a href="guest-home.html" class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
+                            <i data-lucide="bed-double" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <span class="font-heading font-bold text-xl">
+                            <span class="text-white">Hostel</span><span class="text-secondary-500">Viet</span>
+                        </span>
+                    </a>
+                    <p class="text-neutral-400 max-w-sm mb-6">
+                        Your Gateway to Vietnamese Adventures. Discover unique stays and unforgettable experiences across Vietnam.
+                    </p>
+
+                    <!-- Social Icons -->
+                    <div class="flex items-center gap-3">
+                        <a href="#" class="w-10 h-10 bg-neutral-800 hover:bg-primary-500 rounded-lg flex items-center justify-center transition-colors focus-ring" aria-label="Facebook">
+                            <i data-lucide="facebook" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-neutral-800 hover:bg-primary-500 rounded-lg flex items-center justify-center transition-colors focus-ring" aria-label="Instagram">
+                            <i data-lucide="instagram" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-neutral-800 hover:bg-primary-500 rounded-lg flex items-center justify-center transition-colors focus-ring" aria-label="Twitter">
+                            <i data-lucide="twitter" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-neutral-800 hover:bg-primary-500 rounded-lg flex items-center justify-center transition-colors focus-ring" aria-label="YouTube">
+                            <i data-lucide="youtube" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="font-heading font-semibold text-lg mb-4">Quick Links</h4>
+                    <nav class="flex flex-col gap-3">
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">About Us</a>
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">Contact</a>
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">Careers</a>
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">Blog</a>
+                    </nav>
+                </div>
+
+                <!-- Legal -->
+                <div>
+                    <h4 class="font-heading font-semibold text-lg mb-4">Legal</h4>
+                    <nav class="flex flex-col gap-3">
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">Terms of Service</a>
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">Privacy Policy</a>
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">Cookie Policy</a>
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">Refund Policy</a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="pt-8 border-t border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p class="text-neutral-500 text-sm">
+                    &copy; 2026 HostelViet. All rights reserved.
+                </p>
+                <p class="text-neutral-500 text-sm">
+                    Made with <i data-lucide="heart" class="w-4 h-4 inline text-secondary-500 fill-secondary-500"></i> in Vietnam
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========================================
+         SCRIPTS
+         - Initialize Lucide icons
+         - Mobile menu toggle
+         - Filter sidebar toggle
+         - Price slider
+    ======================================== -->
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('menu-icon');
+            const button = icon.closest('button');
+
+            menu.classList.toggle('hidden');
+
+            if (menu.classList.contains('hidden')) {
+                icon.setAttribute('data-lucide', 'menu');
+                button.setAttribute('aria-expanded', 'false');
+            } else {
+                icon.setAttribute('data-lucide', 'x');
+                button.setAttribute('aria-expanded', 'true');
+            }
+
+            lucide.createIcons();
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('mobile-menu');
+            const menuButton = document.querySelector('[aria-label="Toggle menu"]');
+
+            if (!menu.contains(event.target) && !menuButton.contains(event.target) && !menu.classList.contains('hidden')) {
+                toggleMobileMenu();
+            }
+        });
+
+        // Filter sidebar toggle (mobile)
+        function toggleFilters() {
+            const sidebar = document.getElementById('filter-sidebar');
+            const overlay = document.getElementById('filter-overlay');
+
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('open');
+
+            // Prevent body scroll when filters are open
+            document.body.style.overflow = sidebar.classList.contains('open') ? 'hidden' : '';
+        }
+
+        // Update price display
+        function updatePriceDisplay() {
+            const minSlider = document.getElementById('price-min');
+            const maxSlider = document.getElementById('price-max');
+            const minDisplay = document.getElementById('price-min-display');
+            const maxDisplay = document.getElementById('price-max-display');
+
+            const minVal = parseInt(minSlider.value);
+            const maxVal = parseInt(maxSlider.value);
+
+            // Format numbers with Vietnamese dong
+            minDisplay.textContent = minVal.toLocaleString('vi-VN') + '₫';
+            maxDisplay.textContent = maxVal.toLocaleString('vi-VN') + '₫';
+        }
+
+        // Set minimum dates for date inputs
+        const today = new Date().toISOString().split('T')[0];
+        const checkinInput = document.getElementById('search-checkin');
+        const checkoutInput = document.getElementById('search-checkout');
+
+        if (checkinInput) {
+            checkinInput.setAttribute('min', today);
+        }
+        if (checkoutInput) {
+            checkoutInput.setAttribute('min', today);
+        }
+
+        // Update checkout min date when checkin changes
+        if (checkinInput && checkoutInput) {
+            checkinInput.addEventListener('change', function() {
+                checkoutInput.setAttribute('min', this.value);
+            });
+        }
+    </script>
+
+</body>
+</html>

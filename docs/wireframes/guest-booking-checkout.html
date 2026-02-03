@@ -1,0 +1,681 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Checkout - HostelViet</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#E6F0F7',
+                            100: '#CCE1EF',
+                            500: '#0F4C75',
+                            600: '#0D3F61',
+                            700: '#0A324D',
+                            900: '#051926',
+                        },
+                        secondary: {
+                            400: '#F5A623',
+                            500: '#D4920F',
+                            600: '#B37D0D',
+                        },
+                        neutral: {
+                            0: '#FFFFFF',
+                            50: '#F8FAFC',
+                            100: '#F1F5F9',
+                            200: '#E2E8F0',
+                            400: '#94A3B8',
+                            600: '#475569',
+                            900: '#0F172A',
+                        }
+                    },
+                    fontFamily: {
+                        heading: ['Outfit', 'system-ui', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base styles */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', system-ui, sans-serif;
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Button hover states */
+        .btn-primary:hover {
+            background-color: #0D3F61;
+        }
+
+        .btn-accent:hover {
+            background-color: #B37D0D;
+        }
+
+        /* Focus states */
+        .focus-ring:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #0F4C75;
+        }
+
+        /* Progress step styles */
+        .step-completed {
+            background-color: #0F4C75;
+            color: white;
+        }
+
+        .step-active {
+            background-color: #0F4C75;
+            color: white;
+            box-shadow: 0 0 0 4px rgba(15, 76, 117, 0.2);
+        }
+
+        .step-pending {
+            background-color: #E2E8F0;
+            color: #94A3B8;
+        }
+
+        .step-line-completed {
+            background-color: #0F4C75;
+        }
+
+        .step-line-pending {
+            background-color: #E2E8F0;
+        }
+
+        /* Sticky sidebar */
+        .sticky-sidebar {
+            position: sticky;
+            top: 100px;
+        }
+
+        /* Form input focus */
+        .form-input:focus {
+            border-color: #0F4C75;
+            box-shadow: 0 0 0 3px rgba(15, 76, 117, 0.1);
+        }
+
+        /* Checkbox custom style */
+        .custom-checkbox:checked {
+            background-color: #0F4C75;
+            border-color: #0F4C75;
+        }
+    </style>
+</head>
+<body class="bg-neutral-50 text-neutral-900 font-body min-h-screen flex flex-col">
+
+    <!-- Skip to content link (accessibility) -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary-500 text-white px-4 py-2 rounded-md z-50">
+        Skip to main content
+    </a>
+
+    <!-- ========================================
+         HEADER (Simplified - No Main Nav)
+         - Logo left, Help right
+         - Secure checkout indicator
+    ======================================== -->
+    <header class="sticky top-0 z-40 bg-white border-b border-neutral-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-2 focus-ring rounded-md">
+                    <div class="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
+                        <i data-lucide="bed-double" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <span class="font-heading font-bold text-xl">
+                        <span class="text-primary-500">Hostel</span><span class="text-secondary-500">Viet</span>
+                    </span>
+                </a>
+
+                <!-- Secure Checkout Indicator -->
+                <div class="flex items-center gap-4">
+                    <div class="hidden sm:flex items-center gap-2 text-sm text-neutral-600">
+                        <i data-lucide="shield-check" class="w-4 h-4 text-green-600"></i>
+                        <span>Secure Checkout</span>
+                    </div>
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 font-medium text-sm flex items-center gap-1.5 transition-colors focus-ring rounded-md px-2 py-1">
+                        <i data-lucide="help-circle" class="w-4 h-4"></i>
+                        <span class="hidden sm:inline">Help</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content" class="flex-grow">
+
+        <!-- ========================================
+             PROGRESS STEPS
+             - Step 1: Review (active)
+             - Step 2: Guest Details
+             - Step 3: Payment
+             - Step 4: Confirmation
+        ======================================== -->
+        <section class="bg-white border-b border-neutral-200 py-6">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <nav aria-label="Booking progress">
+                    <ol class="flex items-center justify-between">
+                        <!-- Step 1: Review (Active) -->
+                        <li class="flex items-center">
+                            <div class="flex flex-col items-center">
+                                <div class="step-active w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm mb-2">
+                                    1
+                                </div>
+                                <span class="text-sm font-medium text-primary-500 hidden sm:block">Review</span>
+                            </div>
+                        </li>
+
+                        <!-- Line 1-2 -->
+                        <div class="flex-1 h-0.5 step-line-pending mx-2 sm:mx-4"></div>
+
+                        <!-- Step 2: Guest Details -->
+                        <li class="flex items-center">
+                            <div class="flex flex-col items-center">
+                                <div class="step-pending w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm mb-2">
+                                    2
+                                </div>
+                                <span class="text-sm font-medium text-neutral-400 hidden sm:block">Guest Details</span>
+                            </div>
+                        </li>
+
+                        <!-- Line 2-3 -->
+                        <div class="flex-1 h-0.5 step-line-pending mx-2 sm:mx-4"></div>
+
+                        <!-- Step 3: Payment -->
+                        <li class="flex items-center">
+                            <div class="flex flex-col items-center">
+                                <div class="step-pending w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm mb-2">
+                                    3
+                                </div>
+                                <span class="text-sm font-medium text-neutral-400 hidden sm:block">Payment</span>
+                            </div>
+                        </li>
+
+                        <!-- Line 3-4 -->
+                        <div class="flex-1 h-0.5 step-line-pending mx-2 sm:mx-4"></div>
+
+                        <!-- Step 4: Confirmation -->
+                        <li class="flex items-center">
+                            <div class="flex flex-col items-center">
+                                <div class="step-pending w-10 h-10 rounded-full flex items-center justify-center font-semibold text-sm mb-2">
+                                    4
+                                </div>
+                                <span class="text-sm font-medium text-neutral-400 hidden sm:block">Confirmation</span>
+                            </div>
+                        </li>
+                    </ol>
+                </nav>
+            </div>
+        </section>
+
+        <!-- ========================================
+             TWO COLUMN LAYOUT
+             - Left (60%): Guest Details Form
+             - Right (40%): Booking Summary (sticky)
+        ======================================== -->
+        <section class="py-8 sm:py-10 lg:py-12">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="grid grid-cols-1 lg:grid-cols-5 gap-8 lg:gap-12">
+
+                    <!-- ========================================
+                         LEFT COLUMN - Guest Details Form
+                    ======================================== -->
+                    <div class="lg:col-span-3 order-2 lg:order-1">
+
+                        <!-- Guest Information Section -->
+                        <div class="bg-white rounded-xl shadow-sm border border-neutral-200 p-6 sm:p-8 mb-6">
+                            <h2 class="font-heading font-semibold text-xl text-neutral-900 mb-6 flex items-center gap-2">
+                                <i data-lucide="user" class="w-5 h-5 text-primary-500"></i>
+                                Guest Information
+                            </h2>
+
+                            <form id="guest-form">
+                                <!-- Name Fields -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                    <!-- First Name -->
+                                    <div>
+                                        <label for="first-name" class="block text-sm font-medium text-neutral-700 mb-1.5">
+                                            First Name <span class="text-red-500">*</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="first-name"
+                                            name="first-name"
+                                            required
+                                            placeholder="John"
+                                            class="form-input w-full h-11 px-4 border border-neutral-200 rounded-lg text-neutral-900 placeholder:text-neutral-400 focus:outline-none transition-all"
+                                        >
+                                    </div>
+
+                                    <!-- Last Name -->
+                                    <div>
+                                        <label for="last-name" class="block text-sm font-medium text-neutral-700 mb-1.5">
+                                            Last Name <span class="text-red-500">*</span>
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="last-name"
+                                            name="last-name"
+                                            required
+                                            placeholder="Doe"
+                                            class="form-input w-full h-11 px-4 border border-neutral-200 rounded-lg text-neutral-900 placeholder:text-neutral-400 focus:outline-none transition-all"
+                                        >
+                                    </div>
+                                </div>
+
+                                <!-- Email and Phone -->
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                                    <!-- Email -->
+                                    <div>
+                                        <label for="email" class="block text-sm font-medium text-neutral-700 mb-1.5">
+                                            Email Address <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="relative">
+                                            <i data-lucide="mail" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400"></i>
+                                            <input
+                                                type="email"
+                                                id="email"
+                                                name="email"
+                                                required
+                                                placeholder="john@example.com"
+                                                class="form-input w-full h-11 pl-10 pr-4 border border-neutral-200 rounded-lg text-neutral-900 placeholder:text-neutral-400 focus:outline-none transition-all"
+                                            >
+                                        </div>
+                                        <p class="text-xs text-neutral-500 mt-1">Confirmation will be sent to this email</p>
+                                    </div>
+
+                                    <!-- Phone -->
+                                    <div>
+                                        <label for="phone" class="block text-sm font-medium text-neutral-700 mb-1.5">
+                                            Phone Number <span class="text-red-500">*</span>
+                                        </label>
+                                        <div class="relative">
+                                            <i data-lucide="phone" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400"></i>
+                                            <input
+                                                type="tel"
+                                                id="phone"
+                                                name="phone"
+                                                required
+                                                placeholder="+84 123 456 789"
+                                                class="form-input w-full h-11 pl-10 pr-4 border border-neutral-200 rounded-lg text-neutral-900 placeholder:text-neutral-400 focus:outline-none transition-all"
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Country -->
+                                <div class="mb-4">
+                                    <label for="country" class="block text-sm font-medium text-neutral-700 mb-1.5">
+                                        Country / Region <span class="text-red-500">*</span>
+                                    </label>
+                                    <div class="relative">
+                                        <i data-lucide="globe" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400"></i>
+                                        <select
+                                            id="country"
+                                            name="country"
+                                            required
+                                            class="form-input w-full h-11 pl-10 pr-8 border border-neutral-200 rounded-lg text-neutral-900 appearance-none focus:outline-none transition-all bg-white"
+                                        >
+                                            <option value="">Select your country</option>
+                                            <option value="VN">Vietnam</option>
+                                            <option value="US">United States</option>
+                                            <option value="GB">United Kingdom</option>
+                                            <option value="AU">Australia</option>
+                                            <option value="CA">Canada</option>
+                                            <option value="DE">Germany</option>
+                                            <option value="FR">France</option>
+                                            <option value="JP">Japan</option>
+                                            <option value="KR">South Korea</option>
+                                            <option value="SG">Singapore</option>
+                                            <option value="TH">Thailand</option>
+                                            <option value="MY">Malaysia</option>
+                                            <option value="ID">Indonesia</option>
+                                            <option value="PH">Philippines</option>
+                                            <option value="OTHER">Other</option>
+                                        </select>
+                                        <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Special Requests -->
+                                <div class="mb-4">
+                                    <label for="special-requests" class="block text-sm font-medium text-neutral-700 mb-1.5">
+                                        Special Requests (Optional)
+                                    </label>
+                                    <textarea
+                                        id="special-requests"
+                                        name="special-requests"
+                                        rows="3"
+                                        placeholder="Any special requests or preferences? (e.g., lower bunk, quiet room, dietary restrictions)"
+                                        class="form-input w-full px-4 py-3 border border-neutral-200 rounded-lg text-neutral-900 placeholder:text-neutral-400 focus:outline-none transition-all resize-none"
+                                    ></textarea>
+                                    <p class="text-xs text-neutral-500 mt-1">Special requests are subject to availability</p>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Arrival Time Section -->
+                        <div class="bg-white rounded-xl shadow-sm border border-neutral-200 p-6 sm:p-8 mb-6">
+                            <h2 class="font-heading font-semibold text-xl text-neutral-900 mb-6 flex items-center gap-2">
+                                <i data-lucide="clock" class="w-5 h-5 text-primary-500"></i>
+                                Arrival Information
+                            </h2>
+
+                            <div>
+                                <label for="arrival-time" class="block text-sm font-medium text-neutral-700 mb-1.5">
+                                    Expected Arrival Time <span class="text-red-500">*</span>
+                                </label>
+                                <div class="relative">
+                                    <i data-lucide="clock" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400"></i>
+                                    <select
+                                        id="arrival-time"
+                                        name="arrival-time"
+                                        required
+                                        class="form-input w-full h-11 pl-10 pr-8 border border-neutral-200 rounded-lg text-neutral-900 appearance-none focus:outline-none transition-all bg-white"
+                                    >
+                                        <option value="">Select your arrival time</option>
+                                        <option value="00:00-02:00">12:00 AM - 2:00 AM</option>
+                                        <option value="02:00-04:00">2:00 AM - 4:00 AM</option>
+                                        <option value="04:00-06:00">4:00 AM - 6:00 AM</option>
+                                        <option value="06:00-08:00">6:00 AM - 8:00 AM</option>
+                                        <option value="08:00-10:00">8:00 AM - 10:00 AM</option>
+                                        <option value="10:00-12:00">10:00 AM - 12:00 PM</option>
+                                        <option value="12:00-14:00">12:00 PM - 2:00 PM</option>
+                                        <option value="14:00-16:00" selected>2:00 PM - 4:00 PM (Check-in time)</option>
+                                        <option value="16:00-18:00">4:00 PM - 6:00 PM</option>
+                                        <option value="18:00-20:00">6:00 PM - 8:00 PM</option>
+                                        <option value="20:00-22:00">8:00 PM - 10:00 PM</option>
+                                        <option value="22:00-00:00">10:00 PM - 12:00 AM</option>
+                                    </select>
+                                    <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none"></i>
+                                </div>
+                                <p class="text-xs text-neutral-500 mt-1">Check-in starts at 2:00 PM. Early check-in may be available upon request.</p>
+                            </div>
+                        </div>
+
+                        <!-- Terms and Continue -->
+                        <div class="bg-white rounded-xl shadow-sm border border-neutral-200 p-6 sm:p-8">
+
+                            <!-- Terms Checkbox -->
+                            <div class="mb-6">
+                                <label class="flex items-start gap-3 cursor-pointer group">
+                                    <input
+                                        type="checkbox"
+                                        id="terms"
+                                        name="terms"
+                                        required
+                                        class="custom-checkbox w-5 h-5 mt-0.5 rounded border-2 border-neutral-300 text-primary-500 focus:ring-primary-500 focus:ring-offset-0 cursor-pointer"
+                                    >
+                                    <span class="text-sm text-neutral-600 leading-relaxed">
+                                        I agree to the <a href="#" class="text-primary-500 hover:underline font-medium">Terms of Service</a>,
+                                        <a href="#" class="text-primary-500 hover:underline font-medium">Privacy Policy</a>, and
+                                        <a href="#" class="text-primary-500 hover:underline font-medium">Cancellation Policy</a>.
+                                        I also consent to receive booking confirmations and updates via email.
+                                    </span>
+                                </label>
+                            </div>
+
+                            <!-- Continue Button -->
+                            <button
+                                type="submit"
+                                form="guest-form"
+                                class="btn-primary w-full h-12 bg-primary-500 text-white font-semibold rounded-lg flex items-center justify-center gap-2 transition-colors focus-ring"
+                            >
+                                <span>Continue to Payment</span>
+                                <i data-lucide="arrow-right" class="w-5 h-5"></i>
+                            </button>
+
+                            <!-- Security Note -->
+                            <div class="flex items-center justify-center gap-2 mt-4 text-sm text-neutral-500">
+                                <i data-lucide="lock" class="w-4 h-4"></i>
+                                <span>Your information is encrypted and secure</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ========================================
+                         RIGHT COLUMN - Booking Summary (Sticky)
+                    ======================================== -->
+                    <div class="lg:col-span-2 order-1 lg:order-2">
+                        <div class="sticky-sidebar">
+                            <div class="bg-white rounded-xl shadow-sm border border-neutral-200 overflow-hidden">
+
+                                <!-- Summary Header -->
+                                <div class="p-6 border-b border-neutral-200">
+                                    <h2 class="font-heading font-semibold text-lg text-neutral-900 mb-4">Booking Summary</h2>
+
+                                    <!-- Hostel Info -->
+                                    <div class="flex gap-4">
+                                        <!-- Hostel Image Placeholder -->
+                                        <div class="w-24 h-20 bg-gradient-to-br from-primary-100 to-primary-200 rounded-lg flex items-center justify-center shrink-0">
+                                            <i data-lucide="image" class="w-8 h-8 text-primary-300"></i>
+                                        </div>
+                                        <div class="flex-1 min-w-0">
+                                            <h3 class="font-heading font-semibold text-neutral-900 line-clamp-1">
+                                                Saigon Backpackers Hub
+                                            </h3>
+                                            <div class="flex items-center gap-1 text-sm text-neutral-500 mt-1">
+                                                <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                                                <span class="line-clamp-1">District 1, Ho Chi Minh City</span>
+                                            </div>
+                                            <div class="flex items-center gap-1 mt-1">
+                                                <i data-lucide="star" class="w-4 h-4 text-secondary-500 fill-secondary-500"></i>
+                                                <span class="font-semibold text-sm text-neutral-900">4.8</span>
+                                                <span class="text-sm text-neutral-500">(256 reviews)</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Booking Details -->
+                                <div class="p-6 border-b border-neutral-200">
+                                    <!-- Room Type -->
+                                    <div class="flex items-center justify-between mb-3">
+                                        <span class="text-sm text-neutral-600">Room Type</span>
+                                        <span class="text-sm font-medium text-neutral-900">Mixed Dorm (6 Bed)</span>
+                                    </div>
+
+                                    <!-- Dates -->
+                                    <div class="bg-neutral-50 rounded-lg p-4 mb-4">
+                                        <div class="grid grid-cols-2 gap-4">
+                                            <div>
+                                                <div class="text-xs text-neutral-500 mb-1">Check-in</div>
+                                                <div class="font-semibold text-neutral-900">Feb 15, 2026</div>
+                                                <div class="text-xs text-neutral-500">From 2:00 PM</div>
+                                            </div>
+                                            <div>
+                                                <div class="text-xs text-neutral-500 mb-1">Check-out</div>
+                                                <div class="font-semibold text-neutral-900">Feb 17, 2026</div>
+                                                <div class="text-xs text-neutral-500">Until 11:00 AM</div>
+                                            </div>
+                                        </div>
+                                        <div class="flex items-center gap-2 mt-3 pt-3 border-t border-neutral-200">
+                                            <i data-lucide="moon" class="w-4 h-4 text-neutral-500"></i>
+                                            <span class="text-sm font-medium text-neutral-900">2 nights</span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Guests -->
+                                    <div class="flex items-center justify-between">
+                                        <span class="text-sm text-neutral-600">Guests</span>
+                                        <span class="text-sm font-medium text-neutral-900">1 Guest</span>
+                                    </div>
+                                </div>
+
+                                <!-- Price Breakdown -->
+                                <div class="p-6 border-b border-neutral-200">
+                                    <h3 class="font-semibold text-neutral-900 mb-4">Price Details</h3>
+
+                                    <!-- Night calculation -->
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm text-neutral-600">2 nights x 180,000 VND</span>
+                                        <span class="text-sm text-neutral-900">360,000 VND</span>
+                                    </div>
+
+                                    <!-- Service Fee -->
+                                    <div class="flex items-center justify-between mb-2">
+                                        <span class="text-sm text-neutral-600 flex items-center gap-1">
+                                            Service fee
+                                            <i data-lucide="info" class="w-3.5 h-3.5 text-neutral-400 cursor-help" title="This fee helps us maintain our platform and provide customer support"></i>
+                                        </span>
+                                        <span class="text-sm text-neutral-900">18,000 VND</span>
+                                    </div>
+
+                                    <!-- Divider -->
+                                    <hr class="border-neutral-200 my-4">
+
+                                    <!-- Total -->
+                                    <div class="flex items-center justify-between">
+                                        <span class="font-semibold text-neutral-900">Total (VND)</span>
+                                        <span class="font-bold text-xl text-primary-500">378,000 VND</span>
+                                    </div>
+
+                                    <!-- USD Equivalent -->
+                                    <div class="text-right mt-1">
+                                        <span class="text-xs text-neutral-500">Approx. $15.12 USD</span>
+                                    </div>
+                                </div>
+
+                                <!-- Cancellation Policy -->
+                                <div class="p-6 bg-neutral-50">
+                                    <div class="flex items-start gap-3">
+                                        <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center shrink-0">
+                                            <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+                                        </div>
+                                        <div>
+                                            <h4 class="font-semibold text-sm text-neutral-900 mb-1">Free Cancellation</h4>
+                                            <p class="text-xs text-neutral-600 leading-relaxed">
+                                                Cancel before Feb 14, 2026 (24h before check-in) for a full refund.
+                                                <a href="#" class="text-primary-500 hover:underline">Learn more</a>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Need Help -->
+                            <div class="mt-4 p-4 bg-white rounded-lg border border-neutral-200">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-primary-50 rounded-full flex items-center justify-center">
+                                        <i data-lucide="headphones" class="w-5 h-5 text-primary-500"></i>
+                                    </div>
+                                    <div>
+                                        <p class="text-sm font-medium text-neutral-900">Need Help?</p>
+                                        <p class="text-xs text-neutral-500">Our support team is available 24/7</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- ========================================
+         FOOTER (Minimal)
+         - Compact footer for checkout flow
+    ======================================== -->
+    <footer class="bg-neutral-900 text-white py-6 mt-auto">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <!-- Logo and Copyright -->
+                <div class="flex items-center gap-3">
+                    <a href="#" class="flex items-center gap-2">
+                        <div class="w-6 h-6 bg-primary-500 rounded flex items-center justify-center">
+                            <i data-lucide="bed-double" class="w-4 h-4 text-white"></i>
+                        </div>
+                        <span class="font-heading font-bold text-sm">
+                            <span class="text-white">Hostel</span><span class="text-secondary-500">Viet</span>
+                        </span>
+                    </a>
+                    <span class="text-neutral-500 text-sm">|</span>
+                    <span class="text-neutral-400 text-sm">2026 All rights reserved</span>
+                </div>
+
+                <!-- Legal Links -->
+                <nav class="flex items-center gap-4 text-sm">
+                    <a href="#" class="text-neutral-400 hover:text-white transition-colors">Terms</a>
+                    <a href="#" class="text-neutral-400 hover:text-white transition-colors">Privacy</a>
+                    <a href="#" class="text-neutral-400 hover:text-white transition-colors">Help</a>
+                </nav>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========================================
+         SCRIPTS
+         - Initialize Lucide icons
+    ======================================== -->
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Form validation visual feedback
+        const formInputs = document.querySelectorAll('.form-input');
+        formInputs.forEach(input => {
+            input.addEventListener('blur', function() {
+                if (this.value && this.checkValidity()) {
+                    this.classList.add('border-green-500');
+                    this.classList.remove('border-red-500');
+                } else if (this.value && !this.checkValidity()) {
+                    this.classList.add('border-red-500');
+                    this.classList.remove('border-green-500');
+                }
+            });
+        });
+
+        // Terms checkbox validation
+        const termsCheckbox = document.getElementById('terms');
+        const submitButton = document.querySelector('button[type="submit"]');
+
+        termsCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            } else {
+                submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+            }
+        });
+
+        // Form submission (demo)
+        document.getElementById('guest-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            if (termsCheckbox.checked) {
+                alert('Form submitted! In production, this would proceed to the payment step.');
+            } else {
+                alert('Please agree to the terms and conditions.');
+            }
+        });
+    </script>
+</body>
+</html>

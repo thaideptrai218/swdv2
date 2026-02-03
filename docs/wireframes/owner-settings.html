@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings | HostelViet</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#E6F0F7',
+                            100: '#CCE1EF',
+                            500: '#0F4C75',
+                            600: '#0D3F61',
+                            700: '#0A324D',
+                            900: '#051926',
+                        },
+                        secondary: {
+                            400: '#F5A623',
+                            500: '#D4920F',
+                            600: '#B37D0D',
+                        },
+                        neutral: {
+                            0: '#FFFFFF',
+                            50: '#F8FAFC',
+                            100: '#F1F5F9',
+                            200: '#E2E8F0',
+                            400: '#94A3B8',
+                            600: '#475569',
+                            900: '#0F172A',
+                        },
+                    },
+                    fontFamily: {
+                        heading: ['Outfit', 'system-ui', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', system-ui, sans-serif;
+        }
+
+        /* Sidebar transition */
+        .sidebar {
+            transition: width 0.3s ease, transform 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 64px;
+        }
+
+        .sidebar.collapsed .nav-label,
+        .sidebar.collapsed .logo-text {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .sidebar.collapsed .nav-item {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        /* Main content transition */
+        .main-content {
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.sidebar-collapsed {
+            margin-left: 64px;
+        }
+
+        /* Mobile sidebar overlay */
+        .sidebar-overlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Settings nav active state */
+        .settings-nav-item {
+            transition: all 0.2s ease;
+        }
+
+        .settings-nav-item.active {
+            background: #E6F0F7;
+            color: #0F4C75;
+            border-left: 3px solid #0F4C75;
+        }
+
+        .settings-nav-item:not(.active):hover {
+            background: #F1F5F9;
+        }
+
+        /* Avatar upload hover */
+        .avatar-upload:hover .avatar-overlay {
+            opacity: 1;
+        }
+
+        /* Progress bar animation */
+        .usage-bar {
+            transition: width 0.5s ease;
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-neutral-50 font-body text-neutral-900">
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="sidebarOverlay" class="sidebar-overlay fixed inset-0 bg-neutral-900/50 z-40 lg:hidden" onclick="toggleMobileSidebar()"></div>
+
+    <!-- ==================== SIDEBAR ==================== -->
+    <!--
+        ANNOTATION: Collapsible sidebar (240px expanded, 64px collapsed)
+        - Same pattern as owner-dashboard.html
+        - Settings nav item is now active
+    -->
+    <aside id="sidebar" class="sidebar fixed left-0 top-0 h-full w-60 bg-primary-900 text-white z-50 flex flex-col transform -translate-x-full lg:translate-x-0">
+
+        <!-- Logo Section -->
+        <div class="flex items-center gap-3 px-5 py-6 border-b border-primary-700">
+            <div class="w-10 h-10 rounded-lg bg-secondary-500 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="waves" class="w-6 h-6 text-primary-900"></i>
+            </div>
+            <span class="logo-text font-heading font-bold text-xl transition-opacity duration-300">
+                Hostel<span class="text-secondary-500">Viet</span>
+            </span>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 py-4 overflow-y-auto">
+            <ul class="space-y-1 px-3">
+                <!-- Dashboard -->
+                <li>
+                    <a href="owner-dashboard.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Dashboard</span>
+                    </a>
+                </li>
+
+                <!-- Properties -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="building-2" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Properties</span>
+                    </a>
+                </li>
+
+                <!-- Rooms -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="bed-double" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Rooms</span>
+                    </a>
+                </li>
+
+                <!-- Bookings -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="calendar-check" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Bookings</span>
+                    </a>
+                </li>
+
+                <!-- Guests -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="users" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Guests</span>
+                    </a>
+                </li>
+
+                <!-- Maintenance -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="wrench" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Maintenance</span>
+                    </a>
+                </li>
+
+                <!-- Reports -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="bar-chart-3" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Reports</span>
+                    </a>
+                </li>
+
+                <!-- Settings - Active -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg bg-primary-700 text-white border-l-4 border-secondary-500 transition-all duration-200">
+                        <i data-lucide="settings" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Collapse Button -->
+        <div class="p-3 border-t border-primary-700 hidden lg:block">
+            <button onclick="toggleSidebar()" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200" aria-label="Toggle sidebar">
+                <i data-lucide="panel-left-close" id="collapseIcon" class="w-5 h-5 flex-shrink-0"></i>
+                <span class="nav-label transition-opacity duration-300">Collapse</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- ==================== MAIN WRAPPER ==================== -->
+    <div id="mainContent" class="main-content lg:ml-60 min-h-screen">
+
+        <!-- ==================== HEADER ==================== -->
+        <!--
+            ANNOTATION: Fixed header - same pattern as dashboard
+        -->
+        <header class="sticky top-0 z-30 bg-white border-b border-neutral-200 px-4 lg:px-6 py-3">
+            <div class="flex items-center justify-between gap-4">
+
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 -ml-2 rounded-lg hover:bg-neutral-100 transition-colors" aria-label="Open menu">
+                    <i data-lucide="menu" class="w-6 h-6 text-neutral-600"></i>
+                </button>
+
+                <!-- Page Title (visible on mobile) -->
+                <h1 class="lg:hidden font-heading font-semibold text-lg text-neutral-900">Settings</h1>
+
+                <!-- Search Bar -->
+                <div class="flex-1 max-w-xl hidden lg:block">
+                    <div class="relative">
+                        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400"></i>
+                        <input
+                            type="search"
+                            placeholder="Search settings..."
+                            class="w-full h-11 pl-10 pr-4 bg-neutral-50 border border-neutral-200 rounded-lg text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                        >
+                    </div>
+                </div>
+
+                <!-- Right Actions -->
+                <div class="flex items-center gap-2">
+
+                    <!-- Notification Bell -->
+                    <button class="relative p-2 rounded-lg hover:bg-neutral-100 transition-colors group" aria-label="Notifications">
+                        <i data-lucide="bell" class="w-5 h-5 text-neutral-600 group-hover:text-primary-500 transition-colors"></i>
+                        <span class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs font-medium rounded-full flex items-center justify-center">3</span>
+                    </button>
+
+                    <!-- User Avatar Dropdown -->
+                    <div class="relative">
+                        <button class="flex items-center gap-2 p-1 pr-3 rounded-full hover:bg-neutral-100 transition-colors" aria-label="User menu">
+                            <div class="w-9 h-9 rounded-full bg-primary-500 flex items-center justify-center text-white font-medium text-sm">
+                                NT
+                            </div>
+                            <span class="hidden md:block text-sm font-medium text-neutral-700">Nguyen Tuan</span>
+                            <i data-lucide="chevron-down" class="hidden md:block w-4 h-4 text-neutral-400"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ==================== MAIN CONTENT ==================== -->
+        <main class="p-4 lg:p-6">
+
+            <!-- Page Header -->
+            <!--
+                ANNOTATION: Settings page header
+                - Title with description
+                - Breadcrumb navigation optional
+            -->
+            <div class="mb-6">
+                <h1 class="font-heading text-2xl lg:text-3xl font-semibold text-neutral-900">
+                    Settings
+                </h1>
+                <p class="text-neutral-600 mt-1">
+                    Manage your account settings and preferences
+                </p>
+            </div>
+
+            <!-- ==================== SETTINGS LAYOUT ==================== -->
+            <!--
+                ANNOTATION: Two-column layout on desktop
+                - Left: Settings navigation (sidebar tabs)
+                - Right: Settings content area
+                - Mobile: Stacked layout with horizontal scrollable tabs
+            -->
+            <div class="flex flex-col lg:flex-row gap-6">
+
+                <!-- ==================== SETTINGS NAVIGATION ==================== -->
+                <!--
+                    ANNOTATION: Settings sidebar navigation
+                    - 6 navigation items with icons
+                    - Active state with left border accent
+                    - Mobile: Horizontal scrollable tabs
+                -->
+                <nav class="lg:w-64 flex-shrink-0">
+                    <!-- Mobile: Horizontal scroll tabs -->
+                    <div class="lg:hidden overflow-x-auto pb-2 -mx-4 px-4">
+                        <div class="flex gap-2 min-w-max">
+                            <button onclick="showSection('profile')" class="settings-tab active px-4 py-2 rounded-full text-sm font-medium bg-primary-500 text-white whitespace-nowrap" data-section="profile">
+                                Profile
+                            </button>
+                            <button onclick="showSection('security')" class="settings-tab px-4 py-2 rounded-full text-sm font-medium bg-neutral-100 text-neutral-600 whitespace-nowrap" data-section="security">
+                                Security
+                            </button>
+                            <button onclick="showSection('subscription')" class="settings-tab px-4 py-2 rounded-full text-sm font-medium bg-neutral-100 text-neutral-600 whitespace-nowrap" data-section="subscription">
+                                Subscription
+                            </button>
+                            <button onclick="showSection('notifications')" class="settings-tab px-4 py-2 rounded-full text-sm font-medium bg-neutral-100 text-neutral-600 whitespace-nowrap" data-section="notifications">
+                                Notifications
+                            </button>
+                            <button onclick="showSection('payment')" class="settings-tab px-4 py-2 rounded-full text-sm font-medium bg-neutral-100 text-neutral-600 whitespace-nowrap" data-section="payment">
+                                Payment
+                            </button>
+                            <button onclick="showSection('team')" class="settings-tab px-4 py-2 rounded-full text-sm font-medium bg-neutral-100 text-neutral-600 whitespace-nowrap" data-section="team">
+                                Team
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Desktop: Vertical sidebar -->
+                    <div class="hidden lg:block bg-white rounded-lg border border-neutral-200 overflow-hidden">
+                        <ul class="py-2">
+                            <li>
+                                <button onclick="showSection('profile')" class="settings-nav-item active w-full flex items-center gap-3 px-4 py-3 text-left text-sm font-medium" data-section="profile">
+                                    <i data-lucide="user" class="w-5 h-5"></i>
+                                    <span>Profile</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button onclick="showSection('security')" class="settings-nav-item w-full flex items-center gap-3 px-4 py-3 text-left text-sm font-medium text-neutral-600" data-section="security">
+                                    <i data-lucide="shield" class="w-5 h-5"></i>
+                                    <span>Account Security</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button onclick="showSection('subscription')" class="settings-nav-item w-full flex items-center gap-3 px-4 py-3 text-left text-sm font-medium text-neutral-600" data-section="subscription">
+                                    <i data-lucide="credit-card" class="w-5 h-5"></i>
+                                    <span>Subscription</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button onclick="showSection('notifications')" class="settings-nav-item w-full flex items-center gap-3 px-4 py-3 text-left text-sm font-medium text-neutral-600" data-section="notifications">
+                                    <i data-lucide="bell-ring" class="w-5 h-5"></i>
+                                    <span>Notifications</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button onclick="showSection('payment')" class="settings-nav-item w-full flex items-center gap-3 px-4 py-3 text-left text-sm font-medium text-neutral-600" data-section="payment">
+                                    <i data-lucide="wallet" class="w-5 h-5"></i>
+                                    <span>Payment Methods</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button onclick="showSection('team')" class="settings-nav-item w-full flex items-center gap-3 px-4 py-3 text-left text-sm font-medium text-neutral-600" data-section="team">
+                                    <i data-lucide="users" class="w-5 h-5"></i>
+                                    <span>Team Members</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </nav>
+
+                <!-- ==================== SETTINGS CONTENT ==================== -->
+                <div class="flex-1 min-w-0">
+
+                    <!-- ==================== PROFILE SECTION ==================== -->
+                    <!--
+                        ANNOTATION: Profile settings (default view)
+                        - Avatar upload with overlay on hover
+                        - Form fields: Business name, Email, Phone, Address
+                        - Save Changes button at bottom
+                    -->
+                    <section id="section-profile" class="settings-section">
+                        <div class="bg-white rounded-lg border border-neutral-200 overflow-hidden">
+                            <div class="px-6 py-4 border-b border-neutral-200">
+                                <h2 class="font-heading font-semibold text-lg text-neutral-900">Profile Information</h2>
+                                <p class="text-sm text-neutral-500 mt-1">Update your business profile and contact details</p>
+                            </div>
+
+                            <div class="p-6">
+                                <!-- Avatar Upload -->
+                                <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6 pb-6 border-b border-neutral-100">
+                                    <div class="avatar-upload relative cursor-pointer group">
+                                        <div class="w-20 h-20 rounded-full bg-primary-500 flex items-center justify-center text-white font-heading font-bold text-2xl">
+                                            NT
+                                        </div>
+                                        <div class="avatar-overlay absolute inset-0 rounded-full bg-neutral-900/60 flex items-center justify-center opacity-0 transition-opacity">
+                                            <i data-lucide="camera" class="w-6 h-6 text-white"></i>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <h3 class="font-medium text-neutral-900">Profile Photo</h3>
+                                        <p class="text-sm text-neutral-500 mt-1">JPG, PNG or GIF. Max size 2MB</p>
+                                        <button class="mt-2 text-sm text-primary-500 hover:text-primary-600 font-medium">
+                                            Upload new photo
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <!-- Form Fields -->
+                                <form class="space-y-5">
+                                    <!-- Business Name -->
+                                    <div>
+                                        <label for="businessName" class="block text-sm font-medium text-neutral-700 mb-1.5">
+                                            Business Name
+                                        </label>
+                                        <input
+                                            type="text"
+                                            id="businessName"
+                                            value="Nguyen Tuan Hostel Group"
+                                            class="w-full h-11 px-4 bg-white border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                                        >
+                                    </div>
+
+                                    <!-- Email -->
+                                    <div>
+                                        <label for="email" class="block text-sm font-medium text-neutral-700 mb-1.5">
+                                            Email Address
+                                        </label>
+                                        <input
+                                            type="email"
+                                            id="email"
+                                            value="nguyen.tuan@hostelviet.com"
+                                            class="w-full h-11 px-4 bg-white border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                                        >
+                                    </div>
+
+                                    <!-- Phone -->
+                                    <div>
+                                        <label for="phone" class="block text-sm font-medium text-neutral-700 mb-1.5">
+                                            Phone Number
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            id="phone"
+                                            value="+84 912 345 678"
+                                            class="w-full h-11 px-4 bg-white border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                                        >
+                                    </div>
+
+                                    <!-- Address -->
+                                    <div>
+                                        <label for="address" class="block text-sm font-medium text-neutral-700 mb-1.5">
+                                            Business Address
+                                        </label>
+                                        <textarea
+                                            id="address"
+                                            rows="3"
+                                            class="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all resize-none"
+                                        >123 Pham Ngu Lao Street, District 1, Ho Chi Minh City, Vietnam</textarea>
+                                    </div>
+
+                                    <!-- Save Button -->
+                                    <div class="flex justify-end pt-4">
+                                        <button type="submit" class="h-11 px-6 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all">
+                                            Save Changes
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ==================== SECURITY SECTION ==================== -->
+                    <!--
+                        ANNOTATION: Account security settings
+                        - Password change form
+                        - Two-factor authentication toggle
+                        - Active sessions list
+                    -->
+                    <section id="section-security" class="settings-section hidden">
+                        <div class="bg-white rounded-lg border border-neutral-200 overflow-hidden">
+                            <div class="px-6 py-4 border-b border-neutral-200">
+                                <h2 class="font-heading font-semibold text-lg text-neutral-900">Account Security</h2>
+                                <p class="text-sm text-neutral-500 mt-1">Manage your password and security settings</p>
+                            </div>
+
+                            <div class="p-6 space-y-6">
+                                <!-- Password Section -->
+                                <div class="pb-6 border-b border-neutral-100">
+                                    <h3 class="font-medium text-neutral-900 mb-4">Change Password</h3>
+                                    <form class="space-y-4 max-w-md">
+                                        <div>
+                                            <label for="currentPassword" class="block text-sm font-medium text-neutral-700 mb-1.5">
+                                                Current Password
+                                            </label>
+                                            <input
+                                                type="password"
+                                                id="currentPassword"
+                                                placeholder="Enter current password"
+                                                class="w-full h-11 px-4 bg-white border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                                            >
+                                        </div>
+                                        <div>
+                                            <label for="newPassword" class="block text-sm font-medium text-neutral-700 mb-1.5">
+                                                New Password
+                                            </label>
+                                            <input
+                                                type="password"
+                                                id="newPassword"
+                                                placeholder="Enter new password"
+                                                class="w-full h-11 px-4 bg-white border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                                            >
+                                        </div>
+                                        <div>
+                                            <label for="confirmPassword" class="block text-sm font-medium text-neutral-700 mb-1.5">
+                                                Confirm New Password
+                                            </label>
+                                            <input
+                                                type="password"
+                                                id="confirmPassword"
+                                                placeholder="Confirm new password"
+                                                class="w-full h-11 px-4 bg-white border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                                            >
+                                        </div>
+                                        <button type="submit" class="h-10 px-5 bg-primary-500 text-white rounded-lg text-sm font-medium hover:bg-primary-600 transition-all">
+                                            Update Password
+                                        </button>
+                                    </form>
+                                </div>
+
+                                <!-- Two-Factor Authentication -->
+                                <div class="flex items-center justify-between py-4 border-b border-neutral-100">
+                                    <div>
+                                        <h3 class="font-medium text-neutral-900">Two-Factor Authentication</h3>
+                                        <p class="text-sm text-neutral-500 mt-1">Add an extra layer of security to your account</p>
+                                    </div>
+                                    <button class="relative inline-flex h-6 w-11 items-center rounded-full bg-neutral-200 transition-colors" role="switch" aria-checked="false">
+                                        <span class="inline-block h-4 w-4 transform translate-x-1 rounded-full bg-white transition-transform"></span>
+                                    </button>
+                                </div>
+
+                                <!-- Active Sessions -->
+                                <div>
+                                    <h3 class="font-medium text-neutral-900 mb-4">Active Sessions</h3>
+                                    <div class="space-y-3">
+                                        <div class="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
+                                            <div class="flex items-center gap-3">
+                                                <i data-lucide="monitor" class="w-5 h-5 text-neutral-600"></i>
+                                                <div>
+                                                    <p class="text-sm font-medium text-neutral-900">Chrome on Windows</p>
+                                                    <p class="text-xs text-neutral-500">Ho Chi Minh City - Current session</p>
+                                                </div>
+                                            </div>
+                                            <span class="text-xs text-green-600 font-medium">Active now</span>
+                                        </div>
+                                        <div class="flex items-center justify-between p-3 bg-neutral-50 rounded-lg">
+                                            <div class="flex items-center gap-3">
+                                                <i data-lucide="smartphone" class="w-5 h-5 text-neutral-600"></i>
+                                                <div>
+                                                    <p class="text-sm font-medium text-neutral-900">Safari on iPhone</p>
+                                                    <p class="text-xs text-neutral-500">Ho Chi Minh City - 2 hours ago</p>
+                                                </div>
+                                            </div>
+                                            <button class="text-xs text-red-500 hover:text-red-600 font-medium">Revoke</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ==================== SUBSCRIPTION SECTION ==================== -->
+                    <!--
+                        ANNOTATION: Subscription management
+                        - Current plan card with features
+                        - Usage stats with progress bars
+                        - Upgrade/Downgrade buttons
+                        - Billing history table (3 rows)
+                    -->
+                    <section id="section-subscription" class="settings-section hidden">
+                        <div class="space-y-6">
+
+                            <!-- Current Plan Card -->
+                            <div class="bg-white rounded-lg border border-neutral-200 overflow-hidden">
+                                <div class="px-6 py-4 border-b border-neutral-200 flex items-center justify-between">
+                                    <div>
+                                        <h2 class="font-heading font-semibold text-lg text-neutral-900">Current Plan</h2>
+                                        <p class="text-sm text-neutral-500 mt-1">Manage your subscription and billing</p>
+                                    </div>
+                                    <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-secondary-500/10 text-secondary-600">
+                                        Pro Plan
+                                    </span>
+                                </div>
+
+                                <div class="p-6">
+                                    <!-- Plan Details -->
+                                    <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6 pb-6 border-b border-neutral-100">
+                                        <div>
+                                            <div class="flex items-baseline gap-2">
+                                                <span class="text-3xl font-heading font-bold text-neutral-900">599,000</span>
+                                                <span class="text-lg text-neutral-600">₫/month</span>
+                                            </div>
+                                            <p class="text-sm text-neutral-500 mt-1">Next billing date: March 3, 2026</p>
+                                        </div>
+                                        <div class="flex gap-3">
+                                            <button class="h-10 px-5 bg-primary-500 text-white rounded-lg text-sm font-medium hover:bg-primary-600 transition-all">
+                                                Upgrade Plan
+                                            </button>
+                                            <button class="h-10 px-5 bg-transparent text-neutral-600 border border-neutral-200 rounded-lg text-sm font-medium hover:bg-neutral-50 transition-all">
+                                                Downgrade
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Features List -->
+                                    <div class="py-6 border-b border-neutral-100">
+                                        <h3 class="font-medium text-neutral-900 mb-4">Plan Features</h3>
+                                        <ul class="grid sm:grid-cols-2 gap-3">
+                                            <li class="flex items-center gap-2 text-sm text-neutral-600">
+                                                <i data-lucide="check" class="w-4 h-4 text-green-500"></i>
+                                                Up to 5 properties
+                                            </li>
+                                            <li class="flex items-center gap-2 text-sm text-neutral-600">
+                                                <i data-lucide="check" class="w-4 h-4 text-green-500"></i>
+                                                Up to 10 staff members
+                                            </li>
+                                            <li class="flex items-center gap-2 text-sm text-neutral-600">
+                                                <i data-lucide="check" class="w-4 h-4 text-green-500"></i>
+                                                Advanced analytics
+                                            </li>
+                                            <li class="flex items-center gap-2 text-sm text-neutral-600">
+                                                <i data-lucide="check" class="w-4 h-4 text-green-500"></i>
+                                                Priority support
+                                            </li>
+                                            <li class="flex items-center gap-2 text-sm text-neutral-600">
+                                                <i data-lucide="check" class="w-4 h-4 text-green-500"></i>
+                                                Channel manager integration
+                                            </li>
+                                            <li class="flex items-center gap-2 text-sm text-neutral-600">
+                                                <i data-lucide="check" class="w-4 h-4 text-green-500"></i>
+                                                Custom branding
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- Usage Stats -->
+                                    <div class="pt-6">
+                                        <h3 class="font-medium text-neutral-900 mb-4">Usage Statistics</h3>
+                                        <div class="grid sm:grid-cols-2 gap-6">
+                                            <!-- Properties Usage -->
+                                            <div>
+                                                <div class="flex items-center justify-between mb-2">
+                                                    <span class="text-sm text-neutral-600">Properties</span>
+                                                    <span class="text-sm font-medium text-neutral-900">3 / 5</span>
+                                                </div>
+                                                <div class="h-2 bg-neutral-100 rounded-full overflow-hidden">
+                                                    <div class="usage-bar h-full bg-primary-500 rounded-full" style="width: 60%"></div>
+                                                </div>
+                                            </div>
+                                            <!-- Staff Usage -->
+                                            <div>
+                                                <div class="flex items-center justify-between mb-2">
+                                                    <span class="text-sm text-neutral-600">Staff Members</span>
+                                                    <span class="text-sm font-medium text-neutral-900">4 / 10</span>
+                                                </div>
+                                                <div class="h-2 bg-neutral-100 rounded-full overflow-hidden">
+                                                    <div class="usage-bar h-full bg-secondary-500 rounded-full" style="width: 40%"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Billing History -->
+                            <div class="bg-white rounded-lg border border-neutral-200 overflow-hidden">
+                                <div class="px-6 py-4 border-b border-neutral-200">
+                                    <h2 class="font-heading font-semibold text-lg text-neutral-900">Billing History</h2>
+                                </div>
+
+                                <div class="overflow-x-auto">
+                                    <table class="w-full min-w-[500px]">
+                                        <thead>
+                                            <tr class="bg-neutral-50 text-left">
+                                                <th class="px-6 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">Date</th>
+                                                <th class="px-6 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">Description</th>
+                                                <th class="px-6 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">Amount</th>
+                                                <th class="px-6 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">Status</th>
+                                                <th class="px-6 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-neutral-100">
+                                            <tr class="hover:bg-primary-50 transition-colors">
+                                                <td class="px-6 py-4 text-sm text-neutral-900">Feb 3, 2026</td>
+                                                <td class="px-6 py-4 text-sm text-neutral-600">Pro Plan - Monthly</td>
+                                                <td class="px-6 py-4 text-sm font-medium text-neutral-900">599,000₫</td>
+                                                <td class="px-6 py-4">
+                                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Paid</span>
+                                                </td>
+                                                <td class="px-6 py-4 text-right">
+                                                    <button class="text-sm text-primary-500 hover:text-primary-600 font-medium">Download</button>
+                                                </td>
+                                            </tr>
+                                            <tr class="hover:bg-primary-50 transition-colors">
+                                                <td class="px-6 py-4 text-sm text-neutral-900">Jan 3, 2026</td>
+                                                <td class="px-6 py-4 text-sm text-neutral-600">Pro Plan - Monthly</td>
+                                                <td class="px-6 py-4 text-sm font-medium text-neutral-900">599,000₫</td>
+                                                <td class="px-6 py-4">
+                                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Paid</span>
+                                                </td>
+                                                <td class="px-6 py-4 text-right">
+                                                    <button class="text-sm text-primary-500 hover:text-primary-600 font-medium">Download</button>
+                                                </td>
+                                            </tr>
+                                            <tr class="hover:bg-primary-50 transition-colors">
+                                                <td class="px-6 py-4 text-sm text-neutral-900">Dec 3, 2025</td>
+                                                <td class="px-6 py-4 text-sm text-neutral-600">Pro Plan - Monthly</td>
+                                                <td class="px-6 py-4 text-sm font-medium text-neutral-900">599,000₫</td>
+                                                <td class="px-6 py-4">
+                                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Paid</span>
+                                                </td>
+                                                <td class="px-6 py-4 text-right">
+                                                    <button class="text-sm text-primary-500 hover:text-primary-600 font-medium">Download</button>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ==================== NOTIFICATIONS SECTION ==================== -->
+                    <!--
+                        ANNOTATION: Notification preferences
+                        - Toggle switches for different notification types
+                        - Email and push notification options
+                    -->
+                    <section id="section-notifications" class="settings-section hidden">
+                        <div class="bg-white rounded-lg border border-neutral-200 overflow-hidden">
+                            <div class="px-6 py-4 border-b border-neutral-200">
+                                <h2 class="font-heading font-semibold text-lg text-neutral-900">Notification Preferences</h2>
+                                <p class="text-sm text-neutral-500 mt-1">Choose what notifications you want to receive</p>
+                            </div>
+
+                            <div class="p-6 divide-y divide-neutral-100">
+                                <!-- Booking Notifications -->
+                                <div class="flex items-center justify-between py-4">
+                                    <div>
+                                        <h3 class="font-medium text-neutral-900">New Bookings</h3>
+                                        <p class="text-sm text-neutral-500 mt-1">Get notified when you receive new bookings</p>
+                                    </div>
+                                    <button class="relative inline-flex h-6 w-11 items-center rounded-full bg-primary-500 transition-colors" role="switch" aria-checked="true">
+                                        <span class="inline-block h-4 w-4 transform translate-x-6 rounded-full bg-white transition-transform"></span>
+                                    </button>
+                                </div>
+
+                                <!-- Cancellation Notifications -->
+                                <div class="flex items-center justify-between py-4">
+                                    <div>
+                                        <h3 class="font-medium text-neutral-900">Cancellations</h3>
+                                        <p class="text-sm text-neutral-500 mt-1">Get notified when bookings are cancelled</p>
+                                    </div>
+                                    <button class="relative inline-flex h-6 w-11 items-center rounded-full bg-primary-500 transition-colors" role="switch" aria-checked="true">
+                                        <span class="inline-block h-4 w-4 transform translate-x-6 rounded-full bg-white transition-transform"></span>
+                                    </button>
+                                </div>
+
+                                <!-- Check-in Reminders -->
+                                <div class="flex items-center justify-between py-4">
+                                    <div>
+                                        <h3 class="font-medium text-neutral-900">Check-in Reminders</h3>
+                                        <p class="text-sm text-neutral-500 mt-1">Daily summary of expected check-ins</p>
+                                    </div>
+                                    <button class="relative inline-flex h-6 w-11 items-center rounded-full bg-primary-500 transition-colors" role="switch" aria-checked="true">
+                                        <span class="inline-block h-4 w-4 transform translate-x-6 rounded-full bg-white transition-transform"></span>
+                                    </button>
+                                </div>
+
+                                <!-- Maintenance Alerts -->
+                                <div class="flex items-center justify-between py-4">
+                                    <div>
+                                        <h3 class="font-medium text-neutral-900">Maintenance Alerts</h3>
+                                        <p class="text-sm text-neutral-500 mt-1">Updates on maintenance requests</p>
+                                    </div>
+                                    <button class="relative inline-flex h-6 w-11 items-center rounded-full bg-neutral-200 transition-colors" role="switch" aria-checked="false">
+                                        <span class="inline-block h-4 w-4 transform translate-x-1 rounded-full bg-white transition-transform"></span>
+                                    </button>
+                                </div>
+
+                                <!-- Marketing Emails -->
+                                <div class="flex items-center justify-between py-4">
+                                    <div>
+                                        <h3 class="font-medium text-neutral-900">Marketing Emails</h3>
+                                        <p class="text-sm text-neutral-500 mt-1">Tips, product updates, and offers</p>
+                                    </div>
+                                    <button class="relative inline-flex h-6 w-11 items-center rounded-full bg-neutral-200 transition-colors" role="switch" aria-checked="false">
+                                        <span class="inline-block h-4 w-4 transform translate-x-1 rounded-full bg-white transition-transform"></span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ==================== PAYMENT METHODS SECTION ==================== -->
+                    <!--
+                        ANNOTATION: Payment methods management
+                        - List of saved payment methods
+                        - Add new payment method button
+                    -->
+                    <section id="section-payment" class="settings-section hidden">
+                        <div class="bg-white rounded-lg border border-neutral-200 overflow-hidden">
+                            <div class="px-6 py-4 border-b border-neutral-200 flex items-center justify-between">
+                                <div>
+                                    <h2 class="font-heading font-semibold text-lg text-neutral-900">Payment Methods</h2>
+                                    <p class="text-sm text-neutral-500 mt-1">Manage your payment options</p>
+                                </div>
+                                <button class="h-10 px-4 bg-primary-500 text-white rounded-lg text-sm font-medium hover:bg-primary-600 transition-all flex items-center gap-2">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                    Add Method
+                                </button>
+                            </div>
+
+                            <div class="p-6 space-y-4">
+                                <!-- Card 1 - Default -->
+                                <div class="flex items-center justify-between p-4 border border-primary-200 bg-primary-50 rounded-lg">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-8 bg-gradient-to-r from-blue-600 to-blue-800 rounded flex items-center justify-center">
+                                            <span class="text-white text-xs font-bold">VISA</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-neutral-900">Visa ending in 4242</p>
+                                            <p class="text-xs text-neutral-500">Expires 12/2027</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <span class="text-xs text-primary-600 font-medium">Default</span>
+                                        <button class="text-sm text-neutral-500 hover:text-neutral-700">Edit</button>
+                                    </div>
+                                </div>
+
+                                <!-- Card 2 -->
+                                <div class="flex items-center justify-between p-4 border border-neutral-200 rounded-lg hover:border-neutral-300 transition-colors">
+                                    <div class="flex items-center gap-4">
+                                        <div class="w-12 h-8 bg-gradient-to-r from-red-500 to-orange-500 rounded flex items-center justify-center">
+                                            <span class="text-white text-xs font-bold">MC</span>
+                                        </div>
+                                        <div>
+                                            <p class="text-sm font-medium text-neutral-900">Mastercard ending in 8888</p>
+                                            <p class="text-xs text-neutral-500">Expires 06/2026</p>
+                                        </div>
+                                    </div>
+                                    <div class="flex items-center gap-3">
+                                        <button class="text-sm text-primary-500 hover:text-primary-600">Set Default</button>
+                                        <button class="text-sm text-neutral-500 hover:text-neutral-700">Edit</button>
+                                        <button class="text-sm text-red-500 hover:text-red-600">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- ==================== TEAM MEMBERS SECTION ==================== -->
+                    <!--
+                        ANNOTATION: Team management
+                        - Invite team member input + button
+                        - Team table: Name, Email, Role, Status, Actions
+                        - Role dropdown (Owner, Manager, Staff)
+                        - Remove member action
+                    -->
+                    <section id="section-team" class="settings-section hidden">
+                        <div class="bg-white rounded-lg border border-neutral-200 overflow-hidden">
+                            <div class="px-6 py-4 border-b border-neutral-200">
+                                <h2 class="font-heading font-semibold text-lg text-neutral-900">Team Members</h2>
+                                <p class="text-sm text-neutral-500 mt-1">Manage your team and their permissions</p>
+                            </div>
+
+                            <div class="p-6">
+                                <!-- Invite Member -->
+                                <div class="flex flex-col sm:flex-row gap-3 mb-6 pb-6 border-b border-neutral-100">
+                                    <div class="flex-1">
+                                        <input
+                                            type="email"
+                                            placeholder="Enter email address to invite"
+                                            class="w-full h-11 px-4 bg-white border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                                        >
+                                    </div>
+                                    <button class="h-11 px-6 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 transition-all flex items-center justify-center gap-2 whitespace-nowrap">
+                                        <i data-lucide="send" class="w-4 h-4"></i>
+                                        Send Invite
+                                    </button>
+                                </div>
+
+                                <!-- Team Table -->
+                                <div class="overflow-x-auto -mx-6">
+                                    <table class="w-full min-w-[600px]">
+                                        <thead>
+                                            <tr class="bg-neutral-50 text-left">
+                                                <th class="px-6 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">Member</th>
+                                                <th class="px-6 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">Email</th>
+                                                <th class="px-6 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">Role</th>
+                                                <th class="px-6 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">Status</th>
+                                                <th class="px-6 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody class="divide-y divide-neutral-100">
+                                            <!-- Owner (Current User) -->
+                                            <tr class="hover:bg-primary-50 transition-colors">
+                                                <td class="px-6 py-4">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="w-8 h-8 rounded-full bg-primary-500 flex items-center justify-center text-white font-medium text-xs">NT</div>
+                                                        <span class="font-medium text-neutral-900">Nguyen Tuan</span>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 text-sm text-neutral-600">nguyen.tuan@hostelviet.com</td>
+                                                <td class="px-6 py-4">
+                                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-secondary-500/10 text-secondary-600">Owner</span>
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Active</span>
+                                                </td>
+                                                <td class="px-6 py-4 text-sm text-neutral-400">-</td>
+                                            </tr>
+
+                                            <!-- Manager -->
+                                            <tr class="hover:bg-primary-50 transition-colors">
+                                                <td class="px-6 py-4">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-medium text-xs">LH</div>
+                                                        <span class="font-medium text-neutral-900">Le Hoang</span>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 text-sm text-neutral-600">le.hoang@hostelviet.com</td>
+                                                <td class="px-6 py-4">
+                                                    <select class="h-8 px-2 text-xs border border-neutral-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                                        <option value="manager" selected>Manager</option>
+                                                        <option value="staff">Staff</option>
+                                                    </select>
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Active</span>
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    <button class="text-sm text-red-500 hover:text-red-600 font-medium">Remove</button>
+                                                </td>
+                                            </tr>
+
+                                            <!-- Staff 1 -->
+                                            <tr class="hover:bg-primary-50 transition-colors">
+                                                <td class="px-6 py-4">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-medium text-xs">TM</div>
+                                                        <span class="font-medium text-neutral-900">Tran Minh</span>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 text-sm text-neutral-600">tran.minh@hostelviet.com</td>
+                                                <td class="px-6 py-4">
+                                                    <select class="h-8 px-2 text-xs border border-neutral-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                                        <option value="manager">Manager</option>
+                                                        <option value="staff" selected>Staff</option>
+                                                    </select>
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Active</span>
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    <button class="text-sm text-red-500 hover:text-red-600 font-medium">Remove</button>
+                                                </td>
+                                            </tr>
+
+                                            <!-- Staff 2 -->
+                                            <tr class="hover:bg-primary-50 transition-colors">
+                                                <td class="px-6 py-4">
+                                                    <div class="flex items-center gap-3">
+                                                        <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-medium text-xs">PA</div>
+                                                        <span class="font-medium text-neutral-900">Pham An</span>
+                                                    </div>
+                                                </td>
+                                                <td class="px-6 py-4 text-sm text-neutral-600">pham.an@hostelviet.com</td>
+                                                <td class="px-6 py-4">
+                                                    <select class="h-8 px-2 text-xs border border-neutral-200 rounded-lg bg-white focus:outline-none focus:ring-2 focus:ring-primary-500">
+                                                        <option value="manager">Manager</option>
+                                                        <option value="staff" selected>Staff</option>
+                                                    </select>
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">Pending</span>
+                                                </td>
+                                                <td class="px-6 py-4">
+                                                    <div class="flex items-center gap-3">
+                                                        <button class="text-sm text-primary-500 hover:text-primary-600 font-medium">Resend</button>
+                                                        <button class="text-sm text-red-500 hover:text-red-600 font-medium">Remove</button>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+
+                                <!-- Usage Note -->
+                                <div class="mt-6 p-4 bg-neutral-50 rounded-lg flex items-start gap-3">
+                                    <i data-lucide="info" class="w-5 h-5 text-neutral-400 flex-shrink-0 mt-0.5"></i>
+                                    <p class="text-sm text-neutral-600">
+                                        Your Pro Plan allows up to <strong>10 team members</strong>. You're currently using <strong>4 of 10</strong> slots.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="px-4 lg:px-6 py-4 border-t border-neutral-200 bg-white">
+            <p class="text-sm text-neutral-500 text-center">
+                &copy; 2026 HostelViet. All rights reserved.
+            </p>
+        </footer>
+    </div>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Sidebar toggle functionality
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const collapseIcon = document.getElementById('collapseIcon');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        let isCollapsed = false;
+        let isMobileOpen = false;
+
+        function toggleSidebar() {
+            isCollapsed = !isCollapsed;
+
+            if (isCollapsed) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('sidebar-collapsed');
+                collapseIcon.setAttribute('data-lucide', 'panel-left-open');
+            } else {
+                sidebar.classList.remove('collapsed');
+                mainContent.classList.remove('sidebar-collapsed');
+                collapseIcon.setAttribute('data-lucide', 'panel-left-close');
+            }
+
+            // Re-render the icon
+            lucide.createIcons();
+        }
+
+        function toggleMobileSidebar() {
+            isMobileOpen = !isMobileOpen;
+
+            if (isMobileOpen) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebarOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                sidebarOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Settings section navigation
+        function showSection(sectionId) {
+            // Hide all sections
+            document.querySelectorAll('.settings-section').forEach(section => {
+                section.classList.add('hidden');
+            });
+
+            // Show selected section
+            document.getElementById('section-' + sectionId).classList.remove('hidden');
+
+            // Update desktop nav active state
+            document.querySelectorAll('.settings-nav-item').forEach(item => {
+                item.classList.remove('active');
+                item.classList.add('text-neutral-600');
+            });
+            document.querySelector('.settings-nav-item[data-section="' + sectionId + '"]').classList.add('active');
+            document.querySelector('.settings-nav-item[data-section="' + sectionId + '"]').classList.remove('text-neutral-600');
+
+            // Update mobile tabs active state
+            document.querySelectorAll('.settings-tab').forEach(tab => {
+                tab.classList.remove('active', 'bg-primary-500', 'text-white');
+                tab.classList.add('bg-neutral-100', 'text-neutral-600');
+            });
+            document.querySelector('.settings-tab[data-section="' + sectionId + '"]').classList.add('active', 'bg-primary-500', 'text-white');
+            document.querySelector('.settings-tab[data-section="' + sectionId + '"]').classList.remove('bg-neutral-100', 'text-neutral-600');
+        }
+
+        // Close mobile sidebar on window resize to desktop
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024 && isMobileOpen) {
+                toggleMobileSidebar();
+            }
+        });
+    </script>
+
+</body>
+</html>

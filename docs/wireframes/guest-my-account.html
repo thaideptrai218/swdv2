@@ -1,0 +1,1107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account - HostelViet</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#E6F0F7',
+                            100: '#CCE1EF',
+                            500: '#0F4C75',
+                            600: '#0D3F61',
+                            700: '#0A324D',
+                            900: '#051926',
+                        },
+                        secondary: {
+                            400: '#F5A623',
+                            500: '#D4920F',
+                            600: '#B37D0D',
+                        },
+                        neutral: {
+                            0: '#FFFFFF',
+                            50: '#F8FAFC',
+                            100: '#F1F5F9',
+                            200: '#E2E8F0',
+                            400: '#94A3B8',
+                            600: '#475569',
+                            900: '#0F172A',
+                        }
+                    },
+                    fontFamily: {
+                        heading: ['Outfit', 'system-ui', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+
+    <style>
+        /* Base styles */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', system-ui, sans-serif;
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Button hover states */
+        .btn-primary:hover {
+            background-color: #0D3F61;
+        }
+
+        .btn-accent:hover {
+            background-color: #B37D0D;
+        }
+
+        .btn-secondary:hover {
+            background-color: #E6F0F7;
+        }
+
+        /* Focus states */
+        .focus-ring:focus {
+            outline: none;
+            box-shadow: 0 0 0 2px #FFFFFF, 0 0 0 4px #0F4C75;
+        }
+
+        /* Mobile menu animation */
+        .mobile-menu {
+            transition: transform 0.3s ease, opacity 0.3s ease;
+        }
+
+        .mobile-menu.hidden {
+            transform: translateY(-10px);
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* Sidebar nav item hover */
+        .sidebar-nav-item {
+            transition: background-color 0.15s ease, color 0.15s ease;
+        }
+
+        .sidebar-nav-item:hover {
+            background-color: #E6F0F7;
+        }
+
+        .sidebar-nav-item.active {
+            background-color: #0F4C75;
+            color: white;
+        }
+
+        /* Tab styles */
+        .tab-button {
+            transition: color 0.15s ease, border-color 0.15s ease;
+        }
+
+        .tab-button:hover:not(.active) {
+            color: #0F4C75;
+        }
+
+        .tab-button.active {
+            color: #0F4C75;
+            border-bottom-color: #0F4C75;
+        }
+
+        /* Booking card hover */
+        .booking-card {
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .booking-card:hover {
+            box-shadow: 0 8px 24px -8px rgba(15, 76, 117, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* Avatar upload hover */
+        .avatar-upload:hover .avatar-overlay {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-neutral-50 text-neutral-900 font-body">
+
+    <!-- Skip to content link (accessibility) -->
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 bg-primary-500 text-white px-4 py-2 rounded-md z-50">
+        Skip to main content
+    </a>
+
+    <!-- ========================================
+         HEADER (Logged In State)
+         - Logo left, Nav center, User dropdown right
+         - Sticky positioning
+         - Mobile hamburger menu
+    ======================================== -->
+    <header class="sticky top-0 z-40 bg-white border-b border-neutral-200">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-2 focus-ring rounded-md">
+                    <div class="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
+                        <i data-lucide="bed-double" class="w-5 h-5 text-white"></i>
+                    </div>
+                    <span class="font-heading font-bold text-xl">
+                        <span class="text-primary-500">Hostel</span><span class="text-secondary-500">Viet</span>
+                    </span>
+                </a>
+
+                <!-- Desktop Navigation -->
+                <nav class="hidden md:flex items-center gap-8" aria-label="Main navigation">
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 font-medium transition-colors focus-ring rounded-md px-2 py-1">
+                        Explore
+                    </a>
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 font-medium transition-colors focus-ring rounded-md px-2 py-1">
+                        About
+                    </a>
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 font-medium transition-colors focus-ring rounded-md px-2 py-1">
+                        Contact
+                    </a>
+                </nav>
+
+                <!-- User Menu (Logged In) -->
+                <div class="hidden md:flex items-center gap-3">
+                    <!-- Notifications -->
+                    <button class="relative p-2 rounded-lg text-neutral-600 hover:text-primary-500 hover:bg-neutral-100 transition-colors focus-ring" aria-label="Notifications">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                        <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-secondary-500 rounded-full"></span>
+                    </button>
+
+                    <!-- User Dropdown -->
+                    <div class="relative">
+                        <button class="flex items-center gap-2 p-1.5 rounded-lg hover:bg-neutral-100 transition-colors focus-ring" aria-label="User menu">
+                            <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                                <span class="text-sm font-semibold text-primary-500">JD</span>
+                            </div>
+                            <span class="text-sm font-medium text-neutral-900 hidden lg:block">John Doe</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4 text-neutral-400"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button
+                    type="button"
+                    class="md:hidden p-2 rounded-md text-neutral-600 hover:text-primary-500 hover:bg-neutral-100 focus-ring"
+                    aria-label="Toggle menu"
+                    aria-expanded="false"
+                    onclick="toggleMobileMenu()"
+                >
+                    <i data-lucide="menu" class="w-6 h-6" id="menu-icon"></i>
+                </button>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu" class="mobile-menu hidden md:hidden pb-4">
+                <nav class="flex flex-col gap-2" aria-label="Mobile navigation">
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 hover:bg-neutral-50 font-medium px-4 py-3 rounded-md transition-colors">
+                        Explore
+                    </a>
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 hover:bg-neutral-50 font-medium px-4 py-3 rounded-md transition-colors">
+                        About
+                    </a>
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 hover:bg-neutral-50 font-medium px-4 py-3 rounded-md transition-colors">
+                        Contact
+                    </a>
+                    <hr class="border-neutral-200 my-2">
+                    <a href="#" class="text-primary-500 hover:bg-primary-50 font-medium px-4 py-3 rounded-md transition-colors flex items-center gap-3">
+                        <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center">
+                            <span class="text-sm font-semibold text-primary-500">JD</span>
+                        </div>
+                        John Doe
+                    </a>
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 hover:bg-neutral-50 font-medium px-4 py-3 rounded-md transition-colors">
+                        My Bookings
+                    </a>
+                    <a href="#" class="text-neutral-600 hover:text-primary-500 hover:bg-neutral-50 font-medium px-4 py-3 rounded-md transition-colors">
+                        Profile
+                    </a>
+                    <a href="#" class="text-red-500 hover:bg-red-50 font-medium px-4 py-3 rounded-md transition-colors">
+                        Log Out
+                    </a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main id="main-content" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+        <!-- ========================================
+             ACCOUNT PAGE LAYOUT
+             - Left sidebar with navigation
+             - Right content area (tabs/sections)
+        ======================================== -->
+        <div class="flex flex-col lg:flex-row gap-6 lg:gap-8">
+
+            <!-- ========================================
+                 ACCOUNT SIDEBAR (Left)
+                 - User avatar + name
+                 - Navigation items
+            ======================================== -->
+            <aside class="lg:w-64 shrink-0">
+                <div class="bg-white rounded-xl border border-neutral-200 p-6 sticky top-24">
+
+                    <!-- User Info -->
+                    <div class="text-center mb-6 pb-6 border-b border-neutral-200">
+                        <!-- Avatar -->
+                        <div class="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                            <span class="text-2xl font-bold text-primary-500">JD</span>
+                        </div>
+                        <h2 class="font-heading font-semibold text-lg text-neutral-900">John Doe</h2>
+                        <p class="text-sm text-neutral-500">john.doe@email.com</p>
+                        <p class="text-xs text-neutral-400 mt-1">Member since Jan 2024</p>
+                    </div>
+
+                    <!-- Navigation -->
+                    <nav class="flex flex-col gap-1" aria-label="Account navigation">
+                        <a href="#" class="sidebar-nav-item active flex items-center gap-3 px-4 py-3 rounded-lg font-medium focus-ring" data-section="bookings">
+                            <i data-lucide="calendar-check" class="w-5 h-5"></i>
+                            My Bookings
+                        </a>
+                        <a href="#" class="sidebar-nav-item flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-neutral-600 focus-ring" data-section="profile">
+                            <i data-lucide="user" class="w-5 h-5"></i>
+                            Profile
+                        </a>
+                        <a href="#" class="sidebar-nav-item flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-neutral-600 focus-ring" data-section="reviews">
+                            <i data-lucide="star" class="w-5 h-5"></i>
+                            My Reviews
+                        </a>
+                        <a href="#" class="sidebar-nav-item flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-neutral-600 focus-ring" data-section="saved">
+                            <i data-lucide="heart" class="w-5 h-5"></i>
+                            Saved
+                        </a>
+                        <a href="#" class="sidebar-nav-item flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-neutral-600 focus-ring" data-section="settings">
+                            <i data-lucide="settings" class="w-5 h-5"></i>
+                            Settings
+                        </a>
+                        <hr class="border-neutral-200 my-2">
+                        <a href="#" class="sidebar-nav-item flex items-center gap-3 px-4 py-3 rounded-lg font-medium text-red-500 hover:bg-red-50 focus-ring">
+                            <i data-lucide="log-out" class="w-5 h-5"></i>
+                            Log Out
+                        </a>
+                    </nav>
+                </div>
+            </aside>
+
+            <!-- ========================================
+                 CONTENT AREA (Right)
+                 - My Bookings section (default)
+                 - Profile section (switchable)
+            ======================================== -->
+            <div class="flex-1 min-w-0">
+
+                <!-- ========================================
+                     MY BOOKINGS SECTION (Default View)
+                     - Tabs: Upcoming, Past, Cancelled
+                     - Booking cards grid
+                ======================================== -->
+                <section id="section-bookings" class="content-section">
+                    <!-- Section Header -->
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                        <h1 class="font-heading font-bold text-2xl sm:text-3xl text-neutral-900">My Bookings</h1>
+                    </div>
+
+                    <!-- Tabs -->
+                    <div class="border-b border-neutral-200 mb-6">
+                        <nav class="flex gap-6 -mb-px" aria-label="Booking tabs">
+                            <button class="tab-button active pb-3 text-sm font-medium border-b-2 border-transparent focus-ring" data-tab="upcoming">
+                                Upcoming
+                                <span class="ml-1.5 bg-primary-100 text-primary-500 text-xs font-semibold px-2 py-0.5 rounded-full">2</span>
+                            </button>
+                            <button class="tab-button pb-3 text-sm font-medium text-neutral-500 border-b-2 border-transparent focus-ring" data-tab="past">
+                                Past
+                                <span class="ml-1.5 bg-neutral-100 text-neutral-600 text-xs font-semibold px-2 py-0.5 rounded-full">5</span>
+                            </button>
+                            <button class="tab-button pb-3 text-sm font-medium text-neutral-500 border-b-2 border-transparent focus-ring" data-tab="cancelled">
+                                Cancelled
+                                <span class="ml-1.5 bg-neutral-100 text-neutral-600 text-xs font-semibold px-2 py-0.5 rounded-full">1</span>
+                            </button>
+                        </nav>
+                    </div>
+
+                    <!-- Upcoming Bookings Tab Content -->
+                    <div id="tab-upcoming" class="tab-content">
+                        <div class="space-y-4">
+
+                            <!-- Upcoming Booking Card 1 -->
+                            <article class="booking-card bg-white rounded-xl border border-neutral-200 overflow-hidden">
+                                <div class="flex flex-col sm:flex-row">
+                                    <!-- Hostel Image -->
+                                    <div class="sm:w-48 h-40 sm:h-auto bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center shrink-0">
+                                        <i data-lucide="image" class="w-10 h-10 text-primary-300"></i>
+                                    </div>
+
+                                    <!-- Booking Details -->
+                                    <div class="flex-1 p-5">
+                                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+                                            <div>
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <h3 class="font-heading font-semibold text-lg text-neutral-900">Saigon Backpackers Hub</h3>
+                                                    <span class="bg-green-100 text-green-700 text-xs font-semibold px-2 py-0.5 rounded-full">Confirmed</span>
+                                                </div>
+                                                <div class="flex items-center gap-1.5 text-neutral-500 text-sm">
+                                                    <i data-lucide="map-pin" class="w-4 h-4"></i>
+                                                    <span>District 1, Ho Chi Minh City</span>
+                                                </div>
+                                            </div>
+                                            <p class="text-sm text-neutral-500">Booking #HV-2024-0123</p>
+                                        </div>
+
+                                        <!-- Booking Info Grid -->
+                                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Check-in</p>
+                                                <p class="font-medium text-neutral-900">Feb 15, 2026</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Check-out</p>
+                                                <p class="font-medium text-neutral-900">Feb 18, 2026</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Room/Bed</p>
+                                                <p class="font-medium text-neutral-900">Mixed Dorm - Bed 4</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Guests</p>
+                                                <p class="font-medium text-neutral-900">1 Guest</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Actions -->
+                                        <div class="flex flex-wrap items-center gap-3 pt-4 border-t border-neutral-100">
+                                            <a href="#" class="btn-primary bg-primary-500 text-white font-medium px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors focus-ring">
+                                                <i data-lucide="eye" class="w-4 h-4"></i>
+                                                View Details
+                                            </a>
+                                            <button class="btn-secondary bg-white text-red-500 border border-red-200 font-medium px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-red-50 transition-colors focus-ring">
+                                                <i data-lucide="x" class="w-4 h-4"></i>
+                                                Cancel Booking
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <!-- Upcoming Booking Card 2 -->
+                            <article class="booking-card bg-white rounded-xl border border-neutral-200 overflow-hidden">
+                                <div class="flex flex-col sm:flex-row">
+                                    <div class="sm:w-48 h-40 sm:h-auto bg-gradient-to-br from-secondary-100 to-secondary-200 flex items-center justify-center shrink-0">
+                                        <i data-lucide="image" class="w-10 h-10 text-secondary-300"></i>
+                                    </div>
+                                    <div class="flex-1 p-5">
+                                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+                                            <div>
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <h3 class="font-heading font-semibold text-lg text-neutral-900">Old Quarter Hostel</h3>
+                                                    <span class="bg-yellow-100 text-yellow-700 text-xs font-semibold px-2 py-0.5 rounded-full">Pending</span>
+                                                </div>
+                                                <div class="flex items-center gap-1.5 text-neutral-500 text-sm">
+                                                    <i data-lucide="map-pin" class="w-4 h-4"></i>
+                                                    <span>Hoan Kiem, Hanoi</span>
+                                                </div>
+                                            </div>
+                                            <p class="text-sm text-neutral-500">Booking #HV-2024-0145</p>
+                                        </div>
+
+                                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Check-in</p>
+                                                <p class="font-medium text-neutral-900">Mar 01, 2026</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Check-out</p>
+                                                <p class="font-medium text-neutral-900">Mar 05, 2026</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Room/Bed</p>
+                                                <p class="font-medium text-neutral-900">Female Dorm - Bed 2</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Guests</p>
+                                                <p class="font-medium text-neutral-900">1 Guest</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex flex-wrap items-center gap-3 pt-4 border-t border-neutral-100">
+                                            <a href="#" class="btn-primary bg-primary-500 text-white font-medium px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors focus-ring">
+                                                <i data-lucide="eye" class="w-4 h-4"></i>
+                                                View Details
+                                            </a>
+                                            <button class="btn-secondary bg-white text-red-500 border border-red-200 font-medium px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-red-50 transition-colors focus-ring">
+                                                <i data-lucide="x" class="w-4 h-4"></i>
+                                                Cancel Booking
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- Past Bookings Tab Content -->
+                    <div id="tab-past" class="tab-content hidden">
+                        <div class="space-y-4">
+
+                            <!-- Past Booking Card 1 - Not Reviewed -->
+                            <article class="booking-card bg-white rounded-xl border border-neutral-200 overflow-hidden">
+                                <div class="flex flex-col sm:flex-row">
+                                    <div class="sm:w-48 h-40 sm:h-auto bg-gradient-to-br from-primary-50 to-secondary-100 flex items-center justify-center shrink-0">
+                                        <i data-lucide="image" class="w-10 h-10 text-primary-200"></i>
+                                    </div>
+                                    <div class="flex-1 p-5">
+                                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+                                            <div>
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <h3 class="font-heading font-semibold text-lg text-neutral-900">Beach View Hostel</h3>
+                                                    <span class="bg-neutral-100 text-neutral-600 text-xs font-semibold px-2 py-0.5 rounded-full">Completed</span>
+                                                </div>
+                                                <div class="flex items-center gap-1.5 text-neutral-500 text-sm">
+                                                    <i data-lucide="map-pin" class="w-4 h-4"></i>
+                                                    <span>My Khe Beach, Da Nang</span>
+                                                </div>
+                                            </div>
+                                            <p class="text-sm text-neutral-500">Booking #HV-2024-0089</p>
+                                        </div>
+
+                                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Check-in</p>
+                                                <p class="font-medium text-neutral-900">Jan 10, 2026</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Check-out</p>
+                                                <p class="font-medium text-neutral-900">Jan 14, 2026</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Room/Bed</p>
+                                                <p class="font-medium text-neutral-900">Private Room</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Total Paid</p>
+                                                <p class="font-medium text-neutral-900">$60</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Prompt to Leave Review -->
+                                        <div class="bg-secondary-50 border border-secondary-200 rounded-lg p-3 mb-4 flex items-center gap-3">
+                                            <i data-lucide="star" class="w-5 h-5 text-secondary-500"></i>
+                                            <p class="text-sm text-neutral-700">How was your stay? <span class="font-medium">Leave a review to help other travelers.</span></p>
+                                        </div>
+
+                                        <div class="flex flex-wrap items-center gap-3 pt-4 border-t border-neutral-100">
+                                            <button class="btn-accent bg-secondary-500 text-neutral-900 font-medium px-4 py-2 rounded-lg text-sm flex items-center gap-2 transition-colors focus-ring">
+                                                <i data-lucide="star" class="w-4 h-4"></i>
+                                                Leave Review
+                                            </button>
+                                            <a href="#" class="btn-secondary bg-white text-primary-500 border border-primary-200 font-medium px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-primary-50 transition-colors focus-ring">
+                                                <i data-lucide="repeat" class="w-4 h-4"></i>
+                                                Book Again
+                                            </a>
+                                            <a href="#" class="text-neutral-500 hover:text-primary-500 font-medium text-sm transition-colors">
+                                                View Details
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <!-- Past Booking Card 2 - Already Reviewed -->
+                            <article class="booking-card bg-white rounded-xl border border-neutral-200 overflow-hidden">
+                                <div class="flex flex-col sm:flex-row">
+                                    <div class="sm:w-48 h-40 sm:h-auto bg-gradient-to-br from-primary-100 to-primary-200 flex items-center justify-center shrink-0">
+                                        <i data-lucide="image" class="w-10 h-10 text-primary-300"></i>
+                                    </div>
+                                    <div class="flex-1 p-5">
+                                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+                                            <div>
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <h3 class="font-heading font-semibold text-lg text-neutral-900">Saigon Backpackers Hub</h3>
+                                                    <span class="bg-neutral-100 text-neutral-600 text-xs font-semibold px-2 py-0.5 rounded-full">Completed</span>
+                                                </div>
+                                                <div class="flex items-center gap-1.5 text-neutral-500 text-sm">
+                                                    <i data-lucide="map-pin" class="w-4 h-4"></i>
+                                                    <span>District 1, Ho Chi Minh City</span>
+                                                </div>
+                                            </div>
+                                            <p class="text-sm text-neutral-500">Booking #HV-2024-0056</p>
+                                        </div>
+
+                                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Check-in</p>
+                                                <p class="font-medium text-neutral-900">Dec 20, 2025</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Check-out</p>
+                                                <p class="font-medium text-neutral-900">Dec 25, 2025</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Room/Bed</p>
+                                                <p class="font-medium text-neutral-900">Mixed Dorm - Bed 7</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Total Paid</p>
+                                                <p class="font-medium text-neutral-900">$48</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Review Given -->
+                                        <div class="bg-neutral-50 border border-neutral-200 rounded-lg p-3 mb-4">
+                                            <div class="flex items-center gap-1 mb-1">
+                                                <span class="text-xs text-neutral-500">Your rating:</span>
+                                                <div class="flex items-center gap-0.5">
+                                                    <i data-lucide="star" class="w-4 h-4 text-secondary-500 fill-secondary-500"></i>
+                                                    <i data-lucide="star" class="w-4 h-4 text-secondary-500 fill-secondary-500"></i>
+                                                    <i data-lucide="star" class="w-4 h-4 text-secondary-500 fill-secondary-500"></i>
+                                                    <i data-lucide="star" class="w-4 h-4 text-secondary-500 fill-secondary-500"></i>
+                                                    <i data-lucide="star" class="w-4 h-4 text-secondary-500 fill-secondary-500"></i>
+                                                </div>
+                                            </div>
+                                            <p class="text-sm text-neutral-600 line-clamp-2">"Amazing hostel! Great location, friendly staff, and super clean. Highly recommend for solo travelers."</p>
+                                        </div>
+
+                                        <div class="flex flex-wrap items-center gap-3 pt-4 border-t border-neutral-100">
+                                            <a href="#" class="btn-secondary bg-white text-primary-500 border border-primary-200 font-medium px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-primary-50 transition-colors focus-ring">
+                                                <i data-lucide="repeat" class="w-4 h-4"></i>
+                                                Book Again
+                                            </a>
+                                            <a href="#" class="text-neutral-500 hover:text-primary-500 font-medium text-sm transition-colors">
+                                                View Details
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+
+                            <!-- Past Booking Cards 3-5 (condensed for brevity) -->
+                            <article class="booking-card bg-white rounded-xl border border-neutral-200 overflow-hidden">
+                                <div class="flex flex-col sm:flex-row">
+                                    <div class="sm:w-48 h-40 sm:h-auto bg-gradient-to-br from-secondary-100 to-secondary-200 flex items-center justify-center shrink-0">
+                                        <i data-lucide="image" class="w-10 h-10 text-secondary-300"></i>
+                                    </div>
+                                    <div class="flex-1 p-5">
+                                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+                                            <div>
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <h3 class="font-heading font-semibold text-lg text-neutral-900">Hoi An Lantern Hostel</h3>
+                                                    <span class="bg-neutral-100 text-neutral-600 text-xs font-semibold px-2 py-0.5 rounded-full">Completed</span>
+                                                </div>
+                                                <div class="flex items-center gap-1.5 text-neutral-500 text-sm">
+                                                    <i data-lucide="map-pin" class="w-4 h-4"></i>
+                                                    <span>Ancient Town, Hoi An</span>
+                                                </div>
+                                            </div>
+                                            <p class="text-sm text-neutral-500">Booking #HV-2024-0034</p>
+                                        </div>
+
+                                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Check-in</p>
+                                                <p class="font-medium text-neutral-900">Nov 15, 2025</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Check-out</p>
+                                                <p class="font-medium text-neutral-900">Nov 18, 2025</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Room/Bed</p>
+                                                <p class="font-medium text-neutral-900">Mixed Dorm - Bed 3</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Total Paid</p>
+                                                <p class="font-medium text-neutral-900">$36</p>
+                                            </div>
+                                        </div>
+
+                                        <div class="flex flex-wrap items-center gap-3 pt-4 border-t border-neutral-100">
+                                            <a href="#" class="btn-secondary bg-white text-primary-500 border border-primary-200 font-medium px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-primary-50 transition-colors focus-ring">
+                                                <i data-lucide="repeat" class="w-4 h-4"></i>
+                                                Book Again
+                                            </a>
+                                            <a href="#" class="text-neutral-500 hover:text-primary-500 font-medium text-sm transition-colors">
+                                                View Details
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+
+                    <!-- Cancelled Bookings Tab Content -->
+                    <div id="tab-cancelled" class="tab-content hidden">
+                        <div class="space-y-4">
+
+                            <!-- Cancelled Booking Card -->
+                            <article class="booking-card bg-white rounded-xl border border-neutral-200 overflow-hidden opacity-75">
+                                <div class="flex flex-col sm:flex-row">
+                                    <div class="sm:w-48 h-40 sm:h-auto bg-gradient-to-br from-neutral-100 to-neutral-200 flex items-center justify-center shrink-0">
+                                        <i data-lucide="image" class="w-10 h-10 text-neutral-300"></i>
+                                    </div>
+                                    <div class="flex-1 p-5">
+                                        <div class="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4">
+                                            <div>
+                                                <div class="flex items-center gap-2 mb-1">
+                                                    <h3 class="font-heading font-semibold text-lg text-neutral-900">Nha Trang Beach Hostel</h3>
+                                                    <span class="bg-red-100 text-red-600 text-xs font-semibold px-2 py-0.5 rounded-full">Cancelled</span>
+                                                </div>
+                                                <div class="flex items-center gap-1.5 text-neutral-500 text-sm">
+                                                    <i data-lucide="map-pin" class="w-4 h-4"></i>
+                                                    <span>Beachfront, Nha Trang</span>
+                                                </div>
+                                            </div>
+                                            <p class="text-sm text-neutral-500">Booking #HV-2024-0078</p>
+                                        </div>
+
+                                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-4">
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Check-in</p>
+                                                <p class="font-medium text-neutral-900 line-through">Jan 05, 2026</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Check-out</p>
+                                                <p class="font-medium text-neutral-900 line-through">Jan 08, 2026</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Room/Bed</p>
+                                                <p class="font-medium text-neutral-900">Mixed Dorm - Bed 5</p>
+                                            </div>
+                                            <div>
+                                                <p class="text-xs text-neutral-400 uppercase tracking-wide mb-1">Refund</p>
+                                                <p class="font-medium text-green-600">$45 refunded</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Cancellation Reason -->
+                                        <div class="bg-neutral-50 border border-neutral-200 rounded-lg p-3 mb-4">
+                                            <p class="text-xs text-neutral-400 mb-1">Cancellation reason:</p>
+                                            <p class="text-sm text-neutral-600">Plans changed - needed to postpone trip</p>
+                                            <p class="text-xs text-neutral-400 mt-2">Cancelled on: Jan 02, 2026</p>
+                                        </div>
+
+                                        <div class="flex flex-wrap items-center gap-3 pt-4 border-t border-neutral-100">
+                                            <a href="#" class="btn-secondary bg-white text-primary-500 border border-primary-200 font-medium px-4 py-2 rounded-lg text-sm flex items-center gap-2 hover:bg-primary-50 transition-colors focus-ring">
+                                                <i data-lucide="repeat" class="w-4 h-4"></i>
+                                                Book Again
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </article>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ========================================
+                     PROFILE SECTION (Switchable)
+                     - Avatar upload
+                     - Personal information form
+                     - Password change
+                ======================================== -->
+                <section id="section-profile" class="content-section hidden">
+                    <!-- Section Header -->
+                    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                        <h1 class="font-heading font-bold text-2xl sm:text-3xl text-neutral-900">Profile</h1>
+                    </div>
+
+                    <div class="space-y-6">
+
+                        <!-- Avatar Upload Card -->
+                        <div class="bg-white rounded-xl border border-neutral-200 p-6">
+                            <h2 class="font-heading font-semibold text-lg text-neutral-900 mb-4">Profile Photo</h2>
+                            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                                <!-- Avatar with Upload Overlay -->
+                                <div class="avatar-upload relative group cursor-pointer">
+                                    <div class="w-24 h-24 bg-primary-100 rounded-full flex items-center justify-center overflow-hidden">
+                                        <span class="text-3xl font-bold text-primary-500">JD</span>
+                                    </div>
+                                    <div class="avatar-overlay absolute inset-0 bg-black/50 rounded-full flex items-center justify-center opacity-0 transition-opacity">
+                                        <i data-lucide="camera" class="w-6 h-6 text-white"></i>
+                                    </div>
+                                    <input type="file" class="absolute inset-0 opacity-0 cursor-pointer" accept="image/*" aria-label="Upload avatar">
+                                </div>
+                                <div>
+                                    <p class="text-sm text-neutral-600 mb-2">Upload a new avatar. JPG, PNG or GIF. Max 2MB.</p>
+                                    <div class="flex items-center gap-2">
+                                        <button class="text-primary-500 hover:text-primary-600 text-sm font-medium transition-colors">Upload Photo</button>
+                                        <span class="text-neutral-300">|</span>
+                                        <button class="text-red-500 hover:text-red-600 text-sm font-medium transition-colors">Remove</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Personal Information Card -->
+                        <div class="bg-white rounded-xl border border-neutral-200 p-6">
+                            <h2 class="font-heading font-semibold text-lg text-neutral-900 mb-4">Personal Information</h2>
+                            <form class="space-y-4">
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <!-- First Name -->
+                                    <div>
+                                        <label for="firstName" class="block text-sm font-medium text-neutral-700 mb-1.5">First Name</label>
+                                        <input
+                                            type="text"
+                                            id="firstName"
+                                            value="John"
+                                            class="w-full h-11 px-4 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        >
+                                    </div>
+                                    <!-- Last Name -->
+                                    <div>
+                                        <label for="lastName" class="block text-sm font-medium text-neutral-700 mb-1.5">Last Name</label>
+                                        <input
+                                            type="text"
+                                            id="lastName"
+                                            value="Doe"
+                                            class="w-full h-11 px-4 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        >
+                                    </div>
+                                </div>
+
+                                <!-- Email -->
+                                <div>
+                                    <label for="email" class="block text-sm font-medium text-neutral-700 mb-1.5">Email Address</label>
+                                    <div class="relative">
+                                        <i data-lucide="mail" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400"></i>
+                                        <input
+                                            type="email"
+                                            id="email"
+                                            value="john.doe@email.com"
+                                            class="w-full h-11 pl-10 pr-4 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        >
+                                    </div>
+                                    <p class="text-xs text-neutral-400 mt-1">This email is used for login and booking confirmations.</p>
+                                </div>
+
+                                <!-- Phone -->
+                                <div>
+                                    <label for="phone" class="block text-sm font-medium text-neutral-700 mb-1.5">Phone Number</label>
+                                    <div class="relative">
+                                        <i data-lucide="phone" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400"></i>
+                                        <input
+                                            type="tel"
+                                            id="phone"
+                                            value="+84 901 234 567"
+                                            class="w-full h-11 pl-10 pr-4 border border-neutral-200 rounded-lg text-neutral-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        >
+                                    </div>
+                                    <p class="text-xs text-neutral-400 mt-1">We'll use this for booking updates and emergency contact.</p>
+                                </div>
+
+                                <!-- Nationality -->
+                                <div>
+                                    <label for="nationality" class="block text-sm font-medium text-neutral-700 mb-1.5">Nationality</label>
+                                    <div class="relative">
+                                        <i data-lucide="globe" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400"></i>
+                                        <select
+                                            id="nationality"
+                                            class="w-full h-11 pl-10 pr-8 border border-neutral-200 rounded-lg text-neutral-900 appearance-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent bg-white"
+                                        >
+                                            <option value="US" selected>United States</option>
+                                            <option value="VN">Vietnam</option>
+                                            <option value="UK">United Kingdom</option>
+                                            <option value="AU">Australia</option>
+                                            <option value="DE">Germany</option>
+                                            <option value="FR">France</option>
+                                            <option value="JP">Japan</option>
+                                            <option value="KR">South Korea</option>
+                                        </select>
+                                        <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none"></i>
+                                    </div>
+                                </div>
+
+                                <!-- Save Button -->
+                                <div class="pt-4">
+                                    <button type="submit" class="btn-primary bg-primary-500 text-white font-medium px-6 py-2.5 rounded-lg transition-colors focus-ring">
+                                        Save Changes
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Password Change Card -->
+                        <div class="bg-white rounded-xl border border-neutral-200 p-6">
+                            <h2 class="font-heading font-semibold text-lg text-neutral-900 mb-4">Change Password</h2>
+                            <form class="space-y-4">
+                                <!-- Current Password -->
+                                <div>
+                                    <label for="currentPassword" class="block text-sm font-medium text-neutral-700 mb-1.5">Current Password</label>
+                                    <div class="relative">
+                                        <i data-lucide="lock" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400"></i>
+                                        <input
+                                            type="password"
+                                            id="currentPassword"
+                                            placeholder="Enter current password"
+                                            class="w-full h-11 pl-10 pr-12 border border-neutral-200 rounded-lg text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                        >
+                                        <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600" aria-label="Toggle password visibility">
+                                            <i data-lucide="eye" class="w-5 h-5"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <!-- New Password -->
+                                    <div>
+                                        <label for="newPassword" class="block text-sm font-medium text-neutral-700 mb-1.5">New Password</label>
+                                        <div class="relative">
+                                            <i data-lucide="lock" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400"></i>
+                                            <input
+                                                type="password"
+                                                id="newPassword"
+                                                placeholder="Enter new password"
+                                                class="w-full h-11 pl-10 pr-4 border border-neutral-200 rounded-lg text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                            >
+                                        </div>
+                                    </div>
+                                    <!-- Confirm Password -->
+                                    <div>
+                                        <label for="confirmPassword" class="block text-sm font-medium text-neutral-700 mb-1.5">Confirm New Password</label>
+                                        <div class="relative">
+                                            <i data-lucide="lock" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400"></i>
+                                            <input
+                                                type="password"
+                                                id="confirmPassword"
+                                                placeholder="Confirm new password"
+                                                class="w-full h-11 pl-10 pr-4 border border-neutral-200 rounded-lg text-neutral-900 placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                                            >
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Password Requirements -->
+                                <div class="bg-neutral-50 rounded-lg p-3">
+                                    <p class="text-xs text-neutral-500 mb-2">Password must contain:</p>
+                                    <ul class="text-xs text-neutral-500 space-y-1">
+                                        <li class="flex items-center gap-1.5">
+                                            <i data-lucide="check" class="w-3 h-3 text-neutral-400"></i>
+                                            At least 8 characters
+                                        </li>
+                                        <li class="flex items-center gap-1.5">
+                                            <i data-lucide="check" class="w-3 h-3 text-neutral-400"></i>
+                                            One uppercase letter
+                                        </li>
+                                        <li class="flex items-center gap-1.5">
+                                            <i data-lucide="check" class="w-3 h-3 text-neutral-400"></i>
+                                            One number
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <!-- Update Password Button -->
+                                <div class="pt-4">
+                                    <button type="submit" class="btn-primary bg-primary-500 text-white font-medium px-6 py-2.5 rounded-lg transition-colors focus-ring">
+                                        Update Password
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+
+                        <!-- Danger Zone -->
+                        <div class="bg-white rounded-xl border border-red-200 p-6">
+                            <h2 class="font-heading font-semibold text-lg text-red-600 mb-2">Danger Zone</h2>
+                            <p class="text-sm text-neutral-600 mb-4">Once you delete your account, there is no going back. Please be certain.</p>
+                            <button class="bg-white text-red-500 border border-red-300 font-medium px-4 py-2 rounded-lg text-sm hover:bg-red-50 transition-colors focus-ring">
+                                Delete Account
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+        </div>
+    </main>
+
+    <!-- ========================================
+         FOOTER
+         - Matches guest-home.html footer
+    ======================================== -->
+    <footer class="bg-neutral-900 text-white py-12 sm:py-16 mt-16">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12 mb-10">
+
+                <!-- Brand Column -->
+                <div class="lg:col-span-2">
+                    <a href="#" class="flex items-center gap-2 mb-4">
+                        <div class="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
+                            <i data-lucide="bed-double" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <span class="font-heading font-bold text-xl">
+                            <span class="text-white">Hostel</span><span class="text-secondary-500">Viet</span>
+                        </span>
+                    </a>
+                    <p class="text-neutral-400 max-w-sm mb-6">
+                        Your Gateway to Vietnamese Adventures. Discover unique stays and unforgettable experiences across Vietnam.
+                    </p>
+
+                    <!-- Social Icons -->
+                    <div class="flex items-center gap-3">
+                        <a href="#" class="w-10 h-10 bg-neutral-800 hover:bg-primary-500 rounded-lg flex items-center justify-center transition-colors focus-ring" aria-label="Facebook">
+                            <i data-lucide="facebook" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-neutral-800 hover:bg-primary-500 rounded-lg flex items-center justify-center transition-colors focus-ring" aria-label="Instagram">
+                            <i data-lucide="instagram" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-neutral-800 hover:bg-primary-500 rounded-lg flex items-center justify-center transition-colors focus-ring" aria-label="Twitter">
+                            <i data-lucide="twitter" class="w-5 h-5"></i>
+                        </a>
+                        <a href="#" class="w-10 h-10 bg-neutral-800 hover:bg-primary-500 rounded-lg flex items-center justify-center transition-colors focus-ring" aria-label="YouTube">
+                            <i data-lucide="youtube" class="w-5 h-5"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Quick Links -->
+                <div>
+                    <h4 class="font-heading font-semibold text-lg mb-4">Quick Links</h4>
+                    <nav class="flex flex-col gap-3">
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">About Us</a>
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">Contact</a>
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">Careers</a>
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">Blog</a>
+                    </nav>
+                </div>
+
+                <!-- Legal -->
+                <div>
+                    <h4 class="font-heading font-semibold text-lg mb-4">Legal</h4>
+                    <nav class="flex flex-col gap-3">
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">Terms of Service</a>
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">Privacy Policy</a>
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">Cookie Policy</a>
+                        <a href="#" class="text-neutral-400 hover:text-white transition-colors">Refund Policy</a>
+                    </nav>
+                </div>
+            </div>
+
+            <!-- Bottom Bar -->
+            <div class="pt-8 border-t border-neutral-800 flex flex-col sm:flex-row items-center justify-between gap-4">
+                <p class="text-neutral-500 text-sm">
+                    &copy; 2026 HostelViet. All rights reserved.
+                </p>
+                <p class="text-neutral-500 text-sm">
+                    Made with <i data-lucide="heart" class="w-4 h-4 inline text-secondary-500 fill-secondary-500"></i> in Vietnam
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- ========================================
+         SCRIPTS
+         - Initialize Lucide icons
+         - Mobile menu toggle
+         - Sidebar navigation
+         - Tab switching
+    ======================================== -->
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Mobile menu toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            const icon = document.getElementById('menu-icon');
+            const button = icon.closest('button');
+
+            menu.classList.toggle('hidden');
+
+            if (menu.classList.contains('hidden')) {
+                icon.setAttribute('data-lucide', 'menu');
+                button.setAttribute('aria-expanded', 'false');
+            } else {
+                icon.setAttribute('data-lucide', 'x');
+                button.setAttribute('aria-expanded', 'true');
+            }
+
+            lucide.createIcons();
+        }
+
+        // Close mobile menu when clicking outside
+        document.addEventListener('click', function(event) {
+            const menu = document.getElementById('mobile-menu');
+            const menuButton = document.querySelector('[aria-label="Toggle menu"]');
+
+            if (!menu.contains(event.target) && !menuButton.contains(event.target) && !menu.classList.contains('hidden')) {
+                toggleMobileMenu();
+            }
+        });
+
+        // Sidebar navigation
+        const sidebarNavItems = document.querySelectorAll('.sidebar-nav-item[data-section]');
+        const contentSections = document.querySelectorAll('.content-section');
+
+        sidebarNavItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                e.preventDefault();
+                const section = this.dataset.section;
+
+                // Update active nav item
+                sidebarNavItems.forEach(nav => {
+                    nav.classList.remove('active');
+                    nav.classList.add('text-neutral-600');
+                });
+                this.classList.add('active');
+                this.classList.remove('text-neutral-600');
+
+                // Show corresponding section
+                contentSections.forEach(sec => {
+                    sec.classList.add('hidden');
+                });
+                document.getElementById('section-' + section)?.classList.remove('hidden');
+            });
+        });
+
+        // Tab switching for bookings
+        const tabButtons = document.querySelectorAll('.tab-button');
+        const tabContents = document.querySelectorAll('.tab-content');
+
+        tabButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const tab = this.dataset.tab;
+
+                // Update active tab button
+                tabButtons.forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.classList.add('text-neutral-500');
+                });
+                this.classList.add('active');
+                this.classList.remove('text-neutral-500');
+
+                // Show corresponding tab content
+                tabContents.forEach(content => {
+                    content.classList.add('hidden');
+                });
+                document.getElementById('tab-' + tab)?.classList.remove('hidden');
+            });
+        });
+    </script>
+</body>
+</html>

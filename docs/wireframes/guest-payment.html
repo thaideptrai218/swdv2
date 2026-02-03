@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment - HostelViet</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#E6F0F7',
+                            100: '#CCE1EF',
+                            500: '#0F4C75',
+                            600: '#0D3F61',
+                            700: '#0A324D',
+                            900: '#051926'
+                        },
+                        secondary: {
+                            400: '#F5A623',
+                            500: '#D4920F',
+                            600: '#B37D0D'
+                        }
+                    },
+                    fontFamily: {
+                        heading: ['Outfit', 'system-ui', 'sans-serif'],
+                        body: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', system-ui, sans-serif;
+        }
+        /* Payment method active state */
+        .payment-method.active {
+            border-color: #0F4C75;
+            background-color: #E6F0F7;
+        }
+        .payment-method.active .radio-indicator {
+            background-color: #0F4C75;
+        }
+        /* Timer pulse animation */
+        @keyframes pulse-timer {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.6; }
+        }
+        .timer-pulse {
+            animation: pulse-timer 2s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-body text-gray-900">
+
+    <!-- ============================================
+         HEADER - Simplified Navigation
+         Minimal header for checkout flow
+    ============================================= -->
+    <header class="bg-white shadow-sm sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <!-- Logo -->
+                <a href="#" class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-primary-500 rounded-lg flex items-center justify-center">
+                        <span class="text-white font-heading font-bold text-sm">HV</span>
+                    </div>
+                    <span class="font-heading font-bold text-xl">
+                        Hostel<span class="text-secondary-500">Viet</span>
+                    </span>
+                </a>
+
+                <!-- Secure Payment Badge -->
+                <div class="flex items-center gap-2 text-gray-600">
+                    <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                    </svg>
+                    <span class="text-sm font-medium hidden sm:inline">Secure Checkout</span>
+                </div>
+
+                <!-- Help Link -->
+                <a href="#" class="text-gray-600 hover:text-primary-500 transition-colors flex items-center gap-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                    </svg>
+                    <span class="hidden sm:inline text-sm">Help</span>
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <main class="py-6 sm:py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+            <!-- ============================================
+                 PROGRESS STEPS
+                 Step 1: Details | Step 2: Review | Step 3: Payment (Active)
+            ============================================= -->
+            <nav class="mb-8" aria-label="Checkout progress">
+                <ol class="flex items-center justify-center">
+                    <!-- Step 1: Details (Completed) -->
+                    <li class="flex items-center">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            <span class="hidden sm:inline text-sm font-medium text-gray-900">Details</span>
+                        </div>
+                    </li>
+
+                    <!-- Connector -->
+                    <div class="w-12 sm:w-24 h-0.5 bg-green-500 mx-2 sm:mx-4"></div>
+
+                    <!-- Step 2: Review (Completed) -->
+                    <li class="flex items-center">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center">
+                                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                                </svg>
+                            </div>
+                            <span class="hidden sm:inline text-sm font-medium text-gray-900">Review</span>
+                        </div>
+                    </li>
+
+                    <!-- Connector -->
+                    <div class="w-12 sm:w-24 h-0.5 bg-primary-500 mx-2 sm:mx-4"></div>
+
+                    <!-- Step 3: Payment (Active) -->
+                    <li class="flex items-center">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 bg-primary-500 rounded-full flex items-center justify-center">
+                                <span class="text-white font-semibold text-sm">3</span>
+                            </div>
+                            <span class="hidden sm:inline text-sm font-medium text-primary-500">Payment</span>
+                        </div>
+                    </li>
+                </ol>
+            </nav>
+
+            <!-- ============================================
+                 TWO COLUMN LAYOUT
+                 Left: Payment Methods | Right: Booking Summary
+            ============================================= -->
+            <div class="flex flex-col lg:flex-row gap-8">
+
+                <!-- ============================================
+                     LEFT COLUMN - Payment Methods
+                ============================================= -->
+                <div class="lg:w-2/3 space-y-6">
+                    <h1 class="font-heading font-bold text-2xl sm:text-3xl text-gray-900">Complete Your Payment</h1>
+
+                    <!-- Payment Method Selection -->
+                    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                        <div class="p-5 border-b border-gray-200">
+                            <h2 class="font-heading font-semibold text-lg text-gray-900">Select Payment Method</h2>
+                        </div>
+
+                        <!-- VietQR / Bank Transfer Option (Default, Recommended) -->
+                        <label class="payment-method active block p-5 border-b border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors">
+                            <div class="flex items-start gap-4">
+                                <!-- Radio Button -->
+                                <div class="mt-1">
+                                    <div class="w-5 h-5 rounded-full border-2 border-primary-500 flex items-center justify-center">
+                                        <div class="radio-indicator w-3 h-3 rounded-full"></div>
+                                    </div>
+                                    <input type="radio" name="payment-method" value="vietqr" checked class="sr-only">
+                                </div>
+
+                                <!-- Method Info -->
+                                <div class="flex-1">
+                                    <div class="flex flex-wrap items-center gap-2 mb-1">
+                                        <span class="font-semibold text-gray-900">VietQR / Bank Transfer</span>
+                                        <span class="inline-flex items-center px-2 py-0.5 bg-green-100 text-green-700 text-xs font-medium rounded-full">
+                                            Recommended
+                                        </span>
+                                    </div>
+                                    <p class="text-sm text-gray-500">Instant confirmation via VietQR. Works with all major Vietnamese banks.</p>
+                                </div>
+
+                                <!-- SePay Logo Placeholder -->
+                                <div class="shrink-0">
+                                    <div class="w-16 h-10 bg-gray-100 rounded flex items-center justify-center text-xs text-gray-400 border border-gray-200">
+                                        SePay
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+
+                        <!-- Credit/Debit Card Option (VNPay) -->
+                        <label class="payment-method block p-5 cursor-pointer hover:bg-gray-50 transition-colors">
+                            <div class="flex items-start gap-4">
+                                <!-- Radio Button -->
+                                <div class="mt-1">
+                                    <div class="w-5 h-5 rounded-full border-2 border-gray-300 flex items-center justify-center">
+                                        <div class="radio-indicator w-3 h-3 rounded-full"></div>
+                                    </div>
+                                    <input type="radio" name="payment-method" value="card" class="sr-only">
+                                </div>
+
+                                <!-- Method Info -->
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-1">
+                                        <span class="font-semibold text-gray-900">Credit / Debit Card</span>
+                                    </div>
+                                    <p class="text-sm text-gray-500">Pay securely with Visa, Mastercard, or JCB via VNPay.</p>
+                                </div>
+
+                                <!-- Card Icons -->
+                                <div class="shrink-0 flex items-center gap-2">
+                                    <div class="w-10 h-7 bg-blue-900 rounded flex items-center justify-center text-white text-xs font-bold">
+                                        VISA
+                                    </div>
+                                    <div class="w-10 h-7 bg-red-500 rounded flex items-center justify-center">
+                                        <div class="flex">
+                                            <div class="w-3 h-3 bg-red-600 rounded-full -mr-1"></div>
+                                            <div class="w-3 h-3 bg-yellow-400 rounded-full"></div>
+                                        </div>
+                                    </div>
+                                    <div class="w-10 h-7 bg-gray-100 rounded flex items-center justify-center text-xs text-gray-500 border border-gray-200">
+                                        JCB
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+                    </div>
+
+                    <!-- ============================================
+                         VietQR Section (Visible when selected)
+                    ============================================= -->
+                    <div id="vietqr-section" class="bg-white rounded-xl border border-gray-200 p-6">
+                        <div class="flex flex-col md:flex-row gap-6">
+                            <!-- QR Code -->
+                            <div class="flex flex-col items-center">
+                                <!-- QR Code Placeholder -->
+                                <div class="w-52 h-52 bg-gray-100 border-2 border-dashed border-gray-300 rounded-xl flex items-center justify-center mb-4">
+                                    <div class="text-center text-gray-400">
+                                        <svg class="w-16 h-16 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z"/>
+                                        </svg>
+                                        <span class="text-sm">QR Code (200x200)</span>
+                                    </div>
+                                </div>
+
+                                <!-- Timer -->
+                                <div class="timer-pulse flex items-center gap-2 text-orange-600 bg-orange-50 px-4 py-2 rounded-lg">
+                                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <span class="font-semibold">Complete within <span id="timer">15:00</span></span>
+                                </div>
+                            </div>
+
+                            <!-- Bank Transfer Info -->
+                            <div class="flex-1 space-y-4">
+                                <h3 class="font-heading font-semibold text-lg text-gray-900">Bank Transfer Details</h3>
+
+                                <!-- Account Info -->
+                                <div class="space-y-3">
+                                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                                        <span class="text-gray-500">Account Name</span>
+                                        <span class="font-medium text-gray-900">HOSTELVIET JSC</span>
+                                    </div>
+                                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                                        <span class="text-gray-500">Bank</span>
+                                        <span class="font-medium text-gray-900">MB Bank</span>
+                                    </div>
+                                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                                        <span class="text-gray-500">Account Number</span>
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-medium text-gray-900">0987654321</span>
+                                            <button class="text-primary-500 hover:text-primary-600" aria-label="Copy account number">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-between items-center py-2 border-b border-gray-100">
+                                        <span class="text-gray-500">Amount</span>
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-bold text-lg text-gray-900">360,000 VND</span>
+                                            <button class="text-primary-500 hover:text-primary-600" aria-label="Copy amount">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="flex justify-between items-center py-2">
+                                        <span class="text-gray-500">Transfer Content</span>
+                                        <div class="flex items-center gap-2">
+                                            <span class="font-medium text-gray-900">HV-BK-2026020312345</span>
+                                            <button class="text-primary-500 hover:text-primary-600" aria-label="Copy transfer content">
+                                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+                                                </svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Scan Instruction -->
+                                <div class="bg-primary-50 rounded-lg p-4">
+                                    <div class="flex items-start gap-3">
+                                        <svg class="w-5 h-5 text-primary-500 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                        </svg>
+                                        <div>
+                                            <p class="font-medium text-primary-900">Scan with your banking app</p>
+                                            <p class="text-sm text-primary-700 mt-1">Open your bank's mobile app, select VietQR scan, and complete the payment. Your booking will be confirmed automatically.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- ============================================
+                         Card Section (Hidden by default)
+                    ============================================= -->
+                    <div id="card-section" class="hidden bg-white rounded-xl border border-gray-200 p-6">
+                        <h3 class="font-heading font-semibold text-lg text-gray-900 mb-6">Card Information</h3>
+
+                        <form class="space-y-4">
+                            <!-- Card Number -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Card Number</label>
+                                <div class="relative">
+                                    <input type="text"
+                                           placeholder="1234 5678 9012 3456"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+                                           maxlength="19">
+                                    <div class="absolute right-3 top-1/2 -translate-y-1/2 flex gap-1">
+                                        <div class="w-8 h-5 bg-blue-900 rounded text-white text-xs flex items-center justify-center font-bold">VISA</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Expiry & CVV Row -->
+                            <div class="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">Expiry Date</label>
+                                    <input type="text"
+                                           placeholder="MM/YY"
+                                           class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+                                           maxlength="5">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-1">CVV</label>
+                                    <div class="relative">
+                                        <input type="text"
+                                               placeholder="123"
+                                               class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none"
+                                               maxlength="4">
+                                        <button type="button" class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600" aria-label="What is CVV?">
+                                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Cardholder Name -->
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Cardholder Name</label>
+                                <input type="text"
+                                       placeholder="Name as shown on card"
+                                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none">
+                            </div>
+
+                            <!-- Pay Now Button -->
+                            <button type="submit" class="w-full py-4 bg-secondary-500 text-white rounded-lg hover:bg-secondary-600 transition-colors font-heading font-semibold text-lg mt-6 flex items-center justify-center gap-2">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                                </svg>
+                                Pay Now - 360,000 VND
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- ============================================
+                         Security Badges
+                    ============================================= -->
+                    <div class="flex flex-wrap items-center justify-center gap-6 py-4">
+                        <!-- SSL Secured -->
+                        <div class="flex items-center gap-2 text-gray-500">
+                            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/>
+                            </svg>
+                            <span class="text-sm font-medium">SSL Secured</span>
+                        </div>
+
+                        <!-- Verified by VNPay -->
+                        <div class="flex items-center gap-2 text-gray-500">
+                            <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+                            </svg>
+                            <span class="text-sm font-medium">Verified by VNPay</span>
+                        </div>
+
+                        <!-- 256-bit Encryption -->
+                        <div class="flex items-center gap-2 text-gray-500">
+                            <svg class="w-5 h-5 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 11V7a4 4 0 118 0m-4 8v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"/>
+                            </svg>
+                            <span class="text-sm font-medium">256-bit Encryption</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ============================================
+                     RIGHT COLUMN - Booking Summary
+                     Sticky sidebar with booking details
+                ============================================= -->
+                <div class="lg:w-1/3">
+                    <div class="sticky top-24 bg-white rounded-xl border border-gray-200 overflow-hidden shadow-lg">
+                        <!-- Hostel Image Header -->
+                        <div class="aspect-video bg-gray-200 relative">
+                            <div class="absolute inset-0 flex items-center justify-center text-gray-400">
+                                <div class="text-center">
+                                    <svg class="w-12 h-12 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                                    </svg>
+                                    <span class="text-xs">Hostel Image</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Summary Content -->
+                        <div class="p-5">
+                            <h3 class="font-heading font-semibold text-lg text-gray-900 mb-1">Backpacker's Paradise Hostel</h3>
+                            <div class="flex items-center gap-1 text-sm text-gray-500 mb-4">
+                                <svg class="w-4 h-4 text-primary-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                                </svg>
+                                <span>District 1, Ho Chi Minh City</span>
+                            </div>
+
+                            <!-- Booking Details -->
+                            <div class="space-y-3 mb-4">
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="text-gray-500">Check-in</span>
+                                    <span class="font-medium text-gray-900">Mon, Feb 10, 2026</span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="text-gray-500">Check-out</span>
+                                    <span class="font-medium text-gray-900">Wed, Feb 12, 2026</span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="text-gray-500">Duration</span>
+                                    <span class="font-medium text-gray-900">2 nights</span>
+                                </div>
+                                <div class="flex items-center justify-between text-sm">
+                                    <span class="text-gray-500">Guest</span>
+                                    <span class="font-medium text-gray-900">1 adult</span>
+                                </div>
+                            </div>
+
+                            <!-- Room Details -->
+                            <div class="border-t border-gray-200 pt-4 mb-4">
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <p class="font-medium text-gray-900">Dorm Room (6-bed Mixed)</p>
+                                        <p class="text-sm text-gray-500">1 bed x 2 nights</p>
+                                    </div>
+                                    <span class="font-medium text-gray-900">360,000 VND</span>
+                                </div>
+                            </div>
+
+                            <!-- Price Breakdown -->
+                            <div class="border-t border-gray-200 pt-4 space-y-2">
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">Subtotal</span>
+                                    <span class="text-gray-900">360,000 VND</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">Service fee</span>
+                                    <span class="text-gray-900">0 VND</span>
+                                </div>
+                                <div class="flex justify-between text-sm">
+                                    <span class="text-gray-500">Taxes</span>
+                                    <span class="text-gray-900">Included</span>
+                                </div>
+                            </div>
+
+                            <!-- Total -->
+                            <div class="border-t border-gray-200 pt-4 mt-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="font-heading font-semibold text-lg text-gray-900">Total</span>
+                                    <span class="font-heading font-bold text-xl text-gray-900">360,000 VND</span>
+                                </div>
+                            </div>
+
+                            <!-- Cancellation Policy -->
+                            <div class="mt-4 p-3 bg-green-50 rounded-lg">
+                                <div class="flex items-start gap-2">
+                                    <svg class="w-5 h-5 text-green-600 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                                    </svg>
+                                    <p class="text-sm text-green-700">Free cancellation within 24 hours of booking</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- ============================================
+         JAVASCRIPT: Payment Method Switching & Timer
+    ============================================= -->
+    <script>
+        // Payment method switching
+        const paymentMethods = document.querySelectorAll('.payment-method');
+        const vietqrSection = document.getElementById('vietqr-section');
+        const cardSection = document.getElementById('card-section');
+
+        paymentMethods.forEach(method => {
+            method.addEventListener('click', function() {
+                // Update active state
+                paymentMethods.forEach(m => {
+                    m.classList.remove('active');
+                    m.querySelector('.w-5.h-5').classList.remove('border-primary-500');
+                    m.querySelector('.w-5.h-5').classList.add('border-gray-300');
+                });
+                this.classList.add('active');
+                this.querySelector('.w-5.h-5').classList.remove('border-gray-300');
+                this.querySelector('.w-5.h-5').classList.add('border-primary-500');
+
+                // Show/hide sections
+                const selectedMethod = this.querySelector('input').value;
+                if (selectedMethod === 'vietqr') {
+                    vietqrSection.classList.remove('hidden');
+                    cardSection.classList.add('hidden');
+                } else {
+                    vietqrSection.classList.add('hidden');
+                    cardSection.classList.remove('hidden');
+                }
+            });
+        });
+
+        // Timer countdown
+        let timeLeft = 15 * 60; // 15 minutes in seconds
+        const timerDisplay = document.getElementById('timer');
+
+        function updateTimer() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            timerDisplay.textContent = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+
+            if (timeLeft > 0) {
+                timeLeft--;
+                setTimeout(updateTimer, 1000);
+            } else {
+                timerDisplay.textContent = 'Expired';
+                timerDisplay.parentElement.classList.remove('timer-pulse');
+                timerDisplay.parentElement.classList.add('bg-red-100', 'text-red-600');
+                timerDisplay.parentElement.classList.remove('bg-orange-50', 'text-orange-600');
+            }
+        }
+
+        updateTimer();
+
+        // Card number formatting
+        const cardInput = document.querySelector('input[placeholder="1234 5678 9012 3456"]');
+        if (cardInput) {
+            cardInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\s/g, '').replace(/\D/g, '');
+                value = value.match(/.{1,4}/g)?.join(' ') || value;
+                e.target.value = value;
+            });
+        }
+
+        // Expiry date formatting
+        const expiryInput = document.querySelector('input[placeholder="MM/YY"]');
+        if (expiryInput) {
+            expiryInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length >= 2) {
+                    value = value.slice(0, 2) + '/' + value.slice(2);
+                }
+                e.target.value = value;
+            });
+        }
+    </script>
+
+</body>
+</html>

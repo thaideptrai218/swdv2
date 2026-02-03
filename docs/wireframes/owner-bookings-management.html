@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookings Management | HostelViet</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#E6F0F7',
+                            100: '#CCE1EF',
+                            500: '#0F4C75',
+                            600: '#0D3F61',
+                            700: '#0A324D',
+                            900: '#051926',
+                        },
+                        secondary: {
+                            400: '#F5A623',
+                            500: '#D4920F',
+                            600: '#B37D0D',
+                        },
+                        neutral: {
+                            0: '#FFFFFF',
+                            50: '#F8FAFC',
+                            100: '#F1F5F9',
+                            200: '#E2E8F0',
+                            400: '#94A3B8',
+                            600: '#475569',
+                            900: '#0F172A',
+                        },
+                    },
+                    fontFamily: {
+                        heading: ['Outfit', 'system-ui', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', system-ui, sans-serif;
+        }
+
+        /* Sidebar transition */
+        .sidebar {
+            transition: width 0.3s ease, transform 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 64px;
+        }
+
+        .sidebar.collapsed .nav-label,
+        .sidebar.collapsed .logo-text {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .sidebar.collapsed .nav-item {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        /* Main content transition */
+        .main-content {
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.sidebar-collapsed {
+            margin-left: 64px;
+        }
+
+        /* Mobile sidebar overlay */
+        .sidebar-overlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Date input styling */
+        input[type="date"]::-webkit-calendar-picker-indicator {
+            cursor: pointer;
+            opacity: 0.6;
+        }
+
+        input[type="date"]::-webkit-calendar-picker-indicator:hover {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-neutral-50 font-body text-neutral-900">
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="sidebarOverlay" class="sidebar-overlay fixed inset-0 bg-neutral-900/50 z-40 lg:hidden" onclick="toggleMobileSidebar()"></div>
+
+    <!-- ==================== SIDEBAR ==================== -->
+    <!--
+        ANNOTATION: Collapsible sidebar (240px expanded, 64px collapsed)
+        - Logo at top with wave + bed icon concept
+        - Navigation with 8 main sections
+        - Active state on Bookings: primary-700 background, secondary-500 left border
+        - Collapse button at bottom
+        - Mobile: transforms to overlay drawer
+    -->
+    <aside id="sidebar" class="sidebar fixed left-0 top-0 h-full w-60 bg-primary-900 text-white z-50 flex flex-col transform -translate-x-full lg:translate-x-0">
+
+        <!-- Logo Section -->
+        <div class="flex items-center gap-3 px-5 py-6 border-b border-primary-700">
+            <!-- Logo Icon: Wave + Bed fusion concept -->
+            <div class="w-10 h-10 rounded-lg bg-secondary-500 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="waves" class="w-6 h-6 text-primary-900"></i>
+            </div>
+            <span class="logo-text font-heading font-bold text-xl transition-opacity duration-300">
+                Hostel<span class="text-secondary-500">Viet</span>
+            </span>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 py-4 overflow-y-auto">
+            <ul class="space-y-1 px-3">
+                <!-- Dashboard -->
+                <li>
+                    <a href="owner-dashboard.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Dashboard</span>
+                    </a>
+                </li>
+
+                <!-- Properties -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="building-2" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Properties</span>
+                    </a>
+                </li>
+
+                <!-- Rooms -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="bed-double" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Rooms</span>
+                    </a>
+                </li>
+
+                <!-- Bookings - Active -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg bg-primary-700 text-white border-l-4 border-secondary-500 transition-all duration-200">
+                        <i data-lucide="calendar-check" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Bookings</span>
+                    </a>
+                </li>
+
+                <!-- Guests -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="users" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Guests</span>
+                    </a>
+                </li>
+
+                <!-- Maintenance -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="wrench" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Maintenance</span>
+                    </a>
+                </li>
+
+                <!-- Reports -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="bar-chart-3" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Reports</span>
+                    </a>
+                </li>
+
+                <!-- Settings -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="settings" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Collapse Button -->
+        <div class="p-3 border-t border-primary-700 hidden lg:block">
+            <button onclick="toggleSidebar()" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200" aria-label="Toggle sidebar">
+                <i data-lucide="panel-left-close" id="collapseIcon" class="w-5 h-5 flex-shrink-0"></i>
+                <span class="nav-label transition-opacity duration-300">Collapse</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- ==================== MAIN WRAPPER ==================== -->
+    <div id="mainContent" class="main-content lg:ml-60 min-h-screen">
+
+        <!-- ==================== HEADER ==================== -->
+        <!--
+            ANNOTATION: Fixed header with full width
+            - Hamburger menu (mobile only)
+            - Search bar (expandable on mobile)
+            - Notification bell with unread badge
+            - User avatar with dropdown trigger
+        -->
+        <header class="sticky top-0 z-30 bg-white border-b border-neutral-200 px-4 lg:px-6 py-3">
+            <div class="flex items-center justify-between gap-4">
+
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 -ml-2 rounded-lg hover:bg-neutral-100 transition-colors" aria-label="Open menu">
+                    <i data-lucide="menu" class="w-6 h-6 text-neutral-600"></i>
+                </button>
+
+                <!-- Search Bar -->
+                <div class="flex-1 max-w-xl hidden sm:block">
+                    <div class="relative">
+                        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400"></i>
+                        <input
+                            type="search"
+                            placeholder="Search bookings, guests, rooms..."
+                            class="w-full h-11 pl-10 pr-4 bg-neutral-50 border border-neutral-200 rounded-lg text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                        >
+                    </div>
+                </div>
+
+                <!-- Mobile Search Button -->
+                <button class="sm:hidden p-2 rounded-lg hover:bg-neutral-100 transition-colors" aria-label="Search">
+                    <i data-lucide="search" class="w-5 h-5 text-neutral-600"></i>
+                </button>
+
+                <!-- Right Actions -->
+                <div class="flex items-center gap-2">
+
+                    <!-- Notification Bell -->
+                    <button class="relative p-2 rounded-lg hover:bg-neutral-100 transition-colors group" aria-label="Notifications">
+                        <i data-lucide="bell" class="w-5 h-5 text-neutral-600 group-hover:text-primary-500 transition-colors"></i>
+                        <!-- Notification Badge -->
+                        <span class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs font-medium rounded-full flex items-center justify-center">3</span>
+                    </button>
+
+                    <!-- User Avatar Dropdown -->
+                    <div class="relative">
+                        <button class="flex items-center gap-2 p-1 pr-3 rounded-full hover:bg-neutral-100 transition-colors" aria-label="User menu">
+                            <div class="w-9 h-9 rounded-full bg-primary-500 flex items-center justify-center text-white font-medium text-sm">
+                                NT
+                            </div>
+                            <span class="hidden md:block text-sm font-medium text-neutral-700">Nguyen Tuan</span>
+                            <i data-lucide="chevron-down" class="hidden md:block w-4 h-4 text-neutral-400"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ==================== MAIN CONTENT ==================== -->
+        <main class="p-4 lg:p-6">
+
+            <!-- ==================== PAGE HEADER ==================== -->
+            <!--
+                ANNOTATION: Page title with primary action button
+                - "Bookings" heading
+                - "New Booking" gold button on the right
+            -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <div>
+                    <h1 class="font-heading text-2xl lg:text-3xl font-semibold text-neutral-900">
+                        Bookings
+                    </h1>
+                    <p class="text-neutral-600 mt-1">Manage all your property bookings</p>
+                </div>
+                <button class="flex items-center justify-center gap-2 h-11 px-5 bg-secondary-500 text-white rounded-lg font-medium hover:bg-secondary-600 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2 transition-all shadow-sm">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                    <span>New Booking</span>
+                </button>
+            </div>
+
+            <!-- ==================== QUICK STATS ROW ==================== -->
+            <!--
+                ANNOTATION: 4 quick stat cards above the table
+                - Today's Check-ins
+                - Today's Check-outs
+                - Pending Confirmation
+                - Total This Month
+            -->
+            <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 mb-6">
+                <!-- Today's Check-ins -->
+                <div class="bg-white rounded-lg border border-neutral-200 p-4 hover:shadow-sm transition-shadow">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-green-50 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="log-in" class="w-5 h-5 text-green-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-heading font-bold text-neutral-900">5</p>
+                            <p class="text-xs text-neutral-500">Today's Check-ins</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Today's Check-outs -->
+                <div class="bg-white rounded-lg border border-neutral-200 p-4 hover:shadow-sm transition-shadow">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="log-out" class="w-5 h-5 text-blue-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-heading font-bold text-neutral-900">3</p>
+                            <p class="text-xs text-neutral-500">Today's Check-outs</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pending Confirmation -->
+                <div class="bg-white rounded-lg border border-neutral-200 p-4 hover:shadow-sm transition-shadow">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-yellow-50 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="clock" class="w-5 h-5 text-yellow-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-heading font-bold text-neutral-900">8</p>
+                            <p class="text-xs text-neutral-500">Pending Confirmation</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Total This Month -->
+                <div class="bg-white rounded-lg border border-neutral-200 p-4 hover:shadow-sm transition-shadow">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg bg-primary-50 flex items-center justify-center flex-shrink-0">
+                            <i data-lucide="calendar-range" class="w-5 h-5 text-primary-500"></i>
+                        </div>
+                        <div>
+                            <p class="text-2xl font-heading font-bold text-neutral-900">156</p>
+                            <p class="text-xs text-neutral-500">Total This Month</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== FILTERS BAR ==================== -->
+            <!--
+                ANNOTATION: Filter controls for booking table
+                - Date range (from/to)
+                - Status dropdown
+                - Property dropdown
+                - Guest search
+                - Clear filters button
+                - Responsive: stacks on mobile
+            -->
+            <div class="bg-white rounded-lg border border-neutral-200 p-4 mb-4">
+                <div class="flex flex-col lg:flex-row lg:items-end gap-3">
+                    <!-- Date Range: From -->
+                    <div class="flex-1 min-w-0">
+                        <label for="dateFrom" class="block text-xs font-medium text-neutral-600 mb-1.5">Check-in From</label>
+                        <input
+                            type="date"
+                            id="dateFrom"
+                            class="w-full h-10 px-3 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                        >
+                    </div>
+
+                    <!-- Date Range: To -->
+                    <div class="flex-1 min-w-0">
+                        <label for="dateTo" class="block text-xs font-medium text-neutral-600 mb-1.5">Check-in To</label>
+                        <input
+                            type="date"
+                            id="dateTo"
+                            class="w-full h-10 px-3 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                        >
+                    </div>
+
+                    <!-- Status Dropdown -->
+                    <div class="flex-1 min-w-0">
+                        <label for="statusFilter" class="block text-xs font-medium text-neutral-600 mb-1.5">Status</label>
+                        <select
+                            id="statusFilter"
+                            class="w-full h-10 px-3 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all appearance-none cursor-pointer"
+                            style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 width%3D%2220%22 height%3D%2220%22 viewBox%3D%220 0 20 20%22 fill%3D%22%2394A3B8%22%3E%3Cpath fill-rule%3D%22evenodd%22 d%3D%22M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z%22 clip-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E'); background-position: right 8px center; background-repeat: no-repeat; padding-right: 32px;"
+                        >
+                            <option value="">All Statuses</option>
+                            <option value="pending">Pending</option>
+                            <option value="confirmed">Confirmed</option>
+                            <option value="checked-in">Checked-in</option>
+                            <option value="checked-out">Checked-out</option>
+                            <option value="cancelled">Cancelled</option>
+                        </select>
+                    </div>
+
+                    <!-- Property Dropdown -->
+                    <div class="flex-1 min-w-0">
+                        <label for="propertyFilter" class="block text-xs font-medium text-neutral-600 mb-1.5">Property</label>
+                        <select
+                            id="propertyFilter"
+                            class="w-full h-10 px-3 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all appearance-none cursor-pointer"
+                            style="background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22 width%3D%2220%22 height%3D%2220%22 viewBox%3D%220 0 20 20%22 fill%3D%22%2394A3B8%22%3E%3Cpath fill-rule%3D%22evenodd%22 d%3D%22M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z%22 clip-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E'); background-position: right 8px center; background-repeat: no-repeat; padding-right: 32px;"
+                        >
+                            <option value="">All Properties</option>
+                            <option value="backpacker-hcm">Backpacker HCM</option>
+                            <option value="beach-hostel-danang">Beach Hostel Da Nang</option>
+                            <option value="old-quarter-hanoi">Old Quarter Hostel Hanoi</option>
+                        </select>
+                    </div>
+
+                    <!-- Guest Search -->
+                    <div class="flex-1 min-w-0">
+                        <label for="guestSearch" class="block text-xs font-medium text-neutral-600 mb-1.5">Guest Name</label>
+                        <div class="relative">
+                            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400"></i>
+                            <input
+                                type="text"
+                                id="guestSearch"
+                                placeholder="Search guest..."
+                                class="w-full h-10 pl-9 pr-3 bg-neutral-50 border border-neutral-200 rounded-lg text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Clear Filters Button -->
+                    <button class="h-10 px-4 text-sm font-medium text-neutral-600 hover:text-neutral-900 hover:bg-neutral-100 rounded-lg transition-colors flex items-center gap-2 flex-shrink-0">
+                        <i data-lucide="x" class="w-4 h-4"></i>
+                        <span>Clear</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ==================== BOOKINGS TABLE ==================== -->
+            <!--
+                ANNOTATION: Data table with 8 sample booking rows
+                - Columns: Booking ID, Guest (name + avatar), Room/Bed, Check-in, Check-out, Status, Amount, Actions
+                - Status badges with distinct colors per status
+                - Action icons: View, Check-in, Cancel
+                - Horizontal scroll on mobile
+            -->
+            <div class="bg-white rounded-lg border border-neutral-200 overflow-hidden mb-4">
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-[900px]">
+                        <thead>
+                            <tr class="bg-neutral-50 text-left">
+                                <th class="px-4 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">Booking ID</th>
+                                <th class="px-4 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">Guest</th>
+                                <th class="px-4 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">Room / Bed</th>
+                                <th class="px-4 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">Check-in</th>
+                                <th class="px-4 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">Check-out</th>
+                                <th class="px-4 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">Status</th>
+                                <th class="px-4 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider text-right">Amount</th>
+                                <th class="px-4 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-neutral-100">
+                            <!-- Row 1: Confirmed -->
+                            <tr class="hover:bg-primary-50 transition-colors">
+                                <td class="px-4 py-3">
+                                    <span class="text-sm font-medium text-primary-500">#BK-2026001</span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-medium text-xs flex-shrink-0">JD</div>
+                                        <span class="font-medium text-neutral-900 text-sm">John Doe</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-neutral-600">Dorm A - Bed 4</td>
+                                <td class="px-4 py-3 text-sm text-neutral-600">Feb 3, 2026</td>
+                                <td class="px-4 py-3 text-sm text-neutral-600">Feb 7, 2026</td>
+                                <td class="px-4 py-3">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Confirmed</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm font-medium text-neutral-900 text-right">1,200,000₫</td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button class="p-2 rounded-lg hover:bg-neutral-100 transition-colors group" title="View Details">
+                                            <i data-lucide="eye" class="w-4 h-4 text-neutral-400 group-hover:text-primary-500"></i>
+                                        </button>
+                                        <button class="p-2 rounded-lg hover:bg-green-50 transition-colors group" title="Check-in Guest">
+                                            <i data-lucide="log-in" class="w-4 h-4 text-neutral-400 group-hover:text-green-600"></i>
+                                        </button>
+                                        <button class="p-2 rounded-lg hover:bg-red-50 transition-colors group" title="Cancel Booking">
+                                            <i data-lucide="x-circle" class="w-4 h-4 text-neutral-400 group-hover:text-red-500"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Row 2: Pending -->
+                            <tr class="hover:bg-primary-50 transition-colors">
+                                <td class="px-4 py-3">
+                                    <span class="text-sm font-medium text-primary-500">#BK-2026002</span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-medium text-xs flex-shrink-0">ML</div>
+                                        <span class="font-medium text-neutral-900 text-sm">Marie Laurent</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-neutral-600">Private Room 2</td>
+                                <td class="px-4 py-3 text-sm text-neutral-600">Feb 4, 2026</td>
+                                <td class="px-4 py-3 text-sm text-neutral-600">Feb 10, 2026</td>
+                                <td class="px-4 py-3">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">Pending</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm font-medium text-neutral-900 text-right">2,400,000₫</td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button class="p-2 rounded-lg hover:bg-neutral-100 transition-colors group" title="View Details">
+                                            <i data-lucide="eye" class="w-4 h-4 text-neutral-400 group-hover:text-primary-500"></i>
+                                        </button>
+                                        <button class="p-2 rounded-lg hover:bg-green-50 transition-colors group" title="Confirm Booking">
+                                            <i data-lucide="check-circle" class="w-4 h-4 text-neutral-400 group-hover:text-green-600"></i>
+                                        </button>
+                                        <button class="p-2 rounded-lg hover:bg-red-50 transition-colors group" title="Cancel Booking">
+                                            <i data-lucide="x-circle" class="w-4 h-4 text-neutral-400 group-hover:text-red-500"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Row 3: Checked-in -->
+                            <tr class="hover:bg-primary-50 transition-colors">
+                                <td class="px-4 py-3">
+                                    <span class="text-sm font-medium text-primary-500">#BK-2026003</span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-700 font-medium text-xs flex-shrink-0">TN</div>
+                                        <span class="font-medium text-neutral-900 text-sm">Tran Nguyen</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-neutral-600">Dorm B - Bed 1</td>
+                                <td class="px-4 py-3 text-sm text-neutral-600">Feb 1, 2026</td>
+                                <td class="px-4 py-3 text-sm text-neutral-600">Feb 5, 2026</td>
+                                <td class="px-4 py-3">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">Checked-in</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm font-medium text-neutral-900 text-right">800,000₫</td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button class="p-2 rounded-lg hover:bg-neutral-100 transition-colors group" title="View Details">
+                                            <i data-lucide="eye" class="w-4 h-4 text-neutral-400 group-hover:text-primary-500"></i>
+                                        </button>
+                                        <button class="p-2 rounded-lg hover:bg-blue-50 transition-colors group" title="Check-out Guest">
+                                            <i data-lucide="log-out" class="w-4 h-4 text-neutral-400 group-hover:text-blue-600"></i>
+                                        </button>
+                                        <button class="p-2 rounded-lg hover:bg-red-50 transition-colors group opacity-50 cursor-not-allowed" title="Cannot Cancel" disabled>
+                                            <i data-lucide="x-circle" class="w-4 h-4 text-neutral-300"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Row 4: Confirmed -->
+                            <tr class="hover:bg-primary-50 transition-colors">
+                                <td class="px-4 py-3">
+                                    <span class="text-sm font-medium text-primary-500">#BK-2026004</span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center text-pink-700 font-medium text-xs flex-shrink-0">AS</div>
+                                        <span class="font-medium text-neutral-900 text-sm">Anna Schmidt</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-neutral-600">Female Dorm - Bed 6</td>
+                                <td class="px-4 py-3 text-sm text-neutral-600">Feb 5, 2026</td>
+                                <td class="px-4 py-3 text-sm text-neutral-600">Feb 12, 2026</td>
+                                <td class="px-4 py-3">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Confirmed</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm font-medium text-neutral-900 text-right">1,400,000₫</td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button class="p-2 rounded-lg hover:bg-neutral-100 transition-colors group" title="View Details">
+                                            <i data-lucide="eye" class="w-4 h-4 text-neutral-400 group-hover:text-primary-500"></i>
+                                        </button>
+                                        <button class="p-2 rounded-lg hover:bg-green-50 transition-colors group" title="Check-in Guest">
+                                            <i data-lucide="log-in" class="w-4 h-4 text-neutral-400 group-hover:text-green-600"></i>
+                                        </button>
+                                        <button class="p-2 rounded-lg hover:bg-red-50 transition-colors group" title="Cancel Booking">
+                                            <i data-lucide="x-circle" class="w-4 h-4 text-neutral-400 group-hover:text-red-500"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Row 5: Cancelled -->
+                            <tr class="hover:bg-primary-50 transition-colors bg-neutral-50/50">
+                                <td class="px-4 py-3">
+                                    <span class="text-sm font-medium text-neutral-400">#BK-2026005</span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-700 font-medium text-xs flex-shrink-0">KP</div>
+                                        <span class="font-medium text-neutral-500 text-sm">Kevin Park</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-neutral-400">Private Room 1</td>
+                                <td class="px-4 py-3 text-sm text-neutral-400">Feb 1, 2026</td>
+                                <td class="px-4 py-3 text-sm text-neutral-400">Feb 2, 2026</td>
+                                <td class="px-4 py-3">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">Cancelled</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm font-medium text-neutral-400 text-right line-through">400,000₫</td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button class="p-2 rounded-lg hover:bg-neutral-100 transition-colors group" title="View Details">
+                                            <i data-lucide="eye" class="w-4 h-4 text-neutral-400 group-hover:text-primary-500"></i>
+                                        </button>
+                                        <button class="p-2 rounded-lg opacity-50 cursor-not-allowed" title="N/A" disabled>
+                                            <i data-lucide="log-in" class="w-4 h-4 text-neutral-300"></i>
+                                        </button>
+                                        <button class="p-2 rounded-lg opacity-50 cursor-not-allowed" title="Already Cancelled" disabled>
+                                            <i data-lucide="x-circle" class="w-4 h-4 text-neutral-300"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Row 6: Checked-out -->
+                            <tr class="hover:bg-primary-50 transition-colors">
+                                <td class="px-4 py-3">
+                                    <span class="text-sm font-medium text-primary-500">#BK-2026006</span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 font-medium text-xs flex-shrink-0">LH</div>
+                                        <span class="font-medium text-neutral-900 text-sm">Le Hoang</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-neutral-600">Dorm A - Bed 2</td>
+                                <td class="px-4 py-3 text-sm text-neutral-600">Jan 28, 2026</td>
+                                <td class="px-4 py-3 text-sm text-neutral-600">Feb 2, 2026</td>
+                                <td class="px-4 py-3">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-neutral-200 text-neutral-700">Checked-out</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm font-medium text-neutral-900 text-right">1,000,000₫</td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button class="p-2 rounded-lg hover:bg-neutral-100 transition-colors group" title="View Details">
+                                            <i data-lucide="eye" class="w-4 h-4 text-neutral-400 group-hover:text-primary-500"></i>
+                                        </button>
+                                        <button class="p-2 rounded-lg opacity-50 cursor-not-allowed" title="Already Checked-out" disabled>
+                                            <i data-lucide="log-out" class="w-4 h-4 text-neutral-300"></i>
+                                        </button>
+                                        <button class="p-2 rounded-lg opacity-50 cursor-not-allowed" title="Cannot Cancel" disabled>
+                                            <i data-lucide="x-circle" class="w-4 h-4 text-neutral-300"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Row 7: Pending -->
+                            <tr class="hover:bg-primary-50 transition-colors">
+                                <td class="px-4 py-3">
+                                    <span class="text-sm font-medium text-primary-500">#BK-2026007</span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-medium text-xs flex-shrink-0">SW</div>
+                                        <span class="font-medium text-neutral-900 text-sm">Sarah Williams</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-neutral-600">Private Room 3</td>
+                                <td class="px-4 py-3 text-sm text-neutral-600">Feb 6, 2026</td>
+                                <td class="px-4 py-3 text-sm text-neutral-600">Feb 8, 2026</td>
+                                <td class="px-4 py-3">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-700">Pending</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm font-medium text-neutral-900 text-right">800,000₫</td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button class="p-2 rounded-lg hover:bg-neutral-100 transition-colors group" title="View Details">
+                                            <i data-lucide="eye" class="w-4 h-4 text-neutral-400 group-hover:text-primary-500"></i>
+                                        </button>
+                                        <button class="p-2 rounded-lg hover:bg-green-50 transition-colors group" title="Confirm Booking">
+                                            <i data-lucide="check-circle" class="w-4 h-4 text-neutral-400 group-hover:text-green-600"></i>
+                                        </button>
+                                        <button class="p-2 rounded-lg hover:bg-red-50 transition-colors group" title="Cancel Booking">
+                                            <i data-lucide="x-circle" class="w-4 h-4 text-neutral-400 group-hover:text-red-500"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Row 8: Checked-in -->
+                            <tr class="hover:bg-primary-50 transition-colors">
+                                <td class="px-4 py-3">
+                                    <span class="text-sm font-medium text-primary-500">#BK-2026008</span>
+                                </td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-700 font-medium text-xs flex-shrink-0">MT</div>
+                                        <span class="font-medium text-neutral-900 text-sm">Mike Thompson</span>
+                                    </div>
+                                </td>
+                                <td class="px-4 py-3 text-sm text-neutral-600">Dorm C - Bed 8</td>
+                                <td class="px-4 py-3 text-sm text-neutral-600">Feb 2, 2026</td>
+                                <td class="px-4 py-3 text-sm text-neutral-600">Feb 4, 2026</td>
+                                <td class="px-4 py-3">
+                                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">Checked-in</span>
+                                </td>
+                                <td class="px-4 py-3 text-sm font-medium text-neutral-900 text-right">600,000₫</td>
+                                <td class="px-4 py-3">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button class="p-2 rounded-lg hover:bg-neutral-100 transition-colors group" title="View Details">
+                                            <i data-lucide="eye" class="w-4 h-4 text-neutral-400 group-hover:text-primary-500"></i>
+                                        </button>
+                                        <button class="p-2 rounded-lg hover:bg-blue-50 transition-colors group" title="Check-out Guest">
+                                            <i data-lucide="log-out" class="w-4 h-4 text-neutral-400 group-hover:text-blue-600"></i>
+                                        </button>
+                                        <button class="p-2 rounded-lg hover:bg-red-50 transition-colors group opacity-50 cursor-not-allowed" title="Cannot Cancel" disabled>
+                                            <i data-lucide="x-circle" class="w-4 h-4 text-neutral-300"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ==================== PAGINATION ==================== -->
+            <!--
+                ANNOTATION: Pagination controls
+                - "Showing 1-8 of 156" text
+                - Page number buttons
+                - Previous/Next arrows
+            -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                <p class="text-sm text-neutral-600">
+                    Showing <span class="font-medium text-neutral-900">1-8</span> of <span class="font-medium text-neutral-900">156</span> bookings
+                </p>
+
+                <nav class="flex items-center gap-1" aria-label="Pagination">
+                    <!-- Previous Button -->
+                    <button class="p-2 rounded-lg text-neutral-400 hover:bg-neutral-100 hover:text-neutral-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled aria-label="Previous page">
+                        <i data-lucide="chevron-left" class="w-5 h-5"></i>
+                    </button>
+
+                    <!-- Page Numbers -->
+                    <button class="w-10 h-10 rounded-lg text-sm font-medium bg-primary-500 text-white" aria-current="page">1</button>
+                    <button class="w-10 h-10 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-100 transition-colors">2</button>
+                    <button class="w-10 h-10 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-100 transition-colors">3</button>
+                    <span class="w-10 h-10 flex items-center justify-center text-neutral-400">...</span>
+                    <button class="w-10 h-10 rounded-lg text-sm font-medium text-neutral-600 hover:bg-neutral-100 transition-colors">20</button>
+
+                    <!-- Next Button -->
+                    <button class="p-2 rounded-lg text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 transition-colors" aria-label="Next page">
+                        <i data-lucide="chevron-right" class="w-5 h-5"></i>
+                    </button>
+                </nav>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="px-4 lg:px-6 py-4 border-t border-neutral-200 bg-white">
+            <p class="text-sm text-neutral-500 text-center">
+                &copy; 2026 HostelViet. All rights reserved.
+            </p>
+        </footer>
+    </div>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Sidebar toggle functionality
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const collapseIcon = document.getElementById('collapseIcon');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        let isCollapsed = false;
+        let isMobileOpen = false;
+
+        function toggleSidebar() {
+            isCollapsed = !isCollapsed;
+
+            if (isCollapsed) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('sidebar-collapsed');
+                collapseIcon.setAttribute('data-lucide', 'panel-left-open');
+            } else {
+                sidebar.classList.remove('collapsed');
+                mainContent.classList.remove('sidebar-collapsed');
+                collapseIcon.setAttribute('data-lucide', 'panel-left-close');
+            }
+
+            // Re-render the icon
+            lucide.createIcons();
+        }
+
+        function toggleMobileSidebar() {
+            isMobileOpen = !isMobileOpen;
+
+            if (isMobileOpen) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebarOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                sidebarOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Close mobile sidebar on window resize to desktop
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024 && isMobileOpen) {
+                toggleMobileSidebar();
+            }
+        });
+    </script>
+
+</body>
+</html>

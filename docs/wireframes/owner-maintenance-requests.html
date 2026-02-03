@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maintenance Requests | HostelViet</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#E6F0F7',
+                            100: '#CCE1EF',
+                            500: '#0F4C75',
+                            600: '#0D3F61',
+                            700: '#0A324D',
+                            900: '#051926',
+                        },
+                        secondary: {
+                            400: '#F5A623',
+                            500: '#D4920F',
+                            600: '#B37D0D',
+                        },
+                        neutral: {
+                            0: '#FFFFFF',
+                            50: '#F8FAFC',
+                            100: '#F1F5F9',
+                            200: '#E2E8F0',
+                            400: '#94A3B8',
+                            600: '#475569',
+                            900: '#0F172A',
+                        },
+                    },
+                    fontFamily: {
+                        heading: ['Outfit', 'system-ui', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', system-ui, sans-serif;
+        }
+
+        /* Sidebar transition */
+        .sidebar {
+            transition: width 0.3s ease, transform 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 64px;
+        }
+
+        .sidebar.collapsed .nav-label,
+        .sidebar.collapsed .logo-text {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .sidebar.collapsed .nav-item {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        /* Main content transition */
+        .main-content {
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.sidebar-collapsed {
+            margin-left: 64px;
+        }
+
+        /* Mobile sidebar overlay */
+        .sidebar-overlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Detail panel slide transition */
+        .detail-panel {
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .detail-panel.open {
+            transform: translateX(0);
+        }
+
+        /* Detail panel overlay */
+        .panel-overlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .panel-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Request card hover */
+        .request-card {
+            transition: box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+        .request-card:hover {
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            border-color: #0F4C75;
+        }
+
+        /* Tab active indicator */
+        .tab-active {
+            position: relative;
+        }
+
+        .tab-active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #0F4C75;
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Timeline styling */
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: 11px;
+            top: 24px;
+            bottom: -16px;
+            width: 2px;
+            background: #E2E8F0;
+        }
+
+        .timeline-item:last-child::before {
+            display: none;
+        }
+    </style>
+</head>
+<body class="bg-neutral-50 font-body text-neutral-900">
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="sidebarOverlay" class="sidebar-overlay fixed inset-0 bg-neutral-900/50 z-40 lg:hidden" onclick="toggleMobileSidebar()"></div>
+
+    <!-- ==================== SIDEBAR ==================== -->
+    <!--
+        ANNOTATION: Collapsible sidebar (240px expanded, 64px collapsed)
+        - Same pattern as owner-dashboard.html
+        - Maintenance nav item is now active
+    -->
+    <aside id="sidebar" class="sidebar fixed left-0 top-0 h-full w-60 bg-primary-900 text-white z-50 flex flex-col transform -translate-x-full lg:translate-x-0">
+
+        <!-- Logo Section -->
+        <div class="flex items-center gap-3 px-5 py-6 border-b border-primary-700">
+            <div class="w-10 h-10 rounded-lg bg-secondary-500 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="waves" class="w-6 h-6 text-primary-900"></i>
+            </div>
+            <span class="logo-text font-heading font-bold text-xl transition-opacity duration-300">
+                Hostel<span class="text-secondary-500">Viet</span>
+            </span>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 py-4 overflow-y-auto">
+            <ul class="space-y-1 px-3">
+                <!-- Dashboard -->
+                <li>
+                    <a href="owner-dashboard.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Dashboard</span>
+                    </a>
+                </li>
+
+                <!-- Properties -->
+                <li>
+                    <a href="owner-properties-list.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="building-2" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Properties</span>
+                    </a>
+                </li>
+
+                <!-- Rooms -->
+                <li>
+                    <a href="owner-rooms-beds-management.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="bed-double" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Rooms</span>
+                    </a>
+                </li>
+
+                <!-- Bookings -->
+                <li>
+                    <a href="owner-bookings-management.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="calendar-check" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Bookings</span>
+                    </a>
+                </li>
+
+                <!-- Guests -->
+                <li>
+                    <a href="owner-guest-records.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="users" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Guests</span>
+                    </a>
+                </li>
+
+                <!-- Maintenance - Active -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg bg-primary-700 text-white border-l-4 border-secondary-500 transition-all duration-200">
+                        <i data-lucide="wrench" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Maintenance</span>
+                    </a>
+                </li>
+
+                <!-- Reports -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="bar-chart-3" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Reports</span>
+                    </a>
+                </li>
+
+                <!-- Settings -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="settings" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Collapse Button -->
+        <div class="p-3 border-t border-primary-700 hidden lg:block">
+            <button onclick="toggleSidebar()" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200" aria-label="Toggle sidebar">
+                <i data-lucide="panel-left-close" id="collapseIcon" class="w-5 h-5 flex-shrink-0"></i>
+                <span class="nav-label transition-opacity duration-300">Collapse</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- ==================== MAIN WRAPPER ==================== -->
+    <div id="mainContent" class="main-content lg:ml-60 min-h-screen">
+
+        <!-- ==================== HEADER ==================== -->
+        <!--
+            ANNOTATION: Fixed header with same pattern as dashboard
+            - Hamburger menu (mobile only)
+            - Search bar
+            - Notifications and user avatar
+        -->
+        <header class="sticky top-0 z-30 bg-white border-b border-neutral-200 px-4 lg:px-6 py-3">
+            <div class="flex items-center justify-between gap-4">
+
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 -ml-2 rounded-lg hover:bg-neutral-100 transition-colors" aria-label="Open menu">
+                    <i data-lucide="menu" class="w-6 h-6 text-neutral-600"></i>
+                </button>
+
+                <!-- Search Bar -->
+                <div class="flex-1 max-w-xl hidden sm:block">
+                    <div class="relative">
+                        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400"></i>
+                        <input
+                            type="search"
+                            placeholder="Search maintenance requests..."
+                            class="w-full h-11 pl-10 pr-4 bg-neutral-50 border border-neutral-200 rounded-lg text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                        >
+                    </div>
+                </div>
+
+                <!-- Mobile Search Button -->
+                <button class="sm:hidden p-2 rounded-lg hover:bg-neutral-100 transition-colors" aria-label="Search">
+                    <i data-lucide="search" class="w-5 h-5 text-neutral-600"></i>
+                </button>
+
+                <!-- Right Actions -->
+                <div class="flex items-center gap-2">
+                    <!-- Notification Bell -->
+                    <button class="relative p-2 rounded-lg hover:bg-neutral-100 transition-colors group" aria-label="Notifications">
+                        <i data-lucide="bell" class="w-5 h-5 text-neutral-600 group-hover:text-primary-500 transition-colors"></i>
+                        <span class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs font-medium rounded-full flex items-center justify-center">3</span>
+                    </button>
+
+                    <!-- User Avatar Dropdown -->
+                    <div class="relative">
+                        <button class="flex items-center gap-2 p-1 pr-3 rounded-full hover:bg-neutral-100 transition-colors" aria-label="User menu">
+                            <div class="w-9 h-9 rounded-full bg-primary-500 flex items-center justify-center text-white font-medium text-sm">
+                                NT
+                            </div>
+                            <span class="hidden md:block text-sm font-medium text-neutral-700">Nguyen Tuan</span>
+                            <i data-lucide="chevron-down" class="hidden md:block w-4 h-4 text-neutral-400"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ==================== MAIN CONTENT ==================== -->
+        <main class="p-4 lg:p-6">
+
+            <!-- ==================== PAGE HEADER ==================== -->
+            <!--
+                ANNOTATION: Page title with "New Request" CTA button
+                - Title: "Maintenance Requests"
+                - Gold colored primary action button
+            -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <div>
+                    <h1 class="font-heading text-2xl lg:text-3xl font-semibold text-neutral-900">
+                        Maintenance Requests
+                    </h1>
+                    <p class="text-neutral-600 mt-1">Manage and track all property maintenance issues</p>
+                </div>
+                <button onclick="openNewRequestModal()" class="flex items-center justify-center gap-2 h-11 px-5 bg-secondary-500 text-white rounded-lg font-medium hover:bg-secondary-600 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2 transition-all">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                    <span>New Request</span>
+                </button>
+            </div>
+
+            <!-- ==================== STATUS FILTER TABS ==================== -->
+            <!--
+                ANNOTATION: Horizontal tabs for filtering by status
+                - All (24), Open (8), In Progress (5), Resolved (11)
+                - Active tab has underline indicator
+                - Counts shown in badges
+            -->
+            <div class="bg-white rounded-lg border border-neutral-200 mb-6">
+                <div class="flex overflow-x-auto border-b border-neutral-200">
+                    <button onclick="filterRequests('all')" class="tab-btn tab-active flex items-center gap-2 px-5 py-4 text-sm font-medium text-primary-500 whitespace-nowrap" data-status="all">
+                        All
+                        <span class="px-2 py-0.5 bg-neutral-100 text-neutral-600 rounded-full text-xs">24</span>
+                    </button>
+                    <button onclick="filterRequests('open')" class="tab-btn flex items-center gap-2 px-5 py-4 text-sm font-medium text-neutral-600 hover:text-primary-500 whitespace-nowrap transition-colors" data-status="open">
+                        Open
+                        <span class="px-2 py-0.5 bg-red-100 text-red-600 rounded-full text-xs">8</span>
+                    </button>
+                    <button onclick="filterRequests('in-progress')" class="tab-btn flex items-center gap-2 px-5 py-4 text-sm font-medium text-neutral-600 hover:text-primary-500 whitespace-nowrap transition-colors" data-status="in-progress">
+                        In Progress
+                        <span class="px-2 py-0.5 bg-yellow-100 text-yellow-700 rounded-full text-xs">5</span>
+                    </button>
+                    <button onclick="filterRequests('resolved')" class="tab-btn flex items-center gap-2 px-5 py-4 text-sm font-medium text-neutral-600 hover:text-primary-500 whitespace-nowrap transition-colors" data-status="resolved">
+                        Resolved
+                        <span class="px-2 py-0.5 bg-green-100 text-green-600 rounded-full text-xs">11</span>
+                    </button>
+                </div>
+
+                <!-- ==================== REQUESTS LIST ==================== -->
+                <!--
+                    ANNOTATION: Grid of request cards
+                    - 6 sample cards with various priorities and statuses
+                    - Each card shows: priority badge, title, location, reporter, date, status, assignee
+                    - Click to open detail panel
+                -->
+                <div class="p-4 lg:p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4" id="requestsGrid">
+
+                        <!-- Request Card 1 - High Priority, Open -->
+                        <div class="request-card bg-white border border-neutral-200 rounded-lg p-4 cursor-pointer" onclick="openDetailPanel(1)" data-status="open">
+                            <div class="flex items-start justify-between gap-3 mb-3">
+                                <div class="flex items-center gap-2">
+                                    <!-- Priority Badge - High (Red) -->
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">
+                                        <i data-lucide="alert-triangle" class="w-3 h-3 mr-1"></i>
+                                        High
+                                    </span>
+                                    <!-- Status Badge -->
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-600 border border-red-200">
+                                        Open
+                                    </span>
+                                </div>
+                                <span class="text-xs text-neutral-400">#MR-001</span>
+                            </div>
+
+                            <h3 class="font-heading font-semibold text-neutral-900 mb-2">Broken AC in Room 201</h3>
+
+                            <div class="space-y-2 text-sm">
+                                <div class="flex items-center gap-2 text-neutral-600">
+                                    <i data-lucide="map-pin" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>Backpacker Haven - Room 201</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-neutral-600">
+                                    <i data-lucide="user" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>Reported by: <span class="font-medium">Le Minh</span> (Staff)</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-neutral-600">
+                                    <i data-lucide="calendar" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>Feb 2, 2026</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-3 pt-3 border-t border-neutral-100 flex items-center justify-between">
+                                <span class="text-xs text-neutral-500">Not assigned</span>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-neutral-400"></i>
+                            </div>
+                        </div>
+
+                        <!-- Request Card 2 - High Priority, In Progress -->
+                        <div class="request-card bg-white border border-neutral-200 rounded-lg p-4 cursor-pointer" onclick="openDetailPanel(2)" data-status="in-progress">
+                            <div class="flex items-start justify-between gap-3 mb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">
+                                        <i data-lucide="alert-triangle" class="w-3 h-3 mr-1"></i>
+                                        High
+                                    </span>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">
+                                        In Progress
+                                    </span>
+                                </div>
+                                <span class="text-xs text-neutral-400">#MR-002</span>
+                            </div>
+
+                            <h3 class="font-heading font-semibold text-neutral-900 mb-2">Water Leak in Bathroom - Floor 3</h3>
+
+                            <div class="space-y-2 text-sm">
+                                <div class="flex items-center gap-2 text-neutral-600">
+                                    <i data-lucide="map-pin" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>Saigon Hostel Central - Floor 3 Bathroom</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-neutral-600">
+                                    <i data-lucide="user" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>Reported by: <span class="font-medium">Tran Van</span> (Staff)</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-neutral-600">
+                                    <i data-lucide="calendar" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>Feb 1, 2026</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-3 pt-3 border-t border-neutral-100 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-medium text-xs">NP</div>
+                                    <span class="text-xs text-neutral-600">Nguyen Phong</span>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-neutral-400"></i>
+                            </div>
+                        </div>
+
+                        <!-- Request Card 3 - Medium Priority, Open -->
+                        <div class="request-card bg-white border border-neutral-200 rounded-lg p-4 cursor-pointer" onclick="openDetailPanel(3)" data-status="open">
+                            <div class="flex items-start justify-between gap-3 mb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-700">
+                                        <i data-lucide="alert-circle" class="w-3 h-3 mr-1"></i>
+                                        Medium
+                                    </span>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-50 text-red-600 border border-red-200">
+                                        Open
+                                    </span>
+                                </div>
+                                <span class="text-xs text-neutral-400">#MR-003</span>
+                            </div>
+
+                            <h3 class="font-heading font-semibold text-neutral-900 mb-2">Flickering Lights in Dorm A</h3>
+
+                            <div class="space-y-2 text-sm">
+                                <div class="flex items-center gap-2 text-neutral-600">
+                                    <i data-lucide="map-pin" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>Backpacker Haven - Dorm A</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-neutral-600">
+                                    <i data-lucide="user" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>Reported by: <span class="font-medium">Hoang Nam</span> (Staff)</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-neutral-600">
+                                    <i data-lucide="calendar" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>Feb 2, 2026</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-3 pt-3 border-t border-neutral-100 flex items-center justify-between">
+                                <span class="text-xs text-neutral-500">Not assigned</span>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-neutral-400"></i>
+                            </div>
+                        </div>
+
+                        <!-- Request Card 4 - Low Priority, In Progress -->
+                        <div class="request-card bg-white border border-neutral-200 rounded-lg p-4 cursor-pointer" onclick="openDetailPanel(4)" data-status="in-progress">
+                            <div class="flex items-start justify-between gap-3 mb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
+                                        <i data-lucide="info" class="w-3 h-3 mr-1"></i>
+                                        Low
+                                    </span>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-50 text-yellow-700 border border-yellow-200">
+                                        In Progress
+                                    </span>
+                                </div>
+                                <span class="text-xs text-neutral-400">#MR-004</span>
+                            </div>
+
+                            <h3 class="font-heading font-semibold text-neutral-900 mb-2">Replace Door Handle - Room 105</h3>
+
+                            <div class="space-y-2 text-sm">
+                                <div class="flex items-center gap-2 text-neutral-600">
+                                    <i data-lucide="map-pin" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>Saigon Hostel Central - Room 105</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-neutral-600">
+                                    <i data-lucide="user" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>Reported by: <span class="font-medium">Mai Linh</span> (Staff)</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-neutral-600">
+                                    <i data-lucide="calendar" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>Jan 30, 2026</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-3 pt-3 border-t border-neutral-100 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-medium text-xs">VH</div>
+                                    <span class="text-xs text-neutral-600">Vu Hoang</span>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-neutral-400"></i>
+                            </div>
+                        </div>
+
+                        <!-- Request Card 5 - Medium Priority, Resolved -->
+                        <div class="request-card bg-white border border-neutral-200 rounded-lg p-4 cursor-pointer" onclick="openDetailPanel(5)" data-status="resolved">
+                            <div class="flex items-start justify-between gap-3 mb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-700">
+                                        <i data-lucide="alert-circle" class="w-3 h-3 mr-1"></i>
+                                        Medium
+                                    </span>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-600 border border-green-200">
+                                        Resolved
+                                    </span>
+                                </div>
+                                <span class="text-xs text-neutral-400">#MR-005</span>
+                            </div>
+
+                            <h3 class="font-heading font-semibold text-neutral-900 mb-2">WiFi Router Replacement - Lobby</h3>
+
+                            <div class="space-y-2 text-sm">
+                                <div class="flex items-center gap-2 text-neutral-600">
+                                    <i data-lucide="map-pin" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>Backpacker Haven - Lobby</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-neutral-600">
+                                    <i data-lucide="user" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>Reported by: <span class="font-medium">Le Minh</span> (Staff)</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-neutral-600">
+                                    <i data-lucide="calendar" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>Jan 28, 2026</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-3 pt-3 border-t border-neutral-100 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-medium text-xs">NP</div>
+                                    <span class="text-xs text-neutral-600">Nguyen Phong</span>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-neutral-400"></i>
+                            </div>
+                        </div>
+
+                        <!-- Request Card 6 - Low Priority, Resolved -->
+                        <div class="request-card bg-white border border-neutral-200 rounded-lg p-4 cursor-pointer" onclick="openDetailPanel(6)" data-status="resolved">
+                            <div class="flex items-start justify-between gap-3 mb-3">
+                                <div class="flex items-center gap-2">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
+                                        <i data-lucide="info" class="w-3 h-3 mr-1"></i>
+                                        Low
+                                    </span>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-green-50 text-green-600 border border-green-200">
+                                        Resolved
+                                    </span>
+                                </div>
+                                <span class="text-xs text-neutral-400">#MR-006</span>
+                            </div>
+
+                            <h3 class="font-heading font-semibold text-neutral-900 mb-2">Squeaky Bunk Bed - Dorm B Bed 3</h3>
+
+                            <div class="space-y-2 text-sm">
+                                <div class="flex items-center gap-2 text-neutral-600">
+                                    <i data-lucide="map-pin" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>Saigon Hostel Central - Dorm B</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-neutral-600">
+                                    <i data-lucide="user" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>Reported by: <span class="font-medium">Hoang Nam</span> (Staff)</span>
+                                </div>
+                                <div class="flex items-center gap-2 text-neutral-600">
+                                    <i data-lucide="calendar" class="w-4 h-4 text-neutral-400"></i>
+                                    <span>Jan 25, 2026</span>
+                                </div>
+                            </div>
+
+                            <div class="mt-3 pt-3 border-t border-neutral-100 flex items-center justify-between">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center text-green-700 font-medium text-xs">VH</div>
+                                    <span class="text-xs text-neutral-600">Vu Hoang</span>
+                                </div>
+                                <i data-lucide="chevron-right" class="w-4 h-4 text-neutral-400"></i>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="px-4 lg:px-6 py-4 border-t border-neutral-200 bg-white">
+            <p class="text-sm text-neutral-500 text-center">
+                &copy; 2026 HostelViet. All rights reserved.
+            </p>
+        </footer>
+    </div>
+
+    <!-- ==================== DETAIL PANEL OVERLAY ==================== -->
+    <div id="panelOverlay" class="panel-overlay fixed inset-0 bg-neutral-900/50 z-50" onclick="closeDetailPanel()"></div>
+
+    <!-- ==================== REQUEST DETAIL PANEL ==================== -->
+    <!--
+        ANNOTATION: Slide-in side panel for request details
+        - Full description
+        - Photo attachment placeholder
+        - Status timeline/history
+        - Assign dropdown
+        - Add note input
+        - Mark as Resolved button
+    -->
+    <aside id="detailPanel" class="detail-panel fixed right-0 top-0 h-full w-full max-w-md bg-white z-50 shadow-xl flex flex-col overflow-hidden">
+
+        <!-- Panel Header -->
+        <div class="flex items-center justify-between px-5 py-4 border-b border-neutral-200 bg-white">
+            <div class="flex items-center gap-3">
+                <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-red-100 text-red-700">
+                    <i data-lucide="alert-triangle" class="w-3 h-3 mr-1"></i>
+                    High
+                </span>
+                <span class="text-sm text-neutral-400">#MR-001</span>
+            </div>
+            <button onclick="closeDetailPanel()" class="p-2 -mr-2 rounded-lg hover:bg-neutral-100 transition-colors" aria-label="Close panel">
+                <i data-lucide="x" class="w-5 h-5 text-neutral-600"></i>
+            </button>
+        </div>
+
+        <!-- Panel Content -->
+        <div class="flex-1 overflow-y-auto">
+
+            <!-- Request Title & Status -->
+            <div class="px-5 py-4 border-b border-neutral-100">
+                <h2 class="font-heading text-xl font-semibold text-neutral-900 mb-3">Broken AC in Room 201</h2>
+                <div class="flex items-center gap-3 flex-wrap">
+                    <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-50 text-red-600 border border-red-200">
+                        <span class="w-1.5 h-1.5 bg-red-500 rounded-full mr-1.5"></span>
+                        Open
+                    </span>
+                    <span class="text-sm text-neutral-500">Created Feb 2, 2026</span>
+                </div>
+            </div>
+
+            <!-- Location Info -->
+            <div class="px-5 py-4 border-b border-neutral-100">
+                <h3 class="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-2">Location</h3>
+                <div class="flex items-center gap-2">
+                    <i data-lucide="building-2" class="w-4 h-4 text-primary-500"></i>
+                    <span class="font-medium text-neutral-900">Backpacker Haven</span>
+                </div>
+                <p class="text-sm text-neutral-600 mt-1 ml-6">Room 201 - Private Room</p>
+            </div>
+
+            <!-- Full Description -->
+            <div class="px-5 py-4 border-b border-neutral-100">
+                <h3 class="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-2">Description</h3>
+                <p class="text-sm text-neutral-700 leading-relaxed">
+                    The air conditioning unit in Room 201 stopped working yesterday evening. Guests have complained about the heat. The unit makes a clicking noise but doesn't cool. This is urgent as we have guests checking in tomorrow who specifically requested this room.
+                </p>
+            </div>
+
+            <!-- Photo Attachment -->
+            <div class="px-5 py-4 border-b border-neutral-100">
+                <h3 class="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-2">Attachments</h3>
+                <div class="grid grid-cols-2 gap-2">
+                    <div class="aspect-video bg-neutral-100 rounded-lg flex items-center justify-center border border-neutral-200 cursor-pointer hover:border-primary-500 transition-colors">
+                        <div class="text-center">
+                            <i data-lucide="image" class="w-8 h-8 text-neutral-400 mx-auto mb-1"></i>
+                            <span class="text-xs text-neutral-500">ac_unit.jpg</span>
+                        </div>
+                    </div>
+                    <div class="aspect-video bg-neutral-100 rounded-lg flex items-center justify-center border border-dashed border-neutral-300 cursor-pointer hover:border-primary-500 hover:bg-primary-50 transition-colors">
+                        <div class="text-center">
+                            <i data-lucide="plus" class="w-6 h-6 text-neutral-400 mx-auto mb-1"></i>
+                            <span class="text-xs text-neutral-500">Add photo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Assign To -->
+            <div class="px-5 py-4 border-b border-neutral-100">
+                <h3 class="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-2">Assign To</h3>
+                <div class="relative">
+                    <select class="w-full h-10 px-3 pr-10 bg-neutral-50 border border-neutral-200 rounded-lg text-sm text-neutral-700 appearance-none focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all cursor-pointer">
+                        <option value="">Select a staff member...</option>
+                        <option value="nguyen-phong">Nguyen Phong (Maintenance)</option>
+                        <option value="vu-hoang">Vu Hoang (Maintenance)</option>
+                        <option value="le-minh">Le Minh (General)</option>
+                        <option value="external">External Contractor</option>
+                    </select>
+                    <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none"></i>
+                </div>
+            </div>
+
+            <!-- Status Timeline -->
+            <div class="px-5 py-4 border-b border-neutral-100">
+                <h3 class="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-3">Activity Timeline</h3>
+                <div class="space-y-4">
+
+                    <!-- Timeline Item 1 -->
+                    <div class="timeline-item relative pl-8">
+                        <div class="absolute left-0 top-0 w-6 h-6 rounded-full bg-red-100 flex items-center justify-center">
+                            <i data-lucide="alert-circle" class="w-3 h-3 text-red-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-neutral-900">Request Created</p>
+                            <p class="text-xs text-neutral-500 mt-0.5">Feb 2, 2026 at 3:45 PM by Le Minh</p>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Item 2 -->
+                    <div class="timeline-item relative pl-8">
+                        <div class="absolute left-0 top-0 w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center">
+                            <i data-lucide="message-circle" class="w-3 h-3 text-blue-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-neutral-900">Note Added</p>
+                            <p class="text-xs text-neutral-500 mt-0.5">Feb 2, 2026 at 4:00 PM by Le Minh</p>
+                            <p class="text-sm text-neutral-600 mt-1 p-2 bg-neutral-50 rounded-lg">"Tried resetting the unit, still not working. May need technician."</p>
+                        </div>
+                    </div>
+
+                    <!-- Timeline Item 3 -->
+                    <div class="timeline-item relative pl-8">
+                        <div class="absolute left-0 top-0 w-6 h-6 rounded-full bg-primary-100 flex items-center justify-center">
+                            <i data-lucide="eye" class="w-3 h-3 text-primary-600"></i>
+                        </div>
+                        <div>
+                            <p class="text-sm font-medium text-neutral-900">Viewed by Owner</p>
+                            <p class="text-xs text-neutral-500 mt-0.5">Feb 2, 2026 at 5:30 PM by Nguyen Tuan</p>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <!-- Add Note Section -->
+            <div class="px-5 py-4">
+                <h3 class="text-xs font-medium text-neutral-500 uppercase tracking-wider mb-2">Add Note</h3>
+                <div class="space-y-3">
+                    <textarea
+                        placeholder="Write a note or update..."
+                        rows="3"
+                        class="w-full px-3 py-2 bg-neutral-50 border border-neutral-200 rounded-lg text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all resize-none"
+                    ></textarea>
+                    <button class="flex items-center justify-center gap-2 h-9 px-4 bg-neutral-100 text-neutral-700 rounded-lg text-sm font-medium hover:bg-neutral-200 focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:ring-offset-2 transition-all">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                        <span>Add Note</span>
+                    </button>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Panel Footer Actions -->
+        <div class="px-5 py-4 border-t border-neutral-200 bg-neutral-50 space-y-2">
+            <button class="w-full flex items-center justify-center gap-2 h-11 px-4 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition-all">
+                <i data-lucide="check-circle" class="w-5 h-5"></i>
+                <span>Mark as Resolved</span>
+            </button>
+            <button class="w-full flex items-center justify-center gap-2 h-10 px-4 bg-transparent text-neutral-600 border border-neutral-300 rounded-lg text-sm font-medium hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:ring-offset-2 transition-all">
+                <i data-lucide="trash-2" class="w-4 h-4"></i>
+                <span>Delete Request</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Sidebar state
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const collapseIcon = document.getElementById('collapseIcon');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        let isCollapsed = false;
+        let isMobileOpen = false;
+
+        function toggleSidebar() {
+            isCollapsed = !isCollapsed;
+
+            if (isCollapsed) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('sidebar-collapsed');
+                collapseIcon.setAttribute('data-lucide', 'panel-left-open');
+            } else {
+                sidebar.classList.remove('collapsed');
+                mainContent.classList.remove('sidebar-collapsed');
+                collapseIcon.setAttribute('data-lucide', 'panel-left-close');
+            }
+
+            lucide.createIcons();
+        }
+
+        function toggleMobileSidebar() {
+            isMobileOpen = !isMobileOpen;
+
+            if (isMobileOpen) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebarOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                sidebarOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Detail panel state
+        const detailPanel = document.getElementById('detailPanel');
+        const panelOverlay = document.getElementById('panelOverlay');
+
+        function openDetailPanel(requestId) {
+            detailPanel.classList.add('open');
+            panelOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+            // In real implementation, would load request data based on requestId
+            console.log('Opening request:', requestId);
+        }
+
+        function closeDetailPanel() {
+            detailPanel.classList.remove('open');
+            panelOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Tab filtering
+        function filterRequests(status) {
+            // Update active tab
+            const tabs = document.querySelectorAll('.tab-btn');
+            tabs.forEach(tab => {
+                tab.classList.remove('tab-active', 'text-primary-500');
+                tab.classList.add('text-neutral-600');
+            });
+
+            const activeTab = document.querySelector(`[data-status="${status}"]`);
+            activeTab.classList.add('tab-active', 'text-primary-500');
+            activeTab.classList.remove('text-neutral-600');
+
+            // Filter cards
+            const cards = document.querySelectorAll('.request-card');
+            cards.forEach(card => {
+                const cardStatus = card.getAttribute('data-status');
+                if (status === 'all' || cardStatus === status) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+
+        // New request modal placeholder
+        function openNewRequestModal() {
+            alert('New Request modal would open here.');
+            // In real implementation, would open a modal form
+        }
+
+        // Close mobile sidebar on window resize to desktop
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024 && isMobileOpen) {
+                toggleMobileSidebar();
+            }
+        });
+
+        // Close detail panel with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (detailPanel.classList.contains('open')) {
+                    closeDetailPanel();
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

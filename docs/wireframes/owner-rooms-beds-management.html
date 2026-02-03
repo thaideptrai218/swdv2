@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rooms & Beds Management | HostelViet</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#E6F0F7',
+                            100: '#CCE1EF',
+                            500: '#0F4C75',
+                            600: '#0D3F61',
+                            700: '#0A324D',
+                            900: '#051926',
+                        },
+                        secondary: {
+                            400: '#F5A623',
+                            500: '#D4920F',
+                            600: '#B37D0D',
+                        },
+                        neutral: {
+                            0: '#FFFFFF',
+                            50: '#F8FAFC',
+                            100: '#F1F5F9',
+                            200: '#E2E8F0',
+                            400: '#94A3B8',
+                            600: '#475569',
+                            900: '#0F172A',
+                        },
+                    },
+                    fontFamily: {
+                        heading: ['Outfit', 'system-ui', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', system-ui, sans-serif;
+        }
+
+        /* Sidebar transition */
+        .sidebar {
+            transition: width 0.3s ease, transform 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 64px;
+        }
+
+        .sidebar.collapsed .nav-label,
+        .sidebar.collapsed .logo-text {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .sidebar.collapsed .nav-item {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        /* Main content transition */
+        .main-content {
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.sidebar-collapsed {
+            margin-left: 64px;
+        }
+
+        /* Mobile sidebar overlay */
+        .sidebar-overlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Bed status colors */
+        .bed-available {
+            background-color: #22C55E;
+        }
+
+        .bed-occupied {
+            background-color: #3B82F6;
+        }
+
+        .bed-reserved {
+            background-color: #EAB308;
+        }
+
+        .bed-maintenance {
+            background-color: #EF4444;
+        }
+
+        /* Bed grid hover effect */
+        .bed-cell {
+            transition: transform 0.15s ease, box-shadow 0.15s ease;
+            cursor: pointer;
+        }
+
+        .bed-cell:hover {
+            transform: scale(1.1);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Modal overlay */
+        .modal-overlay {
+            background-color: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+        }
+
+        /* Room card hover */
+        .room-card {
+            transition: box-shadow 0.2s ease, transform 0.2s ease;
+        }
+
+        .room-card:hover {
+            box-shadow: 0 4px 16px rgba(15, 76, 117, 0.12);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body class="bg-neutral-50 font-body text-neutral-900">
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="sidebarOverlay" class="sidebar-overlay fixed inset-0 bg-neutral-900/50 z-40 lg:hidden" onclick="toggleMobileSidebar()"></div>
+
+    <!-- ==================== SIDEBAR ==================== -->
+    <!--
+        ANNOTATION: Collapsible sidebar (240px expanded, 64px collapsed)
+        - Same pattern as owner-dashboard.html
+        - Rooms nav item is active on this page
+        - Collapse button at bottom
+        - Mobile: transforms to overlay drawer
+    -->
+    <aside id="sidebar" class="sidebar fixed left-0 top-0 h-full w-60 bg-primary-900 text-white z-50 flex flex-col transform -translate-x-full lg:translate-x-0">
+
+        <!-- Logo Section -->
+        <div class="flex items-center gap-3 px-5 py-6 border-b border-primary-700">
+            <!-- Logo Icon: Wave + Bed fusion concept -->
+            <div class="w-10 h-10 rounded-lg bg-secondary-500 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="waves" class="w-6 h-6 text-primary-900"></i>
+            </div>
+            <span class="logo-text font-heading font-bold text-xl transition-opacity duration-300">
+                Hostel<span class="text-secondary-500">Viet</span>
+            </span>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 py-4 overflow-y-auto">
+            <ul class="space-y-1 px-3">
+                <!-- Dashboard -->
+                <li>
+                    <a href="owner-dashboard.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Dashboard</span>
+                    </a>
+                </li>
+
+                <!-- Properties -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="building-2" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Properties</span>
+                    </a>
+                </li>
+
+                <!-- Rooms - Active -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg bg-primary-700 text-white border-l-4 border-secondary-500 transition-all duration-200">
+                        <i data-lucide="bed-double" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Rooms</span>
+                    </a>
+                </li>
+
+                <!-- Bookings -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="calendar-check" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Bookings</span>
+                    </a>
+                </li>
+
+                <!-- Guests -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="users" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Guests</span>
+                    </a>
+                </li>
+
+                <!-- Maintenance -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="wrench" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Maintenance</span>
+                    </a>
+                </li>
+
+                <!-- Reports -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="bar-chart-3" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Reports</span>
+                    </a>
+                </li>
+
+                <!-- Settings -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="settings" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Collapse Button -->
+        <div class="p-3 border-t border-primary-700 hidden lg:block">
+            <button onclick="toggleSidebar()" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200" aria-label="Toggle sidebar">
+                <i data-lucide="panel-left-close" id="collapseIcon" class="w-5 h-5 flex-shrink-0"></i>
+                <span class="nav-label transition-opacity duration-300">Collapse</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- ==================== MAIN WRAPPER ==================== -->
+    <div id="mainContent" class="main-content lg:ml-60 min-h-screen">
+
+        <!-- ==================== HEADER ==================== -->
+        <!--
+            ANNOTATION: Fixed header with full width
+            - Same pattern as owner-dashboard.html
+            - Hamburger menu (mobile only)
+            - Search bar (expandable on mobile)
+            - Notification bell with unread badge
+            - User avatar with dropdown trigger
+        -->
+        <header class="sticky top-0 z-30 bg-white border-b border-neutral-200 px-4 lg:px-6 py-3">
+            <div class="flex items-center justify-between gap-4">
+
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 -ml-2 rounded-lg hover:bg-neutral-100 transition-colors" aria-label="Open menu">
+                    <i data-lucide="menu" class="w-6 h-6 text-neutral-600"></i>
+                </button>
+
+                <!-- Search Bar -->
+                <div class="flex-1 max-w-xl hidden sm:block">
+                    <div class="relative">
+                        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400"></i>
+                        <input
+                            type="search"
+                            placeholder="Search rooms, beds, guests..."
+                            class="w-full h-11 pl-10 pr-4 bg-neutral-50 border border-neutral-200 rounded-lg text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                        >
+                    </div>
+                </div>
+
+                <!-- Mobile Search Button -->
+                <button class="sm:hidden p-2 rounded-lg hover:bg-neutral-100 transition-colors" aria-label="Search">
+                    <i data-lucide="search" class="w-5 h-5 text-neutral-600"></i>
+                </button>
+
+                <!-- Right Actions -->
+                <div class="flex items-center gap-2">
+
+                    <!-- Notification Bell -->
+                    <button class="relative p-2 rounded-lg hover:bg-neutral-100 transition-colors group" aria-label="Notifications">
+                        <i data-lucide="bell" class="w-5 h-5 text-neutral-600 group-hover:text-primary-500 transition-colors"></i>
+                        <!-- Notification Badge -->
+                        <span class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs font-medium rounded-full flex items-center justify-center">3</span>
+                    </button>
+
+                    <!-- User Avatar Dropdown -->
+                    <div class="relative">
+                        <button class="flex items-center gap-2 p-1 pr-3 rounded-full hover:bg-neutral-100 transition-colors" aria-label="User menu">
+                            <div class="w-9 h-9 rounded-full bg-primary-500 flex items-center justify-center text-white font-medium text-sm">
+                                NT
+                            </div>
+                            <span class="hidden md:block text-sm font-medium text-neutral-700">Nguyen Tuan</span>
+                            <i data-lucide="chevron-down" class="hidden md:block w-4 h-4 text-neutral-400"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ==================== MAIN CONTENT ==================== -->
+        <main class="p-4 lg:p-6">
+
+            <!-- ==================== PAGE HEADER ==================== -->
+            <!--
+                ANNOTATION: Page header with title, property selector, and Add Room button
+                - Title: "Rooms & Beds"
+                - Property selector dropdown (for owners with multiple properties)
+                - Add Room button with gold/secondary color
+                - Responsive: stacks on mobile
+            -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <div>
+                    <h1 class="font-heading text-2xl lg:text-3xl font-semibold text-neutral-900">
+                        Rooms & Beds
+                    </h1>
+                    <p class="text-neutral-600 mt-1">
+                        Manage your rooms and bed assignments
+                    </p>
+                </div>
+
+                <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+                    <!-- Property Selector Dropdown -->
+                    <div class="relative">
+                        <select class="h-11 pl-4 pr-10 bg-white border border-neutral-200 rounded-lg text-sm font-medium text-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 appearance-none cursor-pointer min-w-[200px]">
+                            <option value="all">All Properties</option>
+                            <option value="1" selected>Sunrise Hostel - D1</option>
+                            <option value="2">Beach View Dorm - D2</option>
+                            <option value="3">Old Quarter Stay - HN</option>
+                        </select>
+                        <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none"></i>
+                    </div>
+
+                    <!-- Add Room Button (Gold/Secondary) -->
+                    <button class="flex items-center justify-center gap-2 h-11 px-5 bg-secondary-500 text-white rounded-lg font-medium hover:bg-secondary-600 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2 transition-all">
+                        <i data-lucide="plus" class="w-5 h-5"></i>
+                        <span>Add Room</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ==================== BED LEGEND ==================== -->
+            <!--
+                ANNOTATION: Color key for bed statuses
+                - Green = Available
+                - Blue = Occupied
+                - Yellow = Reserved
+                - Red = Maintenance
+                - Horizontal layout on desktop, 2-column on mobile
+            -->
+            <div class="bg-white rounded-lg border border-neutral-200 p-4 mb-6">
+                <div class="flex flex-wrap items-center gap-4 sm:gap-6">
+                    <span class="text-sm font-medium text-neutral-700">Bed Status:</span>
+
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded bed-available"></div>
+                        <span class="text-sm text-neutral-600">Available</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded bed-occupied"></div>
+                        <span class="text-sm text-neutral-600">Occupied</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded bed-reserved"></div>
+                        <span class="text-sm text-neutral-600">Reserved</span>
+                    </div>
+
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-4 rounded bed-maintenance"></div>
+                        <span class="text-sm text-neutral-600">Maintenance</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ==================== ROOM CARDS GRID ==================== -->
+            <!--
+                ANNOTATION: Grid of room cards (4 cards)
+                - 1 column on mobile, 2 on tablet, 2 on desktop (xl: could be 3)
+                - Each card shows room info and visual bed grid
+                - Room type badges: Dorm (blue), Private (purple), Mixed (teal)
+                - Bed grid uses colored squares for status visualization
+                - Quick stats show X/Y beds available
+                - Edit Room button in footer
+            -->
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-4 lg:gap-6">
+
+                <!-- Room Card 1: Mixed Dorm A - 6 Beds -->
+                <div class="room-card bg-white rounded-lg border border-neutral-200 overflow-hidden">
+                    <div class="p-5">
+                        <!-- Room Header -->
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-heading font-semibold text-lg text-neutral-900">Dorm A</h3>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-700">Mixed Dorm</span>
+                                </div>
+                                <p class="text-sm text-neutral-600">6 Beds - Bunk beds</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-semibold text-neutral-900">150,000<span class="text-sm font-normal">₫</span></p>
+                                <p class="text-xs text-neutral-500">per night</p>
+                            </div>
+                        </div>
+
+                        <!-- Bed Grid: 3x2 layout for 6 beds -->
+                        <!--
+                            ANNOTATION: Visual bed grid
+                            - Uses colored squares to show bed status at a glance
+                            - Clickable to open bed detail modal
+                            - Grid layout adapts to number of beds
+                        -->
+                        <div class="mb-4">
+                            <p class="text-xs text-neutral-500 mb-2">Bed Status (click to manage)</p>
+                            <div class="grid grid-cols-6 gap-2">
+                                <button onclick="openBedModal('A', 1, 'available')" class="bed-cell w-full aspect-square rounded bed-available" title="Bed 1 - Available" aria-label="Bed 1 - Available"></button>
+                                <button onclick="openBedModal('A', 2, 'occupied')" class="bed-cell w-full aspect-square rounded bed-occupied" title="Bed 2 - Occupied" aria-label="Bed 2 - Occupied"></button>
+                                <button onclick="openBedModal('A', 3, 'occupied')" class="bed-cell w-full aspect-square rounded bed-occupied" title="Bed 3 - Occupied" aria-label="Bed 3 - Occupied"></button>
+                                <button onclick="openBedModal('A', 4, 'reserved')" class="bed-cell w-full aspect-square rounded bed-reserved" title="Bed 4 - Reserved" aria-label="Bed 4 - Reserved"></button>
+                                <button onclick="openBedModal('A', 5, 'available')" class="bed-cell w-full aspect-square rounded bed-available" title="Bed 5 - Available" aria-label="Bed 5 - Available"></button>
+                                <button onclick="openBedModal('A', 6, 'maintenance')" class="bed-cell w-full aspect-square rounded bed-maintenance" title="Bed 6 - Maintenance" aria-label="Bed 6 - Maintenance"></button>
+                            </div>
+                        </div>
+
+                        <!-- Quick Stats -->
+                        <div class="flex items-center justify-between pt-3 border-t border-neutral-100">
+                            <div class="flex items-center gap-1 text-sm">
+                                <i data-lucide="bed-single" class="w-4 h-4 text-green-600"></i>
+                                <span class="text-neutral-600"><span class="font-medium text-green-600">2</span>/6 beds available</span>
+                            </div>
+                            <button class="flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 transition-colors">
+                                <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                <span>Edit Room</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Room Card 2: Female Dorm - 8 Beds -->
+                <div class="room-card bg-white rounded-lg border border-neutral-200 overflow-hidden">
+                    <div class="p-5">
+                        <!-- Room Header -->
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-heading font-semibold text-lg text-neutral-900">Female Dorm</h3>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-pink-100 text-pink-700">Female Only</span>
+                                </div>
+                                <p class="text-sm text-neutral-600">8 Beds - Bunk beds</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-semibold text-neutral-900">140,000<span class="text-sm font-normal">₫</span></p>
+                                <p class="text-xs text-neutral-500">per night</p>
+                            </div>
+                        </div>
+
+                        <!-- Bed Grid: 4x2 layout for 8 beds -->
+                        <div class="mb-4">
+                            <p class="text-xs text-neutral-500 mb-2">Bed Status (click to manage)</p>
+                            <div class="grid grid-cols-8 gap-2">
+                                <button onclick="openBedModal('Female', 1, 'occupied')" class="bed-cell w-full aspect-square rounded bed-occupied" title="Bed 1 - Occupied" aria-label="Bed 1 - Occupied"></button>
+                                <button onclick="openBedModal('Female', 2, 'occupied')" class="bed-cell w-full aspect-square rounded bed-occupied" title="Bed 2 - Occupied" aria-label="Bed 2 - Occupied"></button>
+                                <button onclick="openBedModal('Female', 3, 'available')" class="bed-cell w-full aspect-square rounded bed-available" title="Bed 3 - Available" aria-label="Bed 3 - Available"></button>
+                                <button onclick="openBedModal('Female', 4, 'occupied')" class="bed-cell w-full aspect-square rounded bed-occupied" title="Bed 4 - Occupied" aria-label="Bed 4 - Occupied"></button>
+                                <button onclick="openBedModal('Female', 5, 'available')" class="bed-cell w-full aspect-square rounded bed-available" title="Bed 5 - Available" aria-label="Bed 5 - Available"></button>
+                                <button onclick="openBedModal('Female', 6, 'reserved')" class="bed-cell w-full aspect-square rounded bed-reserved" title="Bed 6 - Reserved" aria-label="Bed 6 - Reserved"></button>
+                                <button onclick="openBedModal('Female', 7, 'occupied')" class="bed-cell w-full aspect-square rounded bed-occupied" title="Bed 7 - Occupied" aria-label="Bed 7 - Occupied"></button>
+                                <button onclick="openBedModal('Female', 8, 'available')" class="bed-cell w-full aspect-square rounded bed-available" title="Bed 8 - Available" aria-label="Bed 8 - Available"></button>
+                            </div>
+                        </div>
+
+                        <!-- Quick Stats -->
+                        <div class="flex items-center justify-between pt-3 border-t border-neutral-100">
+                            <div class="flex items-center gap-1 text-sm">
+                                <i data-lucide="bed-single" class="w-4 h-4 text-green-600"></i>
+                                <span class="text-neutral-600"><span class="font-medium text-green-600">3</span>/8 beds available</span>
+                            </div>
+                            <button class="flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 transition-colors">
+                                <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                <span>Edit Room</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Room Card 3: Private Room 1 - 1 Bed (Double) -->
+                <div class="room-card bg-white rounded-lg border border-neutral-200 overflow-hidden">
+                    <div class="p-5">
+                        <!-- Room Header -->
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-heading font-semibold text-lg text-neutral-900">Private Room 1</h3>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-700">Private</span>
+                                </div>
+                                <p class="text-sm text-neutral-600">1 Double Bed - En-suite</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-semibold text-neutral-900">450,000<span class="text-sm font-normal">₫</span></p>
+                                <p class="text-xs text-neutral-500">per night</p>
+                            </div>
+                        </div>
+
+                        <!-- Bed Grid: Single bed visualization -->
+                        <div class="mb-4">
+                            <p class="text-xs text-neutral-500 mb-2">Room Status (click to manage)</p>
+                            <div class="flex gap-2">
+                                <button onclick="openBedModal('Private 1', 1, 'occupied')" class="bed-cell w-16 h-10 rounded bed-occupied flex items-center justify-center" title="Double Bed - Occupied" aria-label="Double Bed - Occupied">
+                                    <i data-lucide="bed-double" class="w-5 h-5 text-white"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Quick Stats -->
+                        <div class="flex items-center justify-between pt-3 border-t border-neutral-100">
+                            <div class="flex items-center gap-1 text-sm">
+                                <i data-lucide="bed-double" class="w-4 h-4 text-blue-600"></i>
+                                <span class="text-neutral-600"><span class="font-medium text-blue-600">Occupied</span> - 2 guests</span>
+                            </div>
+                            <button class="flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 transition-colors">
+                                <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                <span>Edit Room</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Room Card 4: Dorm B - 4 Beds -->
+                <div class="room-card bg-white rounded-lg border border-neutral-200 overflow-hidden">
+                    <div class="p-5">
+                        <!-- Room Header -->
+                        <div class="flex items-start justify-between mb-4">
+                            <div>
+                                <div class="flex items-center gap-2 mb-1">
+                                    <h3 class="font-heading font-semibold text-lg text-neutral-900">Dorm B</h3>
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-teal-100 text-teal-700">Mixed Dorm</span>
+                                </div>
+                                <p class="text-sm text-neutral-600">4 Beds - Single beds</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-lg font-semibold text-neutral-900">180,000<span class="text-sm font-normal">₫</span></p>
+                                <p class="text-xs text-neutral-500">per night</p>
+                            </div>
+                        </div>
+
+                        <!-- Bed Grid: 4 beds in a row -->
+                        <div class="mb-4">
+                            <p class="text-xs text-neutral-500 mb-2">Bed Status (click to manage)</p>
+                            <div class="grid grid-cols-4 gap-2">
+                                <button onclick="openBedModal('B', 1, 'available')" class="bed-cell w-full aspect-square rounded bed-available" title="Bed 1 - Available" aria-label="Bed 1 - Available"></button>
+                                <button onclick="openBedModal('B', 2, 'available')" class="bed-cell w-full aspect-square rounded bed-available" title="Bed 2 - Available" aria-label="Bed 2 - Available"></button>
+                                <button onclick="openBedModal('B', 3, 'available')" class="bed-cell w-full aspect-square rounded bed-available" title="Bed 3 - Available" aria-label="Bed 3 - Available"></button>
+                                <button onclick="openBedModal('B', 4, 'reserved')" class="bed-cell w-full aspect-square rounded bed-reserved" title="Bed 4 - Reserved" aria-label="Bed 4 - Reserved"></button>
+                            </div>
+                        </div>
+
+                        <!-- Quick Stats -->
+                        <div class="flex items-center justify-between pt-3 border-t border-neutral-100">
+                            <div class="flex items-center gap-1 text-sm">
+                                <i data-lucide="bed-single" class="w-4 h-4 text-green-600"></i>
+                                <span class="text-neutral-600"><span class="font-medium text-green-600">3</span>/4 beds available</span>
+                            </div>
+                            <button class="flex items-center gap-1 text-sm font-medium text-primary-500 hover:text-primary-600 transition-colors">
+                                <i data-lucide="edit-3" class="w-4 h-4"></i>
+                                <span>Edit Room</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="px-4 lg:px-6 py-4 border-t border-neutral-200 bg-white">
+            <p class="text-sm text-neutral-500 text-center">
+                &copy; 2026 HostelViet. All rights reserved.
+            </p>
+        </footer>
+    </div>
+
+    <!-- ==================== BED DETAIL MODAL ==================== -->
+    <!--
+        ANNOTATION: Modal overlay for bed details
+        - Shows bed number, current status, guest info
+        - Check-in/out dates for occupied beds
+        - Status change dropdown
+        - Save/Cancel buttons
+        - Visible as overlay (demonstrated)
+        - Close on overlay click or Cancel button
+    -->
+    <div id="bedModal" class="fixed inset-0 z-50 flex items-center justify-center p-4" style="display: flex;">
+        <!-- Modal Overlay -->
+        <div class="modal-overlay absolute inset-0" onclick="closeBedModal()"></div>
+
+        <!-- Modal Content -->
+        <div class="relative bg-white rounded-xl shadow-xl max-w-md w-full max-h-[90vh] overflow-auto">
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between px-6 py-4 border-b border-neutral-200">
+                <div>
+                    <h2 class="font-heading font-semibold text-xl text-neutral-900">Bed Details</h2>
+                    <p class="text-sm text-neutral-500 mt-0.5" id="modalRoomBed">Dorm A - Bed 2</p>
+                </div>
+                <button onclick="closeBedModal()" class="p-2 -mr-2 rounded-lg hover:bg-neutral-100 transition-colors" aria-label="Close modal">
+                    <i data-lucide="x" class="w-5 h-5 text-neutral-500"></i>
+                </button>
+            </div>
+
+            <!-- Modal Body -->
+            <div class="px-6 py-5 space-y-5">
+                <!-- Current Status -->
+                <div>
+                    <label class="block text-sm font-medium text-neutral-700 mb-2">Current Status</label>
+                    <div class="flex items-center gap-2">
+                        <div id="modalStatusDot" class="w-3 h-3 rounded-full bed-occupied"></div>
+                        <span id="modalStatusText" class="text-sm font-medium text-neutral-900">Occupied</span>
+                    </div>
+                </div>
+
+                <!-- Current Guest (shown when occupied) -->
+                <div id="guestInfo" class="bg-neutral-50 rounded-lg p-4">
+                    <p class="text-xs text-neutral-500 uppercase tracking-wider mb-2">Current Guest</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-medium text-sm">JD</div>
+                        <div>
+                            <p class="font-medium text-neutral-900">John Doe</p>
+                            <p class="text-sm text-neutral-500">john.doe@email.com</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Check-in/out Dates (shown when occupied/reserved) -->
+                <div id="dateInfo" class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-xs text-neutral-500 uppercase tracking-wider mb-1">Check-in</label>
+                        <p class="font-medium text-neutral-900">Feb 3, 2026</p>
+                        <p class="text-sm text-neutral-500">2:00 PM</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-neutral-500 uppercase tracking-wider mb-1">Check-out</label>
+                        <p class="font-medium text-neutral-900">Feb 7, 2026</p>
+                        <p class="text-sm text-neutral-500">11:00 AM</p>
+                    </div>
+                </div>
+
+                <!-- Change Status Dropdown -->
+                <div>
+                    <label for="statusSelect" class="block text-sm font-medium text-neutral-700 mb-2">Change Status</label>
+                    <div class="relative">
+                        <select id="statusSelect" class="w-full h-11 pl-4 pr-10 bg-white border border-neutral-200 rounded-lg text-sm text-neutral-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 appearance-none cursor-pointer">
+                            <option value="available">Available</option>
+                            <option value="occupied" selected>Occupied</option>
+                            <option value="reserved">Reserved</option>
+                            <option value="maintenance">Maintenance</option>
+                        </select>
+                        <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none"></i>
+                    </div>
+                </div>
+
+                <!-- Notes (optional) -->
+                <div>
+                    <label for="bedNotes" class="block text-sm font-medium text-neutral-700 mb-2">Notes <span class="text-neutral-400 font-normal">(optional)</span></label>
+                    <textarea
+                        id="bedNotes"
+                        rows="2"
+                        placeholder="Add any notes about this bed..."
+                        class="w-full px-4 py-3 bg-white border border-neutral-200 rounded-lg text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none"
+                    ></textarea>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="flex items-center justify-end gap-3 px-6 py-4 border-t border-neutral-200 bg-neutral-50 rounded-b-xl">
+                <button onclick="closeBedModal()" class="h-10 px-5 bg-transparent text-neutral-600 border border-neutral-300 rounded-lg font-medium hover:bg-neutral-100 focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:ring-offset-2 transition-all">
+                    Cancel
+                </button>
+                <button class="h-10 px-5 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all">
+                    Save Changes
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Sidebar toggle functionality
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const collapseIcon = document.getElementById('collapseIcon');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        let isCollapsed = false;
+        let isMobileOpen = false;
+
+        function toggleSidebar() {
+            isCollapsed = !isCollapsed;
+
+            if (isCollapsed) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('sidebar-collapsed');
+                collapseIcon.setAttribute('data-lucide', 'panel-left-open');
+            } else {
+                sidebar.classList.remove('collapsed');
+                mainContent.classList.remove('sidebar-collapsed');
+                collapseIcon.setAttribute('data-lucide', 'panel-left-close');
+            }
+
+            // Re-render the icon
+            lucide.createIcons();
+        }
+
+        function toggleMobileSidebar() {
+            isMobileOpen = !isMobileOpen;
+
+            if (isMobileOpen) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebarOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                sidebarOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Close mobile sidebar on window resize to desktop
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024 && isMobileOpen) {
+                toggleMobileSidebar();
+            }
+        });
+
+        // Bed Modal functionality
+        const bedModal = document.getElementById('bedModal');
+        const modalRoomBed = document.getElementById('modalRoomBed');
+        const modalStatusDot = document.getElementById('modalStatusDot');
+        const modalStatusText = document.getElementById('modalStatusText');
+        const statusSelect = document.getElementById('statusSelect');
+        const guestInfo = document.getElementById('guestInfo');
+        const dateInfo = document.getElementById('dateInfo');
+
+        // Sample guest data for demonstration
+        const guestData = {
+            'A-2': { name: 'John Doe', initials: 'JD', email: 'john.doe@email.com', checkIn: 'Feb 3, 2026', checkOut: 'Feb 7, 2026' },
+            'A-3': { name: 'Marie Laurent', initials: 'ML', email: 'marie@email.com', checkIn: 'Feb 2, 2026', checkOut: 'Feb 5, 2026' },
+            'Female-1': { name: 'Anna Schmidt', initials: 'AS', email: 'anna@email.com', checkIn: 'Feb 1, 2026', checkOut: 'Feb 8, 2026' },
+            'Female-2': { name: 'Lisa Chen', initials: 'LC', email: 'lisa@email.com', checkIn: 'Feb 3, 2026', checkOut: 'Feb 6, 2026' },
+            'Female-4': { name: 'Emma Wilson', initials: 'EW', email: 'emma@email.com', checkIn: 'Feb 2, 2026', checkOut: 'Feb 4, 2026' },
+            'Female-7': { name: 'Sophie Martin', initials: 'SM', email: 'sophie@email.com', checkIn: 'Feb 3, 2026', checkOut: 'Feb 10, 2026' },
+            'Private 1-1': { name: 'Kevin Park & Guest', initials: 'KP', email: 'kevin@email.com', checkIn: 'Feb 1, 2026', checkOut: 'Feb 5, 2026' },
+        };
+
+        const statusLabels = {
+            'available': 'Available',
+            'occupied': 'Occupied',
+            'reserved': 'Reserved',
+            'maintenance': 'Maintenance'
+        };
+
+        function openBedModal(room, bedNum, status) {
+            const key = `${room}-${bedNum}`;
+
+            // Update modal content
+            modalRoomBed.textContent = `${room} - Bed ${bedNum}`;
+
+            // Update status
+            modalStatusDot.className = `w-3 h-3 rounded-full bed-${status}`;
+            modalStatusText.textContent = statusLabels[status];
+            statusSelect.value = status;
+
+            // Show/hide guest info based on status
+            if (status === 'occupied' && guestData[key]) {
+                guestInfo.style.display = 'block';
+                dateInfo.style.display = 'grid';
+                const guest = guestData[key];
+                guestInfo.innerHTML = `
+                    <p class="text-xs text-neutral-500 uppercase tracking-wider mb-2">Current Guest</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-medium text-sm">${guest.initials}</div>
+                        <div>
+                            <p class="font-medium text-neutral-900">${guest.name}</p>
+                            <p class="text-sm text-neutral-500">${guest.email}</p>
+                        </div>
+                    </div>
+                `;
+                dateInfo.innerHTML = `
+                    <div>
+                        <label class="block text-xs text-neutral-500 uppercase tracking-wider mb-1">Check-in</label>
+                        <p class="font-medium text-neutral-900">${guest.checkIn}</p>
+                        <p class="text-sm text-neutral-500">2:00 PM</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-neutral-500 uppercase tracking-wider mb-1">Check-out</label>
+                        <p class="font-medium text-neutral-900">${guest.checkOut}</p>
+                        <p class="text-sm text-neutral-500">11:00 AM</p>
+                    </div>
+                `;
+            } else if (status === 'reserved') {
+                guestInfo.style.display = 'none';
+                dateInfo.style.display = 'grid';
+                dateInfo.innerHTML = `
+                    <div>
+                        <label class="block text-xs text-neutral-500 uppercase tracking-wider mb-1">Reserved From</label>
+                        <p class="font-medium text-neutral-900">Feb 5, 2026</p>
+                        <p class="text-sm text-neutral-500">2:00 PM</p>
+                    </div>
+                    <div>
+                        <label class="block text-xs text-neutral-500 uppercase tracking-wider mb-1">Reserved Until</label>
+                        <p class="font-medium text-neutral-900">Feb 8, 2026</p>
+                        <p class="text-sm text-neutral-500">11:00 AM</p>
+                    </div>
+                `;
+            } else {
+                guestInfo.style.display = 'none';
+                dateInfo.style.display = 'none';
+            }
+
+            // Show modal
+            bedModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+
+            // Re-render icons in modal
+            lucide.createIcons();
+        }
+
+        function closeBedModal() {
+            bedModal.style.display = 'none';
+            document.body.style.overflow = '';
+        }
+
+        // Close modal on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && bedModal.style.display === 'flex') {
+                closeBedModal();
+            }
+        });
+
+        // Update status indicator when dropdown changes
+        statusSelect.addEventListener('change', (e) => {
+            const status = e.target.value;
+            modalStatusDot.className = `w-3 h-3 rounded-full bed-${status}`;
+            modalStatusText.textContent = statusLabels[status];
+        });
+    </script>
+
+</body>
+</html>

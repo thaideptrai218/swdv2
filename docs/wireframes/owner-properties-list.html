@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Properties | HostelViet</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#E6F0F7',
+                            100: '#CCE1EF',
+                            500: '#0F4C75',
+                            600: '#0D3F61',
+                            700: '#0A324D',
+                            900: '#051926',
+                        },
+                        secondary: {
+                            400: '#F5A623',
+                            500: '#D4920F',
+                            600: '#B37D0D',
+                        },
+                        neutral: {
+                            0: '#FFFFFF',
+                            50: '#F8FAFC',
+                            100: '#F1F5F9',
+                            200: '#E2E8F0',
+                            400: '#94A3B8',
+                            600: '#475569',
+                            900: '#0F172A',
+                        },
+                    },
+                    fontFamily: {
+                        heading: ['Outfit', 'system-ui', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', system-ui, sans-serif;
+        }
+
+        /* Sidebar transition */
+        .sidebar {
+            transition: width 0.3s ease, transform 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 64px;
+        }
+
+        .sidebar.collapsed .nav-label,
+        .sidebar.collapsed .logo-text {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .sidebar.collapsed .nav-item {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        /* Main content transition */
+        .main-content {
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.sidebar-collapsed {
+            margin-left: 64px;
+        }
+
+        /* Mobile sidebar overlay */
+        .sidebar-overlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* View toggle button active state */
+        .view-toggle-btn.active {
+            background-color: #0F4C75;
+            color: white;
+        }
+
+        /* Property card hover effect */
+        .property-card {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .property-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Image placeholder styling */
+        .image-placeholder {
+            background: linear-gradient(135deg, #E6F0F7 0%, #CCE1EF 100%);
+            position: relative;
+        }
+
+        .image-placeholder::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-neutral-50 font-body text-neutral-900">
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="sidebarOverlay" class="sidebar-overlay fixed inset-0 bg-neutral-900/50 z-40 lg:hidden" onclick="toggleMobileSidebar()"></div>
+
+    <!-- ==================== SIDEBAR ==================== -->
+    <!--
+        ANNOTATION: Collapsible sidebar (240px expanded, 64px collapsed)
+        - Same pattern as owner-dashboard.html
+        - Properties nav item is now ACTIVE
+    -->
+    <aside id="sidebar" class="sidebar fixed left-0 top-0 h-full w-60 bg-primary-900 text-white z-50 flex flex-col transform -translate-x-full lg:translate-x-0">
+
+        <!-- Logo Section -->
+        <div class="flex items-center gap-3 px-5 py-6 border-b border-primary-700">
+            <!-- Logo Icon: Wave + Bed fusion concept -->
+            <div class="w-10 h-10 rounded-lg bg-secondary-500 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="waves" class="w-6 h-6 text-primary-900"></i>
+            </div>
+            <span class="logo-text font-heading font-bold text-xl transition-opacity duration-300">
+                Hostel<span class="text-secondary-500">Viet</span>
+            </span>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 py-4 overflow-y-auto">
+            <ul class="space-y-1 px-3">
+                <!-- Dashboard -->
+                <li>
+                    <a href="owner-dashboard.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Dashboard</span>
+                    </a>
+                </li>
+
+                <!-- Properties - ACTIVE -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg bg-primary-700 text-white border-l-4 border-secondary-500 transition-all duration-200">
+                        <i data-lucide="building-2" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Properties</span>
+                    </a>
+                </li>
+
+                <!-- Rooms -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="bed-double" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Rooms</span>
+                    </a>
+                </li>
+
+                <!-- Bookings -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="calendar-check" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Bookings</span>
+                    </a>
+                </li>
+
+                <!-- Guests -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="users" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Guests</span>
+                    </a>
+                </li>
+
+                <!-- Maintenance -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="wrench" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Maintenance</span>
+                    </a>
+                </li>
+
+                <!-- Reports -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="bar-chart-3" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Reports</span>
+                    </a>
+                </li>
+
+                <!-- Settings -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="settings" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Collapse Button -->
+        <div class="p-3 border-t border-primary-700 hidden lg:block">
+            <button onclick="toggleSidebar()" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200" aria-label="Toggle sidebar">
+                <i data-lucide="panel-left-close" id="collapseIcon" class="w-5 h-5 flex-shrink-0"></i>
+                <span class="nav-label transition-opacity duration-300">Collapse</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- ==================== MAIN WRAPPER ==================== -->
+    <div id="mainContent" class="main-content lg:ml-60 min-h-screen">
+
+        <!-- ==================== HEADER ==================== -->
+        <!--
+            ANNOTATION: Fixed header - same pattern as owner-dashboard.html
+            - Hamburger menu (mobile only)
+            - Search bar
+            - Notification bell with badge
+            - User avatar dropdown
+        -->
+        <header class="sticky top-0 z-30 bg-white border-b border-neutral-200 px-4 lg:px-6 py-3">
+            <div class="flex items-center justify-between gap-4">
+
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 -ml-2 rounded-lg hover:bg-neutral-100 transition-colors" aria-label="Open menu">
+                    <i data-lucide="menu" class="w-6 h-6 text-neutral-600"></i>
+                </button>
+
+                <!-- Search Bar -->
+                <div class="flex-1 max-w-xl hidden sm:block">
+                    <div class="relative">
+                        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400"></i>
+                        <input
+                            type="search"
+                            placeholder="Search properties..."
+                            class="w-full h-11 pl-10 pr-4 bg-neutral-50 border border-neutral-200 rounded-lg text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                        >
+                    </div>
+                </div>
+
+                <!-- Mobile Search Button -->
+                <button class="sm:hidden p-2 rounded-lg hover:bg-neutral-100 transition-colors" aria-label="Search">
+                    <i data-lucide="search" class="w-5 h-5 text-neutral-600"></i>
+                </button>
+
+                <!-- Right Actions -->
+                <div class="flex items-center gap-2">
+
+                    <!-- Notification Bell -->
+                    <button class="relative p-2 rounded-lg hover:bg-neutral-100 transition-colors group" aria-label="Notifications">
+                        <i data-lucide="bell" class="w-5 h-5 text-neutral-600 group-hover:text-primary-500 transition-colors"></i>
+                        <!-- Notification Badge -->
+                        <span class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs font-medium rounded-full flex items-center justify-center">3</span>
+                    </button>
+
+                    <!-- User Avatar Dropdown -->
+                    <div class="relative">
+                        <button class="flex items-center gap-2 p-1 pr-3 rounded-full hover:bg-neutral-100 transition-colors" aria-label="User menu">
+                            <div class="w-9 h-9 rounded-full bg-primary-500 flex items-center justify-center text-white font-medium text-sm">
+                                NT
+                            </div>
+                            <span class="hidden md:block text-sm font-medium text-neutral-700">Nguyen Tuan</span>
+                            <i data-lucide="chevron-down" class="hidden md:block w-4 h-4 text-neutral-400"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ==================== MAIN CONTENT ==================== -->
+        <main class="p-4 lg:p-6">
+
+            <!-- ==================== PAGE HEADER ==================== -->
+            <!--
+                ANNOTATION: Page header with title and primary action
+                - "My Properties" title
+                - "Add Property" button in gold/secondary color
+                - Responsive: stacks on mobile
+            -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <div>
+                    <h1 class="font-heading text-2xl lg:text-3xl font-semibold text-neutral-900">
+                        My Properties
+                    </h1>
+                    <p class="text-neutral-600 mt-1">
+                        Manage and monitor all your hostel properties
+                    </p>
+                </div>
+
+                <!-- Add Property Button (Gold/Secondary) -->
+                <button class="flex items-center justify-center gap-2 h-12 px-6 bg-secondary-500 text-white rounded-lg font-medium hover:bg-secondary-600 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2 transition-all shadow-sm">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                    <span>Add Property</span>
+                </button>
+            </div>
+
+            <!-- ==================== VIEW TOGGLE & FILTERS ==================== -->
+            <!--
+                ANNOTATION: View toggle between grid and list views
+                - Grid view icon (default active)
+                - List view icon
+                - Optional: Filter/sort controls
+            -->
+            <div class="flex items-center justify-between gap-4 mb-6">
+                <!-- Property Count -->
+                <p class="text-sm text-neutral-600">
+                    <span class="font-medium text-neutral-900">4</span> properties
+                </p>
+
+                <!-- View Toggle -->
+                <div class="flex items-center gap-1 p-1 bg-neutral-100 rounded-lg">
+                    <button id="gridViewBtn" onclick="setView('grid')" class="view-toggle-btn active p-2 rounded-md transition-colors" aria-label="Grid view">
+                        <i data-lucide="layout-grid" class="w-5 h-5"></i>
+                    </button>
+                    <button id="listViewBtn" onclick="setView('list')" class="view-toggle-btn p-2 rounded-md text-neutral-600 hover:text-neutral-900 transition-colors" aria-label="List view">
+                        <i data-lucide="list" class="w-5 h-5"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ==================== PROPERTIES GRID ==================== -->
+            <!--
+                ANNOTATION: 2x2 grid of property cards (default view)
+                Each card contains:
+                - Image placeholder (16:9 aspect ratio)
+                - Property name
+                - Address
+                - Stats row: Rooms, Beds, Occupancy percentage
+                - Status badge (Active/Inactive)
+                - Action icons: Edit, View, Settings
+
+                Responsive:
+                - Mobile: 1 column
+                - Tablet: 2 columns
+                - Desktop: 2 columns (could be 3 on larger screens)
+            -->
+            <div id="propertiesGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6">
+
+                <!-- Property Card 1 - Active -->
+                <div class="property-card bg-white rounded-lg border border-neutral-200 overflow-hidden">
+                    <!-- Image Placeholder (16:9) -->
+                    <div class="image-placeholder aspect-video relative">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i data-lucide="image" class="w-12 h-12 text-primary-500/30"></i>
+                        </div>
+                        <!-- Status Badge -->
+                        <span class="absolute top-3 left-3 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                            Active
+                        </span>
+                    </div>
+
+                    <!-- Card Content -->
+                    <div class="p-4">
+                        <!-- Property Name -->
+                        <h3 class="font-heading font-semibold text-lg text-neutral-900 mb-1">
+                            Sunrise Beach Hostel
+                        </h3>
+                        <!-- Address -->
+                        <p class="text-sm text-neutral-500 flex items-center gap-1 mb-4">
+                            <i data-lucide="map-pin" class="w-4 h-4"></i>
+                            <span>123 Nguyen Hue, District 1, HCMC</span>
+                        </p>
+
+                        <!-- Stats Row -->
+                        <div class="flex items-center gap-4 py-3 border-t border-neutral-100">
+                            <div class="flex items-center gap-1.5 text-sm">
+                                <i data-lucide="door-open" class="w-4 h-4 text-neutral-400"></i>
+                                <span class="text-neutral-600"><span class="font-medium text-neutral-900">6</span> Rooms</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 text-sm">
+                                <i data-lucide="bed-single" class="w-4 h-4 text-neutral-400"></i>
+                                <span class="text-neutral-600"><span class="font-medium text-neutral-900">24</span> Beds</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 text-sm">
+                                <i data-lucide="percent" class="w-4 h-4 text-neutral-400"></i>
+                                <span class="text-neutral-600"><span class="font-medium text-green-600">78%</span> Occ.</span>
+                            </div>
+                        </div>
+
+                        <!-- Action Icons -->
+                        <div class="flex items-center justify-end gap-1 pt-3 border-t border-neutral-100">
+                            <button class="p-2 rounded-lg text-neutral-400 hover:text-primary-500 hover:bg-primary-50 transition-colors" aria-label="Edit property">
+                                <i data-lucide="pencil" class="w-5 h-5"></i>
+                            </button>
+                            <button class="p-2 rounded-lg text-neutral-400 hover:text-primary-500 hover:bg-primary-50 transition-colors" aria-label="View property">
+                                <i data-lucide="eye" class="w-5 h-5"></i>
+                            </button>
+                            <button class="p-2 rounded-lg text-neutral-400 hover:text-primary-500 hover:bg-primary-50 transition-colors" aria-label="Property settings">
+                                <i data-lucide="settings" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Property Card 2 - Active -->
+                <div class="property-card bg-white rounded-lg border border-neutral-200 overflow-hidden">
+                    <!-- Image Placeholder (16:9) -->
+                    <div class="image-placeholder aspect-video relative">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i data-lucide="image" class="w-12 h-12 text-primary-500/30"></i>
+                        </div>
+                        <!-- Status Badge -->
+                        <span class="absolute top-3 left-3 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                            Active
+                        </span>
+                    </div>
+
+                    <!-- Card Content -->
+                    <div class="p-4">
+                        <!-- Property Name -->
+                        <h3 class="font-heading font-semibold text-lg text-neutral-900 mb-1">
+                            Mountain View Hostel
+                        </h3>
+                        <!-- Address -->
+                        <p class="text-sm text-neutral-500 flex items-center gap-1 mb-4">
+                            <i data-lucide="map-pin" class="w-4 h-4"></i>
+                            <span>45 Le Loi, Da Lat City</span>
+                        </p>
+
+                        <!-- Stats Row -->
+                        <div class="flex items-center gap-4 py-3 border-t border-neutral-100">
+                            <div class="flex items-center gap-1.5 text-sm">
+                                <i data-lucide="door-open" class="w-4 h-4 text-neutral-400"></i>
+                                <span class="text-neutral-600"><span class="font-medium text-neutral-900">8</span> Rooms</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 text-sm">
+                                <i data-lucide="bed-single" class="w-4 h-4 text-neutral-400"></i>
+                                <span class="text-neutral-600"><span class="font-medium text-neutral-900">32</span> Beds</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 text-sm">
+                                <i data-lucide="percent" class="w-4 h-4 text-neutral-400"></i>
+                                <span class="text-neutral-600"><span class="font-medium text-green-600">92%</span> Occ.</span>
+                            </div>
+                        </div>
+
+                        <!-- Action Icons -->
+                        <div class="flex items-center justify-end gap-1 pt-3 border-t border-neutral-100">
+                            <button class="p-2 rounded-lg text-neutral-400 hover:text-primary-500 hover:bg-primary-50 transition-colors" aria-label="Edit property">
+                                <i data-lucide="pencil" class="w-5 h-5"></i>
+                            </button>
+                            <button class="p-2 rounded-lg text-neutral-400 hover:text-primary-500 hover:bg-primary-50 transition-colors" aria-label="View property">
+                                <i data-lucide="eye" class="w-5 h-5"></i>
+                            </button>
+                            <button class="p-2 rounded-lg text-neutral-400 hover:text-primary-500 hover:bg-primary-50 transition-colors" aria-label="Property settings">
+                                <i data-lucide="settings" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Property Card 3 - Active -->
+                <div class="property-card bg-white rounded-lg border border-neutral-200 overflow-hidden">
+                    <!-- Image Placeholder (16:9) -->
+                    <div class="image-placeholder aspect-video relative">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i data-lucide="image" class="w-12 h-12 text-primary-500/30"></i>
+                        </div>
+                        <!-- Status Badge -->
+                        <span class="absolute top-3 left-3 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">
+                            Active
+                        </span>
+                    </div>
+
+                    <!-- Card Content -->
+                    <div class="p-4">
+                        <!-- Property Name -->
+                        <h3 class="font-heading font-semibold text-lg text-neutral-900 mb-1">
+                            Old Town Backpackers
+                        </h3>
+                        <!-- Address -->
+                        <p class="text-sm text-neutral-500 flex items-center gap-1 mb-4">
+                            <i data-lucide="map-pin" class="w-4 h-4"></i>
+                            <span>78 Tran Phu, Hoi An</span>
+                        </p>
+
+                        <!-- Stats Row -->
+                        <div class="flex items-center gap-4 py-3 border-t border-neutral-100">
+                            <div class="flex items-center gap-1.5 text-sm">
+                                <i data-lucide="door-open" class="w-4 h-4 text-neutral-400"></i>
+                                <span class="text-neutral-600"><span class="font-medium text-neutral-900">4</span> Rooms</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 text-sm">
+                                <i data-lucide="bed-single" class="w-4 h-4 text-neutral-400"></i>
+                                <span class="text-neutral-600"><span class="font-medium text-neutral-900">16</span> Beds</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 text-sm">
+                                <i data-lucide="percent" class="w-4 h-4 text-neutral-400"></i>
+                                <span class="text-neutral-600"><span class="font-medium text-green-600">65%</span> Occ.</span>
+                            </div>
+                        </div>
+
+                        <!-- Action Icons -->
+                        <div class="flex items-center justify-end gap-1 pt-3 border-t border-neutral-100">
+                            <button class="p-2 rounded-lg text-neutral-400 hover:text-primary-500 hover:bg-primary-50 transition-colors" aria-label="Edit property">
+                                <i data-lucide="pencil" class="w-5 h-5"></i>
+                            </button>
+                            <button class="p-2 rounded-lg text-neutral-400 hover:text-primary-500 hover:bg-primary-50 transition-colors" aria-label="View property">
+                                <i data-lucide="eye" class="w-5 h-5"></i>
+                            </button>
+                            <button class="p-2 rounded-lg text-neutral-400 hover:text-primary-500 hover:bg-primary-50 transition-colors" aria-label="Property settings">
+                                <i data-lucide="settings" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Property Card 4 - Inactive -->
+                <div class="property-card bg-white rounded-lg border border-neutral-200 overflow-hidden opacity-75">
+                    <!-- Image Placeholder (16:9) -->
+                    <div class="image-placeholder aspect-video relative grayscale">
+                        <div class="absolute inset-0 flex items-center justify-center">
+                            <i data-lucide="image" class="w-12 h-12 text-primary-500/30"></i>
+                        </div>
+                        <!-- Status Badge - Inactive -->
+                        <span class="absolute top-3 left-3 inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-neutral-200 text-neutral-600">
+                            Inactive
+                        </span>
+                    </div>
+
+                    <!-- Card Content -->
+                    <div class="p-4">
+                        <!-- Property Name -->
+                        <h3 class="font-heading font-semibold text-lg text-neutral-900 mb-1">
+                            Riverside Lodge
+                        </h3>
+                        <!-- Address -->
+                        <p class="text-sm text-neutral-500 flex items-center gap-1 mb-4">
+                            <i data-lucide="map-pin" class="w-4 h-4"></i>
+                            <span>12 Bach Dang, Hue City</span>
+                        </p>
+
+                        <!-- Stats Row -->
+                        <div class="flex items-center gap-4 py-3 border-t border-neutral-100">
+                            <div class="flex items-center gap-1.5 text-sm">
+                                <i data-lucide="door-open" class="w-4 h-4 text-neutral-400"></i>
+                                <span class="text-neutral-600"><span class="font-medium text-neutral-900">5</span> Rooms</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 text-sm">
+                                <i data-lucide="bed-single" class="w-4 h-4 text-neutral-400"></i>
+                                <span class="text-neutral-600"><span class="font-medium text-neutral-900">20</span> Beds</span>
+                            </div>
+                            <div class="flex items-center gap-1.5 text-sm">
+                                <i data-lucide="percent" class="w-4 h-4 text-neutral-400"></i>
+                                <span class="text-neutral-600"><span class="font-medium text-neutral-400">0%</span> Occ.</span>
+                            </div>
+                        </div>
+
+                        <!-- Action Icons -->
+                        <div class="flex items-center justify-end gap-1 pt-3 border-t border-neutral-100">
+                            <button class="p-2 rounded-lg text-neutral-400 hover:text-primary-500 hover:bg-primary-50 transition-colors" aria-label="Edit property">
+                                <i data-lucide="pencil" class="w-5 h-5"></i>
+                            </button>
+                            <button class="p-2 rounded-lg text-neutral-400 hover:text-primary-500 hover:bg-primary-50 transition-colors" aria-label="View property">
+                                <i data-lucide="eye" class="w-5 h-5"></i>
+                            </button>
+                            <button class="p-2 rounded-lg text-neutral-400 hover:text-primary-500 hover:bg-primary-50 transition-colors" aria-label="Property settings">
+                                <i data-lucide="settings" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- ==================== EMPTY STATE (Commented Out) ==================== -->
+            <!--
+                ANNOTATION: Empty state for when no properties exist
+                - Centered content
+                - Illustration placeholder
+                - "No properties yet" message
+                - Add Property CTA button
+
+                To use: Remove the properties grid above and uncomment this section
+            -->
+            <!--
+            <div id="emptyState" class="flex flex-col items-center justify-center py-16 px-4">
+                <div class="w-32 h-32 mb-6 rounded-full bg-neutral-100 flex items-center justify-center">
+                    <i data-lucide="building-2" class="w-16 h-16 text-neutral-300"></i>
+                </div>
+                <h3 class="font-heading font-semibold text-xl text-neutral-900 mb-2 text-center">
+                    No properties yet
+                </h3>
+                <p class="text-neutral-500 text-center max-w-sm mb-6">
+                    Start by adding your first hostel property to manage bookings, rooms, and guests.
+                </p>
+                <button class="flex items-center justify-center gap-2 h-12 px-6 bg-secondary-500 text-white rounded-lg font-medium hover:bg-secondary-600 focus:outline-none focus:ring-2 focus:ring-secondary-500 focus:ring-offset-2 transition-all shadow-sm">
+                    <i data-lucide="plus" class="w-5 h-5"></i>
+                    <span>Add Your First Property</span>
+                </button>
+            </div>
+            -->
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="px-4 lg:px-6 py-4 border-t border-neutral-200 bg-white">
+            <p class="text-sm text-neutral-500 text-center">
+                &copy; 2026 HostelViet. All rights reserved.
+            </p>
+        </footer>
+    </div>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Sidebar toggle functionality
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const collapseIcon = document.getElementById('collapseIcon');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        let isCollapsed = false;
+        let isMobileOpen = false;
+
+        function toggleSidebar() {
+            isCollapsed = !isCollapsed;
+
+            if (isCollapsed) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('sidebar-collapsed');
+                collapseIcon.setAttribute('data-lucide', 'panel-left-open');
+            } else {
+                sidebar.classList.remove('collapsed');
+                mainContent.classList.remove('sidebar-collapsed');
+                collapseIcon.setAttribute('data-lucide', 'panel-left-close');
+            }
+
+            // Re-render the icon
+            lucide.createIcons();
+        }
+
+        function toggleMobileSidebar() {
+            isMobileOpen = !isMobileOpen;
+
+            if (isMobileOpen) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebarOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                sidebarOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // View toggle functionality
+        const gridViewBtn = document.getElementById('gridViewBtn');
+        const listViewBtn = document.getElementById('listViewBtn');
+        const propertiesGrid = document.getElementById('propertiesGrid');
+
+        function setView(view) {
+            if (view === 'grid') {
+                gridViewBtn.classList.add('active');
+                listViewBtn.classList.remove('active');
+                propertiesGrid.classList.remove('grid-cols-1');
+                propertiesGrid.classList.add('md:grid-cols-2');
+            } else {
+                listViewBtn.classList.add('active');
+                gridViewBtn.classList.remove('active');
+                propertiesGrid.classList.remove('md:grid-cols-2');
+                propertiesGrid.classList.add('grid-cols-1');
+            }
+        }
+
+        // Close mobile sidebar on window resize to desktop
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024 && isMobileOpen) {
+                toggleMobileSidebar();
+            }
+        });
+    </script>
+
+</body>
+</html>

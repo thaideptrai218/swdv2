@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 60" width="240" height="60">
+  <defs>
+    <linearGradient id="waveGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#0F4C75;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#1B6B9C;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Icon: Bed with wave -->
+  <g transform="translate(8, 10)">
+    <!-- Bed base -->
+    <rect x="0" y="24" width="40" height="4" rx="2" fill="#0F4C75"/>
+    <!-- Bed headboard -->
+    <rect x="0" y="12" width="8" height="16" rx="2" fill="#0F4C75"/>
+    <!-- Pillow -->
+    <rect x="10" y="16" width="12" height="6" rx="2" fill="#0F4C75"/>
+    <!-- Blanket -->
+    <rect x="10" y="22" width="28" height="6" rx="1" fill="#D4920F"/>
+    <!-- Legs -->
+    <rect x="2" y="28" width="4" height="8" rx="1" fill="#0F4C75"/>
+    <rect x="34" y="28" width="4" height="8" rx="1" fill="#0F4C75"/>
+    <!-- Wave underneath -->
+    <path d="M0 40 Q10 36, 20 40 T40 40" stroke="#0F4C75" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- Text: HostelViet -->
+  <text x="58" y="38" font-family="'Outfit', 'Segoe UI', sans-serif" font-size="26" font-weight="700">
+    <tspan fill="#0F4C75">Hostel</tspan><tspan fill="#D4920F">Viet</tspan>
+  </text>
+</svg>

@@ -1,0 +1,952 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guest Records | HostelViet</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.js"></script>
+
+    <!-- Tailwind Config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#E6F0F7',
+                            100: '#CCE1EF',
+                            500: '#0F4C75',
+                            600: '#0D3F61',
+                            700: '#0A324D',
+                            900: '#051926',
+                        },
+                        secondary: {
+                            400: '#F5A623',
+                            500: '#D4920F',
+                            600: '#B37D0D',
+                        },
+                        neutral: {
+                            0: '#FFFFFF',
+                            50: '#F8FAFC',
+                            100: '#F1F5F9',
+                            200: '#E2E8F0',
+                            400: '#94A3B8',
+                            600: '#475569',
+                            900: '#0F172A',
+                        },
+                    },
+                    fontFamily: {
+                        heading: ['Outfit', 'system-ui', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    },
+                },
+            },
+        }
+    </script>
+
+    <style>
+        /* Base Styles */
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Outfit', system-ui, sans-serif;
+        }
+
+        /* Sidebar transition */
+        .sidebar {
+            transition: width 0.3s ease, transform 0.3s ease;
+        }
+
+        .sidebar.collapsed {
+            width: 64px;
+        }
+
+        .sidebar.collapsed .nav-label,
+        .sidebar.collapsed .logo-text {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .sidebar.collapsed .nav-item {
+            justify-content: center;
+            padding-left: 0;
+            padding-right: 0;
+        }
+
+        /* Main content transition */
+        .main-content {
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.sidebar-collapsed {
+            margin-left: 64px;
+        }
+
+        /* Mobile sidebar overlay */
+        .sidebar-overlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Guest Profile Sidebar/Modal Overlay */
+        .profile-overlay {
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .profile-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .profile-sidebar {
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .profile-sidebar.active {
+            transform: translateX(0);
+        }
+
+        /* Reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
+
+        /* Custom scrollbar for profile sidebar */
+        .profile-sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .profile-sidebar::-webkit-scrollbar-track {
+            background: #F1F5F9;
+        }
+
+        .profile-sidebar::-webkit-scrollbar-thumb {
+            background: #94A3B8;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body class="bg-neutral-50 font-body text-neutral-900">
+
+    <!-- Mobile Sidebar Overlay -->
+    <div id="sidebarOverlay" class="sidebar-overlay fixed inset-0 bg-neutral-900/50 z-40 lg:hidden" onclick="toggleMobileSidebar()"></div>
+
+    <!-- ==================== SIDEBAR ==================== -->
+    <!--
+        ANNOTATION: Collapsible sidebar (240px expanded, 64px collapsed)
+        - Logo at top with wave + bed icon concept
+        - Navigation with 8 main sections
+        - Active state on "Guests": primary-50 background, primary-500 left border
+        - Collapse button at bottom
+        - Mobile: transforms to overlay drawer
+    -->
+    <aside id="sidebar" class="sidebar fixed left-0 top-0 h-full w-60 bg-primary-900 text-white z-50 flex flex-col transform -translate-x-full lg:translate-x-0">
+
+        <!-- Logo Section -->
+        <div class="flex items-center gap-3 px-5 py-6 border-b border-primary-700">
+            <!-- Logo Icon: Wave + Bed fusion concept -->
+            <div class="w-10 h-10 rounded-lg bg-secondary-500 flex items-center justify-center flex-shrink-0">
+                <i data-lucide="waves" class="w-6 h-6 text-primary-900"></i>
+            </div>
+            <span class="logo-text font-heading font-bold text-xl transition-opacity duration-300">
+                Hostel<span class="text-secondary-500">Viet</span>
+            </span>
+        </div>
+
+        <!-- Navigation -->
+        <nav class="flex-1 py-4 overflow-y-auto">
+            <ul class="space-y-1 px-3">
+                <!-- Dashboard -->
+                <li>
+                    <a href="owner-dashboard.html" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Dashboard</span>
+                    </a>
+                </li>
+
+                <!-- Properties -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="building-2" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Properties</span>
+                    </a>
+                </li>
+
+                <!-- Rooms -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="bed-double" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Rooms</span>
+                    </a>
+                </li>
+
+                <!-- Bookings -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="calendar-check" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Bookings</span>
+                    </a>
+                </li>
+
+                <!-- Guests - Active -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg bg-primary-700 text-white border-l-4 border-secondary-500 transition-all duration-200">
+                        <i data-lucide="users" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Guests</span>
+                    </a>
+                </li>
+
+                <!-- Maintenance -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="wrench" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Maintenance</span>
+                    </a>
+                </li>
+
+                <!-- Reports -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="bar-chart-3" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Reports</span>
+                    </a>
+                </li>
+
+                <!-- Settings -->
+                <li>
+                    <a href="#" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200">
+                        <i data-lucide="settings" class="w-5 h-5 flex-shrink-0"></i>
+                        <span class="nav-label transition-opacity duration-300">Settings</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Collapse Button -->
+        <div class="p-3 border-t border-primary-700 hidden lg:block">
+            <button onclick="toggleSidebar()" class="nav-item w-full flex items-center gap-3 px-4 py-3 rounded-lg text-neutral-200 hover:bg-primary-700 hover:text-white transition-all duration-200" aria-label="Toggle sidebar">
+                <i data-lucide="panel-left-close" id="collapseIcon" class="w-5 h-5 flex-shrink-0"></i>
+                <span class="nav-label transition-opacity duration-300">Collapse</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- ==================== MAIN WRAPPER ==================== -->
+    <div id="mainContent" class="main-content lg:ml-60 min-h-screen">
+
+        <!-- ==================== HEADER ==================== -->
+        <!--
+            ANNOTATION: Fixed header with full width
+            - Hamburger menu (mobile only)
+            - Search bar (expandable on mobile)
+            - Notification bell with unread badge
+            - User avatar with dropdown trigger
+        -->
+        <header class="sticky top-0 z-30 bg-white border-b border-neutral-200 px-4 lg:px-6 py-3">
+            <div class="flex items-center justify-between gap-4">
+
+                <!-- Mobile Menu Button -->
+                <button onclick="toggleMobileSidebar()" class="lg:hidden p-2 -ml-2 rounded-lg hover:bg-neutral-100 transition-colors" aria-label="Open menu">
+                    <i data-lucide="menu" class="w-6 h-6 text-neutral-600"></i>
+                </button>
+
+                <!-- Search Bar -->
+                <div class="flex-1 max-w-xl hidden sm:block">
+                    <div class="relative">
+                        <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400"></i>
+                        <input
+                            type="search"
+                            placeholder="Search bookings, guests, rooms..."
+                            class="w-full h-11 pl-10 pr-4 bg-neutral-50 border border-neutral-200 rounded-lg text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                        >
+                    </div>
+                </div>
+
+                <!-- Mobile Search Button -->
+                <button class="sm:hidden p-2 rounded-lg hover:bg-neutral-100 transition-colors" aria-label="Search">
+                    <i data-lucide="search" class="w-5 h-5 text-neutral-600"></i>
+                </button>
+
+                <!-- Right Actions -->
+                <div class="flex items-center gap-2">
+
+                    <!-- Notification Bell -->
+                    <button class="relative p-2 rounded-lg hover:bg-neutral-100 transition-colors group" aria-label="Notifications">
+                        <i data-lucide="bell" class="w-5 h-5 text-neutral-600 group-hover:text-primary-500 transition-colors"></i>
+                        <!-- Notification Badge -->
+                        <span class="absolute top-1 right-1 w-4 h-4 bg-red-500 text-white text-xs font-medium rounded-full flex items-center justify-center">3</span>
+                    </button>
+
+                    <!-- User Avatar Dropdown -->
+                    <div class="relative">
+                        <button class="flex items-center gap-2 p-1 pr-3 rounded-full hover:bg-neutral-100 transition-colors" aria-label="User menu">
+                            <div class="w-9 h-9 rounded-full bg-primary-500 flex items-center justify-center text-white font-medium text-sm">
+                                NT
+                            </div>
+                            <span class="hidden md:block text-sm font-medium text-neutral-700">Nguyen Tuan</span>
+                            <i data-lucide="chevron-down" class="hidden md:block w-4 h-4 text-neutral-400"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- ==================== MAIN CONTENT ==================== -->
+        <main class="p-4 lg:p-6">
+
+            <!-- ==================== PAGE HEADER ==================== -->
+            <!--
+                ANNOTATION: Page header with title and action buttons
+                - Title "Guest Records" with description
+                - Export button (dropdown with CSV/Excel options)
+                - "Add Guest" primary button
+            -->
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+                <div>
+                    <h1 class="font-heading text-2xl lg:text-3xl font-semibold text-neutral-900">
+                        Guest Records
+                    </h1>
+                    <p class="text-neutral-600 mt-1">
+                        Manage and view all guest information across your properties
+                    </p>
+                </div>
+
+                <div class="flex items-center gap-3">
+                    <!-- Export Dropdown -->
+                    <div class="relative">
+                        <button id="exportBtn" onclick="toggleExportDropdown()" class="flex items-center gap-2 h-10 px-4 bg-white text-neutral-700 border border-neutral-200 rounded-lg font-medium hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all">
+                            <i data-lucide="download" class="w-4 h-4"></i>
+                            <span>Export</span>
+                            <i data-lucide="chevron-down" class="w-4 h-4"></i>
+                        </button>
+                        <!-- Export Dropdown Menu -->
+                        <div id="exportDropdown" class="hidden absolute right-0 mt-2 w-40 bg-white border border-neutral-200 rounded-lg shadow-lg z-10">
+                            <button class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors rounded-t-lg">
+                                <i data-lucide="file-spreadsheet" class="w-4 h-4"></i>
+                                <span>Export CSV</span>
+                            </button>
+                            <button class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-neutral-700 hover:bg-neutral-50 transition-colors rounded-b-lg">
+                                <i data-lucide="file-text" class="w-4 h-4"></i>
+                                <span>Export Excel</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Add Guest Button (Primary) -->
+                    <button class="flex items-center gap-2 h-10 px-4 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all">
+                        <i data-lucide="user-plus" class="w-4 h-4"></i>
+                        <span>Add Guest</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- ==================== SEARCH & FILTERS ==================== -->
+            <!--
+                ANNOTATION: Search and filter controls
+                - Search input: by name/email/phone
+                - Date range picker: Start date, End date
+                - Property filter dropdown
+                - Status filter: Current/Past/Upcoming tabs or dropdown
+            -->
+            <div class="bg-white rounded-lg border border-neutral-200 p-4 lg:p-5 mb-6">
+                <div class="flex flex-col lg:flex-row gap-4">
+
+                    <!-- Search Input -->
+                    <div class="flex-1 min-w-0">
+                        <label class="block text-sm font-medium text-neutral-700 mb-1.5">Search Guests</label>
+                        <div class="relative">
+                            <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400"></i>
+                            <input
+                                type="search"
+                                placeholder="Search by name, email, or phone..."
+                                class="w-full h-10 pl-10 pr-4 bg-neutral-50 border border-neutral-200 rounded-lg text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Date Range: Start -->
+                    <div class="w-full lg:w-40">
+                        <label class="block text-sm font-medium text-neutral-700 mb-1.5">Stay From</label>
+                        <div class="relative">
+                            <i data-lucide="calendar" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400"></i>
+                            <input
+                                type="date"
+                                class="w-full h-10 pl-10 pr-3 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Date Range: End -->
+                    <div class="w-full lg:w-40">
+                        <label class="block text-sm font-medium text-neutral-700 mb-1.5">Stay To</label>
+                        <div class="relative">
+                            <i data-lucide="calendar" class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400"></i>
+                            <input
+                                type="date"
+                                class="w-full h-10 pl-10 pr-3 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all"
+                            >
+                        </div>
+                    </div>
+
+                    <!-- Property Filter -->
+                    <div class="w-full lg:w-48">
+                        <label class="block text-sm font-medium text-neutral-700 mb-1.5">Property</label>
+                        <div class="relative">
+                            <select class="w-full h-10 pl-3 pr-10 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all appearance-none cursor-pointer">
+                                <option value="">All Properties</option>
+                                <option value="sunset-hostel">Sunset Beach Hostel</option>
+                                <option value="old-quarter">Old Quarter Hostel</option>
+                                <option value="highland">Highland Retreat</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none"></i>
+                        </div>
+                    </div>
+
+                    <!-- Status Filter -->
+                    <div class="w-full lg:w-44">
+                        <label class="block text-sm font-medium text-neutral-700 mb-1.5">Status</label>
+                        <div class="relative">
+                            <select class="w-full h-10 pl-3 pr-10 bg-neutral-50 border border-neutral-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all appearance-none cursor-pointer">
+                                <option value="">All Status</option>
+                                <option value="current">Current Guests</option>
+                                <option value="upcoming">Upcoming</option>
+                                <option value="past">Past Guests</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-neutral-400 pointer-events-none"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Active Filters Pills (optional display) -->
+                <div class="flex flex-wrap items-center gap-2 mt-4 pt-4 border-t border-neutral-100">
+                    <span class="text-sm text-neutral-500">Active filters:</span>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-primary-50 text-primary-700 rounded-full text-xs font-medium">
+                        Sunset Beach Hostel
+                        <button class="hover:text-primary-900 transition-colors" aria-label="Remove filter">
+                            <i data-lucide="x" class="w-3 h-3"></i>
+                        </button>
+                    </span>
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-50 text-green-700 rounded-full text-xs font-medium">
+                        Current Guests
+                        <button class="hover:text-green-900 transition-colors" aria-label="Remove filter">
+                            <i data-lucide="x" class="w-3 h-3"></i>
+                        </button>
+                    </span>
+                    <button class="text-xs text-neutral-500 hover:text-neutral-700 underline transition-colors">Clear all</button>
+                </div>
+            </div>
+
+            <!-- ==================== GUESTS TABLE ==================== -->
+            <!--
+                ANNOTATION: Data table with guest records
+                - Columns: Guest (avatar + name), Email, Phone, Total Stays, Last Visit, Total Spent, Actions
+                - 6 sample rows with diverse data
+                - Actions: View Profile, Send Message buttons
+                - Mobile: horizontal scroll
+                - Row hover highlight
+            -->
+            <div class="bg-white rounded-lg border border-neutral-200 overflow-hidden">
+                <div class="px-5 py-4 border-b border-neutral-200 flex items-center justify-between">
+                    <div>
+                        <h2 class="font-heading font-semibold text-lg text-neutral-900">All Guests</h2>
+                        <p class="text-sm text-neutral-500 mt-0.5">Showing 6 of 248 guests</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <button class="p-2 rounded-lg hover:bg-neutral-100 transition-colors" aria-label="Grid view">
+                            <i data-lucide="layout-grid" class="w-4 h-4 text-neutral-400"></i>
+                        </button>
+                        <button class="p-2 rounded-lg bg-primary-50 transition-colors" aria-label="List view">
+                            <i data-lucide="list" class="w-4 h-4 text-primary-500"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full min-w-[900px]">
+                        <thead>
+                            <tr class="bg-neutral-50 text-left">
+                                <th class="px-5 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">Guest</th>
+                                <th class="px-5 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">Email</th>
+                                <th class="px-5 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">Phone</th>
+                                <th class="px-5 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider text-center">Total Stays</th>
+                                <th class="px-5 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider">Last Visit</th>
+                                <th class="px-5 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider text-right">Total Spent</th>
+                                <th class="px-5 py-3 text-xs font-medium text-neutral-600 uppercase tracking-wider text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-neutral-100">
+                            <!-- Row 1: Current Guest -->
+                            <tr class="hover:bg-primary-50 transition-colors cursor-pointer" onclick="openGuestProfile('john-doe')">
+                                <td class="px-5 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-medium text-sm">JD</div>
+                                        <div>
+                                            <span class="font-medium text-neutral-900 block">John Doe</span>
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-100 text-green-700 mt-0.5">Current</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-5 py-4 text-sm text-neutral-600">john.doe@email.com</td>
+                                <td class="px-5 py-4 text-sm text-neutral-600">+1 555-0123</td>
+                                <td class="px-5 py-4 text-sm text-neutral-900 font-medium text-center">5</td>
+                                <td class="px-5 py-4 text-sm text-neutral-600">Feb 3, 2026</td>
+                                <td class="px-5 py-4 text-sm text-neutral-900 font-medium text-right">4,250,000₫</td>
+                                <td class="px-5 py-4">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button onclick="event.stopPropagation(); openGuestProfile('john-doe')" class="p-2 rounded-lg hover:bg-primary-100 text-neutral-600 hover:text-primary-600 transition-colors" aria-label="View profile">
+                                            <i data-lucide="user" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="event.stopPropagation();" class="p-2 rounded-lg hover:bg-primary-100 text-neutral-600 hover:text-primary-600 transition-colors" aria-label="Send message">
+                                            <i data-lucide="message-circle" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Row 2: Current Guest -->
+                            <tr class="hover:bg-primary-50 transition-colors cursor-pointer" onclick="openGuestProfile('marie-laurent')">
+                                <td class="px-5 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-medium text-sm">ML</div>
+                                        <div>
+                                            <span class="font-medium text-neutral-900 block">Marie Laurent</span>
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-100 text-green-700 mt-0.5">Current</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-5 py-4 text-sm text-neutral-600">marie.l@gmail.com</td>
+                                <td class="px-5 py-4 text-sm text-neutral-600">+33 6 12 34 56 78</td>
+                                <td class="px-5 py-4 text-sm text-neutral-900 font-medium text-center">2</td>
+                                <td class="px-5 py-4 text-sm text-neutral-600">Feb 2, 2026</td>
+                                <td class="px-5 py-4 text-sm text-neutral-900 font-medium text-right">1,800,000₫</td>
+                                <td class="px-5 py-4">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button onclick="event.stopPropagation(); openGuestProfile('marie-laurent')" class="p-2 rounded-lg hover:bg-primary-100 text-neutral-600 hover:text-primary-600 transition-colors" aria-label="View profile">
+                                            <i data-lucide="user" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="event.stopPropagation();" class="p-2 rounded-lg hover:bg-primary-100 text-neutral-600 hover:text-primary-600 transition-colors" aria-label="Send message">
+                                            <i data-lucide="message-circle" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Row 3: Upcoming Guest -->
+                            <tr class="hover:bg-primary-50 transition-colors cursor-pointer" onclick="openGuestProfile('tran-nguyen')">
+                                <td class="px-5 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center text-orange-700 font-medium text-sm">TN</div>
+                                        <div>
+                                            <span class="font-medium text-neutral-900 block">Tran Nguyen</span>
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-700 mt-0.5">Upcoming</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-5 py-4 text-sm text-neutral-600">tran.ng@outlook.com</td>
+                                <td class="px-5 py-4 text-sm text-neutral-600">+84 90 123 4567</td>
+                                <td class="px-5 py-4 text-sm text-neutral-900 font-medium text-center">1</td>
+                                <td class="px-5 py-4 text-sm text-neutral-600">Feb 5, 2026</td>
+                                <td class="px-5 py-4 text-sm text-neutral-900 font-medium text-right">650,000₫</td>
+                                <td class="px-5 py-4">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button onclick="event.stopPropagation(); openGuestProfile('tran-nguyen')" class="p-2 rounded-lg hover:bg-primary-100 text-neutral-600 hover:text-primary-600 transition-colors" aria-label="View profile">
+                                            <i data-lucide="user" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="event.stopPropagation();" class="p-2 rounded-lg hover:bg-primary-100 text-neutral-600 hover:text-primary-600 transition-colors" aria-label="Send message">
+                                            <i data-lucide="message-circle" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Row 4: Past Guest -->
+                            <tr class="hover:bg-primary-50 transition-colors cursor-pointer" onclick="openGuestProfile('anna-schmidt')">
+                                <td class="px-5 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-pink-100 flex items-center justify-center text-pink-700 font-medium text-sm">AS</div>
+                                        <div>
+                                            <span class="font-medium text-neutral-900 block">Anna Schmidt</span>
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-neutral-100 text-neutral-600 mt-0.5">Past</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-5 py-4 text-sm text-neutral-600">anna.s@web.de</td>
+                                <td class="px-5 py-4 text-sm text-neutral-600">+49 170 1234567</td>
+                                <td class="px-5 py-4 text-sm text-neutral-900 font-medium text-center">8</td>
+                                <td class="px-5 py-4 text-sm text-neutral-600">Jan 28, 2026</td>
+                                <td class="px-5 py-4 text-sm text-neutral-900 font-medium text-right">12,450,000₫</td>
+                                <td class="px-5 py-4">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button onclick="event.stopPropagation(); openGuestProfile('anna-schmidt')" class="p-2 rounded-lg hover:bg-primary-100 text-neutral-600 hover:text-primary-600 transition-colors" aria-label="View profile">
+                                            <i data-lucide="user" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="event.stopPropagation();" class="p-2 rounded-lg hover:bg-primary-100 text-neutral-600 hover:text-primary-600 transition-colors" aria-label="Send message">
+                                            <i data-lucide="message-circle" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Row 5: Past Guest -->
+                            <tr class="hover:bg-primary-50 transition-colors cursor-pointer" onclick="openGuestProfile('kevin-park')">
+                                <td class="px-5 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-700 font-medium text-sm">KP</div>
+                                        <div>
+                                            <span class="font-medium text-neutral-900 block">Kevin Park</span>
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-neutral-100 text-neutral-600 mt-0.5">Past</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-5 py-4 text-sm text-neutral-600">kevin.park@icloud.com</td>
+                                <td class="px-5 py-4 text-sm text-neutral-600">+82 10-1234-5678</td>
+                                <td class="px-5 py-4 text-sm text-neutral-900 font-medium text-center">3</td>
+                                <td class="px-5 py-4 text-sm text-neutral-600">Jan 20, 2026</td>
+                                <td class="px-5 py-4 text-sm text-neutral-900 font-medium text-right">2,100,000₫</td>
+                                <td class="px-5 py-4">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button onclick="event.stopPropagation(); openGuestProfile('kevin-park')" class="p-2 rounded-lg hover:bg-primary-100 text-neutral-600 hover:text-primary-600 transition-colors" aria-label="View profile">
+                                            <i data-lucide="user" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="event.stopPropagation();" class="p-2 rounded-lg hover:bg-primary-100 text-neutral-600 hover:text-primary-600 transition-colors" aria-label="Send message">
+                                            <i data-lucide="message-circle" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+
+                            <!-- Row 6: Upcoming Guest -->
+                            <tr class="hover:bg-primary-50 transition-colors cursor-pointer" onclick="openGuestProfile('emma-wilson')">
+                                <td class="px-5 py-4">
+                                    <div class="flex items-center gap-3">
+                                        <div class="w-10 h-10 rounded-full bg-teal-100 flex items-center justify-center text-teal-700 font-medium text-sm">EW</div>
+                                        <div>
+                                            <span class="font-medium text-neutral-900 block">Emma Wilson</span>
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-100 text-blue-700 mt-0.5">Upcoming</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="px-5 py-4 text-sm text-neutral-600">emma.w@yahoo.co.uk</td>
+                                <td class="px-5 py-4 text-sm text-neutral-600">+44 7700 900123</td>
+                                <td class="px-5 py-4 text-sm text-neutral-900 font-medium text-center">1</td>
+                                <td class="px-5 py-4 text-sm text-neutral-600">Feb 8, 2026</td>
+                                <td class="px-5 py-4 text-sm text-neutral-900 font-medium text-right">950,000₫</td>
+                                <td class="px-5 py-4">
+                                    <div class="flex items-center justify-center gap-1">
+                                        <button onclick="event.stopPropagation(); openGuestProfile('emma-wilson')" class="p-2 rounded-lg hover:bg-primary-100 text-neutral-600 hover:text-primary-600 transition-colors" aria-label="View profile">
+                                            <i data-lucide="user" class="w-4 h-4"></i>
+                                        </button>
+                                        <button onclick="event.stopPropagation();" class="p-2 rounded-lg hover:bg-primary-100 text-neutral-600 hover:text-primary-600 transition-colors" aria-label="Send message">
+                                            <i data-lucide="message-circle" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Pagination -->
+                <div class="px-5 py-4 border-t border-neutral-100 flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <p class="text-sm text-neutral-500">Showing 1-6 of 248 results</p>
+                    <div class="flex items-center gap-1">
+                        <button class="p-2 rounded-lg hover:bg-neutral-100 text-neutral-400 transition-colors disabled:opacity-50" disabled aria-label="Previous page">
+                            <i data-lucide="chevron-left" class="w-4 h-4"></i>
+                        </button>
+                        <button class="w-8 h-8 rounded-lg bg-primary-500 text-white text-sm font-medium">1</button>
+                        <button class="w-8 h-8 rounded-lg hover:bg-neutral-100 text-neutral-600 text-sm font-medium transition-colors">2</button>
+                        <button class="w-8 h-8 rounded-lg hover:bg-neutral-100 text-neutral-600 text-sm font-medium transition-colors">3</button>
+                        <span class="px-1 text-neutral-400">...</span>
+                        <button class="w-8 h-8 rounded-lg hover:bg-neutral-100 text-neutral-600 text-sm font-medium transition-colors">42</button>
+                        <button class="p-2 rounded-lg hover:bg-neutral-100 text-neutral-600 transition-colors" aria-label="Next page">
+                            <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+        </main>
+
+        <!-- Footer -->
+        <footer class="px-4 lg:px-6 py-4 border-t border-neutral-200 bg-white">
+            <p class="text-sm text-neutral-500 text-center">
+                &copy; 2026 HostelViet. All rights reserved.
+            </p>
+        </footer>
+    </div>
+
+    <!-- ==================== GUEST PROFILE SIDEBAR/MODAL ==================== -->
+    <!--
+        ANNOTATION: Slide-in panel from right side
+        - Overlay background with click-to-close
+        - Guest avatar (large), name, email, phone
+        - ID verification status badge (Verified/Pending/Unverified)
+        - Booking history list (3 items with property, dates, amount)
+        - Notes section with editable textarea
+        - Total spent lifetime summary
+        - Send message button (primary action)
+        - Close button (X) in header
+    -->
+    <div id="profileOverlay" class="profile-overlay fixed inset-0 bg-neutral-900/50 z-50" onclick="closeGuestProfile()"></div>
+
+    <aside id="profileSidebar" class="profile-sidebar fixed right-0 top-0 h-full w-full sm:w-[420px] bg-white z-50 shadow-2xl flex flex-col overflow-y-auto">
+
+        <!-- Profile Header -->
+        <div class="sticky top-0 bg-white border-b border-neutral-200 px-5 py-4 flex items-center justify-between">
+            <h2 class="font-heading font-semibold text-lg text-neutral-900">Guest Profile</h2>
+            <button onclick="closeGuestProfile()" class="p-2 -mr-2 rounded-lg hover:bg-neutral-100 transition-colors" aria-label="Close profile">
+                <i data-lucide="x" class="w-5 h-5 text-neutral-600"></i>
+            </button>
+        </div>
+
+        <!-- Profile Content -->
+        <div class="flex-1 p-5 space-y-6">
+
+            <!-- Guest Info Card -->
+            <div class="text-center">
+                <!-- Large Avatar -->
+                <div class="w-20 h-20 rounded-full bg-purple-100 flex items-center justify-center text-purple-700 font-bold text-2xl mx-auto mb-3">
+                    JD
+                </div>
+                <h3 class="font-heading font-semibold text-xl text-neutral-900">John Doe</h3>
+
+                <!-- ID Verification Badge -->
+                <div class="inline-flex items-center gap-1.5 px-2.5 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium mt-2">
+                    <i data-lucide="shield-check" class="w-3.5 h-3.5"></i>
+                    <span>ID Verified</span>
+                </div>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="space-y-3">
+                <div class="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg">
+                    <div class="w-9 h-9 rounded-lg bg-primary-50 flex items-center justify-center">
+                        <i data-lucide="mail" class="w-4 h-4 text-primary-500"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-neutral-500">Email</p>
+                        <p class="text-sm font-medium text-neutral-900">john.doe@email.com</p>
+                    </div>
+                </div>
+                <div class="flex items-center gap-3 p-3 bg-neutral-50 rounded-lg">
+                    <div class="w-9 h-9 rounded-lg bg-primary-50 flex items-center justify-center">
+                        <i data-lucide="phone" class="w-4 h-4 text-primary-500"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs text-neutral-500">Phone</p>
+                        <p class="text-sm font-medium text-neutral-900">+1 555-0123</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats Summary -->
+            <div class="grid grid-cols-2 gap-3">
+                <div class="p-4 bg-secondary-500/10 rounded-lg text-center">
+                    <p class="text-2xl font-heading font-bold text-secondary-600">5</p>
+                    <p class="text-xs text-neutral-600 mt-0.5">Total Stays</p>
+                </div>
+                <div class="p-4 bg-primary-50 rounded-lg text-center">
+                    <p class="text-2xl font-heading font-bold text-primary-600">4,250,000₫</p>
+                    <p class="text-xs text-neutral-600 mt-0.5">Lifetime Spent</p>
+                </div>
+            </div>
+
+            <!-- Booking History -->
+            <div>
+                <h4 class="font-heading font-semibold text-neutral-900 mb-3">Booking History</h4>
+                <div class="space-y-2">
+                    <!-- Booking 1: Current -->
+                    <div class="p-3 border border-neutral-200 rounded-lg hover:border-primary-200 transition-colors">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <p class="font-medium text-sm text-neutral-900">Sunset Beach Hostel</p>
+                                <p class="text-xs text-neutral-500 mt-0.5">Dorm A - Bed 4</p>
+                                <p class="text-xs text-neutral-400 mt-1">Feb 3 - Feb 7, 2026</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-green-100 text-green-700">Current</span>
+                                <p class="text-sm font-medium text-neutral-900 mt-1">850,000₫</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Booking 2: Past -->
+                    <div class="p-3 border border-neutral-200 rounded-lg hover:border-primary-200 transition-colors">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <p class="font-medium text-sm text-neutral-900">Old Quarter Hostel</p>
+                                <p class="text-xs text-neutral-500 mt-0.5">Private Room 3</p>
+                                <p class="text-xs text-neutral-400 mt-1">Jan 15 - Jan 20, 2026</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-neutral-100 text-neutral-600">Completed</span>
+                                <p class="text-sm font-medium text-neutral-900 mt-1">1,500,000₫</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Booking 3: Past -->
+                    <div class="p-3 border border-neutral-200 rounded-lg hover:border-primary-200 transition-colors">
+                        <div class="flex items-start justify-between gap-3">
+                            <div>
+                                <p class="font-medium text-sm text-neutral-900">Sunset Beach Hostel</p>
+                                <p class="text-xs text-neutral-500 mt-0.5">Dorm B - Bed 2</p>
+                                <p class="text-xs text-neutral-400 mt-1">Dec 22 - Dec 28, 2025</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-neutral-100 text-neutral-600">Completed</span>
+                                <p class="text-sm font-medium text-neutral-900 mt-1">1,200,000₫</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <button class="w-full mt-3 text-sm text-primary-500 hover:text-primary-600 font-medium transition-colors">
+                    View all bookings
+                </button>
+            </div>
+
+            <!-- Notes Section -->
+            <div>
+                <h4 class="font-heading font-semibold text-neutral-900 mb-3">Notes</h4>
+                <textarea
+                    placeholder="Add private notes about this guest..."
+                    class="w-full h-24 p-3 bg-neutral-50 border border-neutral-200 rounded-lg text-sm placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 resize-none transition-all"
+                >Friendly guest, prefers top bunk. Vegetarian meals. Has visited 5 times and always tips housekeeping staff.</textarea>
+                <p class="text-xs text-neutral-400 mt-1.5">Only visible to you and your staff</p>
+            </div>
+        </div>
+
+        <!-- Profile Actions (Sticky Footer) -->
+        <div class="sticky bottom-0 bg-white border-t border-neutral-200 p-4 flex gap-3">
+            <button class="flex-1 flex items-center justify-center gap-2 h-11 px-4 bg-primary-500 text-white rounded-lg font-medium hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-all">
+                <i data-lucide="message-circle" class="w-4 h-4"></i>
+                <span>Send Message</span>
+            </button>
+            <button class="flex items-center justify-center gap-2 h-11 px-4 bg-transparent text-neutral-700 border border-neutral-200 rounded-lg font-medium hover:bg-neutral-50 focus:outline-none focus:ring-2 focus:ring-neutral-400 focus:ring-offset-2 transition-all">
+                <i data-lucide="edit-3" class="w-4 h-4"></i>
+                <span>Edit</span>
+            </button>
+        </div>
+    </aside>
+
+    <!-- ==================== JAVASCRIPT ==================== -->
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Sidebar toggle functionality
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const collapseIcon = document.getElementById('collapseIcon');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        let isCollapsed = false;
+        let isMobileOpen = false;
+
+        function toggleSidebar() {
+            isCollapsed = !isCollapsed;
+
+            if (isCollapsed) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('sidebar-collapsed');
+                collapseIcon.setAttribute('data-lucide', 'panel-left-open');
+            } else {
+                sidebar.classList.remove('collapsed');
+                mainContent.classList.remove('sidebar-collapsed');
+                collapseIcon.setAttribute('data-lucide', 'panel-left-close');
+            }
+
+            // Re-render the icon
+            lucide.createIcons();
+        }
+
+        function toggleMobileSidebar() {
+            isMobileOpen = !isMobileOpen;
+
+            if (isMobileOpen) {
+                sidebar.classList.remove('-translate-x-full');
+                sidebarOverlay.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                sidebarOverlay.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Export dropdown functionality
+        function toggleExportDropdown() {
+            const dropdown = document.getElementById('exportDropdown');
+            dropdown.classList.toggle('hidden');
+        }
+
+        // Close export dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const exportBtn = document.getElementById('exportBtn');
+            const exportDropdown = document.getElementById('exportDropdown');
+
+            if (!exportBtn.contains(event.target) && !exportDropdown.contains(event.target)) {
+                exportDropdown.classList.add('hidden');
+            }
+        });
+
+        // Guest Profile Sidebar functionality
+        const profileOverlay = document.getElementById('profileOverlay');
+        const profileSidebar = document.getElementById('profileSidebar');
+
+        function openGuestProfile(guestId) {
+            profileOverlay.classList.add('active');
+            profileSidebar.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            // In a real app, you would fetch guest data by guestId here
+            console.log('Opening profile for guest:', guestId);
+        }
+
+        function closeGuestProfile() {
+            profileOverlay.classList.remove('active');
+            profileSidebar.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // Close profile on Escape key
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                closeGuestProfile();
+            }
+        });
+
+        // Close mobile sidebar on window resize to desktop
+        window.addEventListener('resize', () => {
+            if (window.innerWidth >= 1024 && isMobileOpen) {
+                toggleMobileSidebar();
+            }
+        });
+    </script>
+
+</body>
+</html>
